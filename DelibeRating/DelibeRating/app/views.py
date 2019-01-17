@@ -39,8 +39,21 @@ def about(request):
         request,
         'app/about.html',
         {
-            'title':'About',
-            'message':'Your application description page.',
+            'title':'About Us',
+            'message':'\'Us\' is more of \'I\', actually...',
+            'year':datetime.now().year,
+        }
+    )
+
+def todo(request):
+    """Renders the todo page."""
+    assert isinstance(request, HttpRequest)
+    return render(
+        request,
+        'app/todo.html',
+        {
+            'title':'ToDo',
+            'message':'This has not been implemented.',
             'year':datetime.now().year,
         }
     )
