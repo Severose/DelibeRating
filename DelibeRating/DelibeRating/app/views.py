@@ -6,6 +6,7 @@ from django.shortcuts import render
 from django.http import HttpRequest
 from django.template import RequestContext
 from datetime import datetime
+from django.contrib.auth.forms import UserCreationForm
 
 def home(request):
     """Renders the home page."""
@@ -55,5 +56,30 @@ def todo(request):
             'title':'ToDo',
             'message':'This has not been implemented.',
             'year':datetime.now().year,
+        }
+    )
+
+def register(request):
+    """Renders the register page."""
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            username = form.cleaned_data.get('username')
+            raw_password = form.cleaned_data.get('password1')
+            user = authenticate(username=username, password=raw_password)
+            login(request, user)
+            return redirect('home')
+    else:
+        form = UserCreationForm()
+    assert isinstance(request, HttpRequest)
+    return render(
+        request,
+        'app/register.html',
+        {
+            'title':'Register',
+            'message':'Register a new user account.',
+            'year':datetime.now().year,
+            'form':form,
         }
     )

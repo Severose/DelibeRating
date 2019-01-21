@@ -20,6 +20,7 @@ urlpatterns = [
     url(r'^contact$', app.views.contact, name='contact'),
     url(r'^about', app.views.about, name='about'),
     url(r'^todo', app.views.todo, name='todo'),
+    url(r'^register', app.views.register, name='register'),
     url(r'^login/$',
         django.contrib.auth.views.login,
         {
