@@ -5,6 +5,7 @@ Definition of urls for DelibeRating.
 from datetime import datetime
 from django.conf.urls import url
 import django.contrib.auth.views
+from django.contrib.auth.models import User
 
 import app.forms
 import app.views

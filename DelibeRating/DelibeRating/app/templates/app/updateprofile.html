@@ -6,7 +6,8 @@
 <div class="row">
     {% csrf_token %}
     {{ user_form }}
-    <button type="submit">Create New User Account</button>
+    {{ profile_form }}
+    <button type="submit">Update Profile</button>
 </div>
 
 {% endblock %}

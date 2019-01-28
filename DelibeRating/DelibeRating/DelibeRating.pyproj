@@ -58,6 +58,7 @@
   <ItemGroup>
     <Content Include="app\templates\app\register.html" />
     <Content Include="app\templates\app\todo.html" />
+    <Content Include="app\templates\app\updateprofile.html" />
     <Content Include="DelibeRating\web.config" />
     <Content Include="requirements.txt" />
     <Content Include="db.sqlite3" />
