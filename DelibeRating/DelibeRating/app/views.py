@@ -2,14 +2,16 @@
 Definition of views.
 """
 
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpRequest
 from django.template import RequestContext
 from datetime import datetime
 from app.forms import *
+from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
+from django.contrib import messages
 
 def home(request):
     """Renders the home page."""
@@ -25,6 +27,14 @@ def home(request):
 
 def contact(request):
     """Renders the contact page."""
+    if request.method == 'POST':
+        form = ContactForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.add_message(request, messages.INFO, 'Feedback Submitted.')
+            return redirect('contact')
+    else:
+        form = ContactForm()
     assert isinstance(request, HttpRequest)
     return render(
         request,
@@ -33,6 +43,7 @@ def contact(request):
             'title':'Contact',
             'message':'Your contact page.',
             'year':datetime.now().year,
+            'form':ContactForm,
         }
     )
 
@@ -50,7 +61,8 @@ def about(request):
     )
 
 def login(request):
-    """Renders the todo page."""
+    """Renders the login page."""
+    print("Login View")
     assert isinstance(request, HttpRequest)
     return render(
         request,
@@ -62,50 +74,24 @@ def login(request):
         }
     )
 
-@login_required
-@transaction.atomic
-def update_profile(request, user_id):
-    """Renders the update_profile page."""
-    if request.method == 'POST':
-        user_form = UserForm(requiest.POST, instance=request.user)
-        profile_form = ProfileForm(request.POST, instance=request.user.profile)
-        if user_form.is_valid() and profile_form.is_valid():
-            user_form.save()
-            profile_form.save()
-
-            messages.success(request, _('Your profile was successfully updated!'))
-            return redirect('settings:profile')
-        else:
-            messages.error(request, _('Please correct the error below.'))
-    else:
-        user_form = UserForm(instance=request.user)
-        profile_form = ProfileForm(instance=request.user.profile)
-    assert isinstance(request, HttpRequest)
-    return render(
-        request,
-        'profiles/profile.html', {
-            'title':'Update Profile',
-            'message':'Update your account profile.',
-            'year':datetime.now().year,
-            'user_form': user_form,
-            'profile_form': profile_form
-        })
-
 def register(request):
     """Renders the register page."""
+    print("Register View")
+    print(request)
     if request.method == 'POST':
-        user_form = UserAccountForm(request.POST)
-        profile_form = ProfileForm(request.POST)
-        if user_form.is_valid() and profile_form.is_valid():
-            user_form.save()
-            profile_form.save()
-            messages.success(request, _('Your account was successfully created!'))
+        print("POST Request")
+        form = CustomUserCreationForm(request.POST)
+        if form.is_valid():
+            print("Form Valid... Saving")
+            form.save()
+            messages.success(request, 'Your account was successfully created!')
             return redirect('login')
         else:
-            messages.error(request, _('Please correct the error below.'))
+            print("Error")
+            messages.error(request, 'Please correct the error below.')
     else:
-        user_form = UserAccountForm()
-        profile_form = ProfileForm()
+        print("GET Request")
+        form = CustomUserCreationForm()
     assert isinstance(request, HttpRequest)
     return render(
         request,
@@ -114,8 +100,7 @@ def register(request):
             'title':'Register',
             'message':'Register a new user account.',
             'year':datetime.now().year,
-            'user_form': user_form,
-            'profile_form': profile_form
+            'form':CustomUserCreationForm
         }
     )
 
