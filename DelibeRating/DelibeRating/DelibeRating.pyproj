@@ -21,6 +21,8 @@
     <DjangoSettingsModule>DelibeRating.settings</DjangoSettingsModule>
     <OutputPath>.</OutputPath>
     <SuppressCollectPythonCloudServiceFiles>true</SuppressCollectPythonCloudServiceFiles>
+    <PythonRunWebServerCommandArguments>runserver --settings DelibeRating.settings.prod %SERVER_PORT% $(CommandLineArguments)</PythonRunWebServerCommandArguments>
+    <PythonDebugWebServerCommandArguments>runserver --noreload --settings DelibeRating.settings.dev %SERVER_PORT% $(CommandLineArguments)</PythonDebugWebServerCommandArguments>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -37,9 +39,11 @@
     <Compile Include="app\views.py" />
     <Compile Include="app\__init__.py" />
     <Compile Include="app\migrations\__init__.py" />
+    <Compile Include="DelibeRating\settings\dev.py" />
+    <Compile Include="DelibeRating\settings\prod.py" />
     <Compile Include="manage.py" />
     <Compile Include="DelibeRating\__init__.py" />
-    <Compile Include="DelibeRating\settings.py" />
+    <Compile Include="DelibeRating\settings\base.py" />
     <Compile Include="DelibeRating\urls.py" />
     <Compile Include="DelibeRating\wsgi.py" />
   </ItemGroup>
@@ -54,11 +58,18 @@
     <Folder Include="app\templates\" />
     <Folder Include="app\templates\app\" />
     <Folder Include="DelibeRating\" />
+    <Folder Include="DelibeRating\settings\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="app\templates\app\register.html" />
     <Content Include="app\templates\app\todo.html" />
     <Content Include="app\templates\app\updateprofile.html" />
+    <Content Include="DelibeRating\dev.env">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="DelibeRating\prod.env">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="DelibeRating\web.config" />
     <Content Include="requirements.txt" />
     <Content Include="db.sqlite3" />

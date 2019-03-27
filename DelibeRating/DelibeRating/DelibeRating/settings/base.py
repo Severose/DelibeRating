@@ -10,21 +10,36 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.9/ref/settings/
 """
 
+
 import os
+from os.path import join, dirname
+import sys
 import posixpath
+from app import models
+from dotenv import load_dotenv
+from django.core.exceptions import ImproperlyConfigured
+
+def get_env_variable(var_name):
+    try:
+        return os.environ[var_name]
+    except KeyError:
+        error_msg = "Set the %s environment variable" % var_name
+        raise ImproperlyConfigured(error_msg)
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+dotenv_path = join(dirname(__file__), 'dev.env')
+load_dotenv(dotenv_path)
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.9/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '3567b5a5-a632-48d7-ad5e-1d5351ec853d'
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+SECRET_KEY = get_env_variable("SECRET_KEY")
+DB_NAME = get_env_variable("DB_NAME")
+DB_USER = get_env_variable("DB_USER")
+DB_PASS = get_env_variable("DB_PASS")
 
 ALLOWED_HOSTS = []
 
@@ -34,6 +49,7 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     'app',
     # Add your apps here to enable them
+    'DelibeRating.CustomUser',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -80,9 +96,9 @@ WSGI_APPLICATION = 'DelibeRating.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'deliberating',
-        'USER': 'nathanrcobb',
-        'PASSWORD': 'DelibeRatedNate',
+        'NAME': 'DB_NAME',
+        'USER': 'DB_USER',
+        'PASSWORD': 'DB_PASS',
         'HOST': '127.0.0.1',
         'PORT': '5432',
     }
@@ -106,6 +122,8 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
+AUTH_USER_MODEL = 'DelibeRating.CustomUser'
 
 # Login
 LOGIN_REDIRECT_URL = '/'

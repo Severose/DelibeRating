@@ -5,9 +5,10 @@ Definition of forms.
 from django import forms
 from app.models import *
 from django.forms import ModelForm
+from django.contrib.auth.forms import AuthenticationForm, UserCreationForm, UserChangeForm
 from django.utils.translation import ugettext_lazy as _
 
-class CustomUserAuthenticationForm(ModelForm):
+class CustomUserAuthenticationForm(AuthenticationForm):
 
     username = forms.CharField(label='Username', min_length=4, max_length=150)
     password = forms.CharField(label='Password', widget=forms.PasswordInput)
@@ -24,13 +25,13 @@ class CustomUserAuthenticationForm(ModelForm):
         return password
 
     class Meta:
-        model = User
+        model = CustomUser
         fields = ("username", "password")
 
-class CustomUserCreationForm(ModelForm):
+class CustomUserCreationForm(UserCreationForm):
 
     class Meta:
-        model = User
+        model = CustomUser
         fields = ("username", "password", "email", "first_name", "last_name")
  
     def clean_username(self):
@@ -66,8 +67,7 @@ class CustomUserCreationForm(ModelForm):
         )
         return new_user
 
-class ContactForm(forms.ModelForm):
-
+class CustomUserChangeForm(UserChangeForm):
     class Meta:
-        model = Contact
-        fields = '__all__'
+        model = CustomUser
+        fields = ("username", "password", "email", "first_name", "last_name")

@@ -4,8 +4,10 @@ Definition of urls for DelibeRating.
 
 from datetime import datetime
 from django.conf.urls import url
-import django.contrib.auth.views
-from django.contrib.auth.models import User
+from django.contrib.auth import views as auth_views
+from app import views as app_views
+from app import forms as app_forms
+from django.contrib.auth.models import AbstractUser
 
 import app.forms
 import app.views
@@ -22,10 +24,10 @@ urlpatterns = [
     url(r'^about', app.views.about, name='about'),
     url(r'^todo', app.views.todo, name='todo'),
     url(r'^login/$',
-        django.contrib.auth.views.login,
+        auth_views.login,
         {
             'template_name': 'app/login.html',
-            'authentication_form': django.contrib.auth.forms.AuthenticationForm,
+            'authentication_form': app_views.CustomUserAuthenticationForm,
             'extra_context':
             {
                 'title': 'Log in',
@@ -34,7 +36,7 @@ urlpatterns = [
         },
         name='login'),
     url(r'^logout$',
-        django.contrib.auth.views.logout,
+        auth_views.logout,
         {
             'next_page': '/',
         },
