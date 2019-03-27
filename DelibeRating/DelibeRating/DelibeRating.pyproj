@@ -18,7 +18,8 @@
     <WorkingDirectory>.</WorkingDirectory>
     <WebBrowserUrl>http://localhost</WebBrowserUrl>
     <LaunchProvider>Django launcher</LaunchProvider>
-    <DjangoSettingsModule>DelibeRating.settings</DjangoSettingsModule>
+    <DjangoSettingsModule>
+    </DjangoSettingsModule>
     <OutputPath>.</OutputPath>
     <SuppressCollectPythonCloudServiceFiles>true</SuppressCollectPythonCloudServiceFiles>
     <PythonRunWebServerCommandArguments>runserver --settings DelibeRating.settings.prod %SERVER_PORT% $(CommandLineArguments)</PythonRunWebServerCommandArguments>
