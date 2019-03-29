@@ -12,34 +12,21 @@ https://docs.djangoproject.com/en/1.9/ref/settings/
 
 
 import os
-from os.path import join, dirname
 import sys
 import posixpath
-from app import models
-from dotenv import load_dotenv
+import json
+from os.path import join, dirname
 from django.core.exceptions import ImproperlyConfigured
+from django.conf import settings
+from django.contrib.auth.hashers import check_password
 
-def get_env_variable(var_name):
-    try:
-        return os.environ[var_name]
-    except KeyError:
-        error_msg = "Set the %s environment variable" % var_name
-        raise ImproperlyConfigured(error_msg)
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-dotenv_path = join(dirname(__file__), 'dev.env')
-load_dotenv(dotenv_path)
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.9/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = get_env_variable("SECRET_KEY")
-DB_NAME = get_env_variable("DB_NAME")
-DB_USER = get_env_variable("DB_USER")
-DB_PASS = get_env_variable("DB_PASS")
 
 ALLOWED_HOSTS = []
 
@@ -47,15 +34,14 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'app',
     # Add your apps here to enable them
-    'DelibeRating.CustomUser',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'app',
 ]
 
 MIDDLEWARE_CLASSES = [
@@ -90,20 +76,6 @@ TEMPLATES = [
 WSGI_APPLICATION = 'DelibeRating.wsgi.application'
 
 
-# Database
-# https://docs.djangoproject.com/en/1.9/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'DB_NAME',
-        'USER': 'DB_USER',
-        'PASSWORD': 'DB_PASS',
-        'HOST': '127.0.0.1',
-        'PORT': '5432',
-    }
-}
-
 
 # Password validation
 # https://docs.djangoproject.com/en/1.9/ref/settings/#auth-password-validators
@@ -123,7 +95,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-AUTH_USER_MODEL = 'DelibeRating.CustomUser'
+AUTH_USER_MODEL = 'app.CustomUser'
 
 # Login
 LOGIN_REDIRECT_URL = '/'

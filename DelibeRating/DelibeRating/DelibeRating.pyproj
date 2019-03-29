@@ -40,6 +40,12 @@
     <Compile Include="app\views.py" />
     <Compile Include="app\__init__.py" />
     <Compile Include="app\migrations\__init__.py" />
+    <Compile Include="DelibeRating\admin.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DelibeRating\backends.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="DelibeRating\settings\dev.py" />
     <Compile Include="DelibeRating\settings\prod.py" />
     <Compile Include="manage.py" />
@@ -65,10 +71,10 @@
     <Content Include="app\templates\app\register.html" />
     <Content Include="app\templates\app\todo.html" />
     <Content Include="app\templates\app\updateprofile.html" />
-    <Content Include="DelibeRating\dev.env">
+    <Content Include="DelibeRating\settings\dev.json">
       <SubType>Code</SubType>
     </Content>
-    <Content Include="DelibeRating\prod.env">
+    <Content Include="DelibeRating\settings\prod.json">
       <SubType>Code</SubType>
     </Content>
     <Content Include="DelibeRating\web.config" />

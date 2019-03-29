@@ -7,7 +7,6 @@ from django.conf.urls import url
 from django.contrib.auth import views as auth_views
 from app import views as app_views
 from app import forms as app_forms
-from django.contrib.auth.models import AbstractUser
 
 import app.forms
 import app.views
