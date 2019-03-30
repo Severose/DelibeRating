@@ -11,11 +11,15 @@
                 <h4>Use a local account to log in.</h4>
                 {{ form.as_p }}
                 <input type="submit" value="Log in" class="btn btn-default" />
-                <a href="{% url 'register' %}">Register</a>
 
                 {% if form.errors %}
                 <p class="validation-summary-errors">Please enter a correct user name and password.</p>
                 {% endif %}
+            </form>
+            
+            <form action="{% url 'register' %}" method="post" class="form-horizontal">
+                {% csrf_token %}
+                <button class="btn btn-default">Register</button>
             </form>
         </section>
     </div>

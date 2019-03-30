@@ -33,3 +33,5 @@ DATABASES = {
         'PORT': '5432',
     }
 }
+
+settings.configure()

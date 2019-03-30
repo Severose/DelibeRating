@@ -7,8 +7,7 @@ from django.http import HttpRequest
 from django.template import RequestContext
 from datetime import datetime
 from app.forms import *
-from django.contrib.auth.forms import AuthenticationForm
-from django.contrib.auth.models import User
+from django.contrib.auth import login, authenticate
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.contrib import messages
@@ -84,10 +83,15 @@ def register(request):
         if form.is_valid():
             print("Form Valid... Saving")
             form.save()
+            #("username", "password", "email", "first_name", "last_name")
+            username = CustomUserCreationForm('username')
+            raw_password = form.cleaned_data.get('password1')
+            user = authenticate(username=username, password=raw_password)
+            login(request,user)
             messages.success(request, 'Your account was successfully created!')
-            return redirect('login')
+            return redirect('index')
         else:
-            print("Error")
+            print("Error: Form Invalid")
             messages.error(request, 'Please correct the error below.')
     else:
         print("GET Request")

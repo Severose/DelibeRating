@@ -36,14 +36,14 @@ class CustomUserCreationForm(UserCreationForm):
  
     def clean_username(self):
         username = self.cleaned_data['username'].lower()
-        r = User.objects.filter(username=username)
+        r = CustomUser.objects.filter(username=username)
         if r.count():
             raise  ValidationError("Username already exists")
         return username
  
     def clean_email(self):
         email = self.cleaned_data['email'].lower()
-        r = User.objects.filter(email=email)
+        r = CustomUser.objects.filter(email=email)
         if r.count():
             raise  ValidationError("Email already exists")
         return email
@@ -58,7 +58,7 @@ class CustomUserCreationForm(UserCreationForm):
         return password2
  
     def save(self, commit=True):
-        new_user = User.objects.create_user(
+        new_user = CustomUser.objects.create_user(
             self.cleaned_data['username'],
             self.cleaned_data['email'],
             #self.cleaned_data['password2'],
