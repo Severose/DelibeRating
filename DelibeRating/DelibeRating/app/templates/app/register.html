@@ -10,6 +10,8 @@
                 {% csrf_token %}
                 <h4>Create a new account</h4>
                 {{ form.as_p }}
+                {{ form.errors }}
+                {{ form.non_field_errors }}
                 <!--<h5>or 
                     <a href="% url 'login' %">sign in to your account</a>
                 </h5>

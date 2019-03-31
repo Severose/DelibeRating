@@ -10,10 +10,13 @@ from django.dispatch import receiver
 
 # Create your models here.
 class CustomUser(AbstractUser):
-    identifier = models.CharField(max_length=40, unique=True)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL)
-    USERNAME_FIELD = 'identifier'
+    username = models.CharField(max_length=254,primary_key=True)
+    email = models.CharField(max_length=254)
+    password = models.CharField(max_length=40)
+    first_name = models.CharField(max_length=50)
+    last_name = models.CharField(max_length=50)
 
     class Meta:
-        verbose_name = ('user')
-        verbose_name_plural = ('users')
+        #verbose_name = ('user')
+        managed = False
+        db_table = 'app_customuser'

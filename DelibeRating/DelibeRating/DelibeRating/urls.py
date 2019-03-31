@@ -5,6 +5,7 @@ Definition of urls for DelibeRating.
 from datetime import datetime
 from django.conf.urls import url
 from django.contrib.auth import views as auth_views
+from django.views.generic import RedirectView
 from app import views as app_views
 from app import forms as app_forms
 
@@ -18,6 +19,7 @@ admin.autodiscover()
 
 urlpatterns = [
     # Examples:
+    url(r'^favicon\.ico$',RedirectView.as_view(url='/static/images/favicon.ico')),
     url(r'^$', app.views.home, name='home'),
     url(r'^contact$', app.views.contact, name='contact'),
     url(r'^about', app.views.about, name='about'),

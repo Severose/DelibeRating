@@ -79,14 +79,30 @@ def register(request):
     print(request)
     if request.method == 'POST':
         print("POST Request")
+        #form = CustomUserCreationForm(initial={
+        #    'username': 'Test123',
+        #    'email': 'nathanrcobb@gmail.com',
+        #    'password1': 'ThisIsATest',
+        #    'password2': 'ThisIsATest',
+        #    'first_name': 'Test',
+        #    'last_name': 'User',})
+        
+        #form.fields['username'].widget.render_value = True
+        #form.fields['email'].widget.render_value = True
+        #form.fields['password1'].widget.render_value = True
+        #form.fields['password2'].widget.render_value = True
+        #form.fields['first_name'].widget.render_value = True
+        #form.fields['last_name'].widget.render_value = True
+        #form.save()
+        #return redirect('index')
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
             print("Form Valid... Saving")
+            cd = form.cleaned_data
+            print(request)
             form.save()
-            #("username", "password", "email", "first_name", "last_name")
-            username = CustomUserCreationForm('username')
-            raw_password = form.cleaned_data.get('password1')
-            user = authenticate(username=username, password=raw_password)
+            user = authenticate(username=form.cleaned_data['username'],
+                                password=form.cleaned_data['password'])
             login(request,user)
             messages.success(request, 'Your account was successfully created!')
             return redirect('index')
@@ -104,7 +120,7 @@ def register(request):
             'title':'Register',
             'message':'Register a new user account.',
             'year':datetime.now().year,
-            'form':CustomUserCreationForm
+            'form':form
         }
     )
 

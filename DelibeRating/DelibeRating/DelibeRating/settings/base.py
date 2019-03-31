@@ -97,6 +97,8 @@ AUTH_PASSWORD_VALIDATORS = [
 
 AUTH_USER_MODEL = 'app.CustomUser'
 
+DATABASE_ROUTERS = ('app.db_router.DBRouter',)
+
 # Login
 LOGIN_REDIRECT_URL = '/'
 
