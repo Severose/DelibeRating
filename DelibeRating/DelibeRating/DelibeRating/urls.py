@@ -24,18 +24,7 @@ urlpatterns = [
     url(r'^contact$', app.views.contact, name='contact'),
     url(r'^about', app.views.about, name='about'),
     url(r'^todo', app.views.todo, name='todo'),
-    url(r'^login/$',
-        auth_views.login,
-        {
-            'template_name': 'app/login.html',
-            'authentication_form': app_views.CustomUserAuthenticationForm,
-            'extra_context':
-            {
-                'title': 'Log in',
-                'year': datetime.now().year,
-            }
-        },
-        name='login'),
+    url(r'^login/$', app_views.login, name='login'),
     url(r'^logout$',
         auth_views.logout,
         {

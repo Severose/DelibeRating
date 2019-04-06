@@ -10,17 +10,15 @@ from django.utils.translation import ugettext_lazy as _
 
 class CustomUserAuthenticationForm(AuthenticationForm):
 
-    username = forms.CharField(label='Username', min_length=4, max_length=150)
+    username = forms.CharField(label='Username', min_length=4, max_length=254)
     password = forms.CharField(label='Password', widget=forms.PasswordInput)
- 
-    def clean_username(self):
+
+    def clean(self):
+        cleaned_data = super().clean()
+        # Get username
         username = self.cleaned_data['username'].lower()
-        return username
- 
-    def clean_password2(self):
         password = self.cleaned_data.get('password')
-        #if
-        return password
+        return cleaned_data
 
     class Meta:
         model = CustomUser
@@ -28,41 +26,26 @@ class CustomUserAuthenticationForm(AuthenticationForm):
 
 class CustomUserCreationForm(UserCreationForm):
 
-    username = forms.CharField(max_length=254,
-                               widget=forms.TextInput({
-                                   'class': 'form-control',
-                                   'placeholder': 'Username'}))
-
-    email = forms.EmailField(max_length=254,
-                               widget=forms.TextInput({
-                                   'class': 'form-control',
-                                   'placeholder': 'A valid email address'}))
-
-    password1 = forms.CharField(label=_("Password"),
-                               widget=forms.PasswordInput({
-                                   'class': 'form-control',
-                                   'placeholder':'Password'}))
-
-    password2 = forms.CharField(label=_("Password Confirmation"),
-                               widget=forms.PasswordInput({
-                                   'class': 'form-control',
-                                   'placeholder':'Password confirmation'}))
-
-    first_name = forms.CharField(max_length=254,
-                               widget=forms.TextInput({
-                                   'class': 'form-control',
-                                   'placeholder': 'First name'}))
-
-    last_name = forms.CharField(max_length=254,
-                               widget=forms.TextInput({
-                                   'class': 'form-control',
-                                   'placeholder': 'Last name'}))
+    username = forms.CharField(label='Username', min_length=4, max_length=254)
+    email = forms.CharField(label='Email', max_length=254)
+    password1 = forms.CharField(label='Password', widget=forms.PasswordInput, max_length=254)
+    password2 = forms.CharField(label='Password (confirm)', widget=forms.PasswordInput, max_length=254)
+    first_name = forms.CharField(label='First name', max_length=254)
+    last_name = forms.CharField(label='Last name', max_length=254)
 
     class Meta:
         model = CustomUser
         fields = ("username", "password1", "password2", "email", "first_name", "last_name")
+        field_classes = {"username": forms.CharField,
+                         "password1": forms.CharField,
+                         "password2": forms.CharField,
+                         "email": forms.EmailField,
+                         "first_name": forms.CharField,
+                         "last_name": forms.CharField}
 
-    def cleaned_data(self):
+    def clean(self):
+        cleaned_data = super().clean()
+
         # Get username
         username = self.cleaned_data['username'].lower()
         r = CustomUser.objects.filter(username=username)
@@ -70,8 +53,8 @@ class CustomUserCreationForm(UserCreationForm):
             raise  ValidationError("Username already exists")
 
         # Get password
-        password1 = self.cleaned_data.get('password1')
-        password2 = self.cleaned_data.get('password2')
+        password1 = self.cleaned_data['password1']
+        password2 = self.cleaned_data['password2']
         if password1 and password2 and password1 != password2:
             raise ValidationError("Password don't match")
 
@@ -86,22 +69,19 @@ class CustomUserCreationForm(UserCreationForm):
         last_name = self.cleaned_data['last_name'].lower()
 
         # Combine all user data
-        return {
-            'username':   username,
-            'password2':  password2,
-            'email':      email,
-            'first_name': first_name,
-            'last_name': last_name,}
-
+        return cleaned_data
 
     def save(self, commit=True):
-        new_user = CustomUser.objects.create_user(
-            clean_username('username'),
-            clean_password2('password2'),
-            clean_email('email'),
-            clean_firstname('first_name'),
-            clean_lastname('last_name'),
-        )
+        new_user = super(CustomUserCreationForm, self).save(commit=False)
+        #new_user = CustomUser.objects.create_user(
+        new_user.username = clean_username('username')
+        new_user.password = clean_password2('password2')
+        new_user.email = clean_email('email')
+        new_user.first_name = clean_firstname('first_name')
+        new_user.last_name = clean_lastname('last_name')
+        print(new_user)
+        if commit:
+            new_user.save()
         return new_user
 
 class CustomUserChangeForm(UserChangeForm):

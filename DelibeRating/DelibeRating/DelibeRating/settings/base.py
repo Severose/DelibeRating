@@ -95,11 +95,15 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+PASSWORD_HASHERS = [
+    'django.contrib.auth.hashers.PBKDF2PasswordHasher',
+]
+
 AUTH_USER_MODEL = 'app.CustomUser'
 
 DATABASE_ROUTERS = ('app.db_router.DBRouter',)
 
-# Login
+# Redirects
 LOGIN_REDIRECT_URL = '/'
 
 

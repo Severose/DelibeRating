@@ -11,6 +11,8 @@ from django.contrib.auth import login, authenticate
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.contrib import messages
+from django.contrib.auth.hashers import PBKDF2PasswordHasher as hasher
+from django.contrib.auth.hashers import make_password
 
 def home(request):
     """Renders the home page."""
@@ -62,6 +64,23 @@ def about(request):
 def login(request):
     """Renders the login page."""
     print("Login View")
+    if request.method == 'POST':
+        print("Login: POST Request")
+        form = CustomUserAuthenticationForm(data=request.POST)
+        if form.is_valid():
+            print("Login: Form Valid")
+            user = authenticate(username=request.POST['username'].lower(),
+                                password=request.POST['password'])
+            login(request,user)
+            messages.success(request, 'You have been logged in!')
+            return redirect('/')
+        else:
+            print("Login: Form Invalid")
+            print(form.errors)
+            messages.error(request, 'Please correct the error below.')
+    else:
+        print("Login: GET Request")
+        form = CustomUserAuthenticationForm()
     assert isinstance(request, HttpRequest)
     return render(
         request,
@@ -69,48 +88,30 @@ def login(request):
         {
             'title':'Login',
             'message':'Login to your account.',
-            'year':datetime.now().year,
+            'form': form,
         }
     )
 
 def register(request):
     """Renders the register page."""
     print("Register View")
-    print(request)
     if request.method == 'POST':
-        print("POST Request")
-        #form = CustomUserCreationForm(initial={
-        #    'username': 'Test123',
-        #    'email': 'nathanrcobb@gmail.com',
-        #    'password1': 'ThisIsATest',
-        #    'password2': 'ThisIsATest',
-        #    'first_name': 'Test',
-        #    'last_name': 'User',})
-        
-        #form.fields['username'].widget.render_value = True
-        #form.fields['email'].widget.render_value = True
-        #form.fields['password1'].widget.render_value = True
-        #form.fields['password2'].widget.render_value = True
-        #form.fields['first_name'].widget.render_value = True
-        #form.fields['last_name'].widget.render_value = True
-        #form.save()
-        #return redirect('index')
-        form = CustomUserCreationForm(request.POST)
+        print("Register: POST Request")
+        form = CustomUserCreationForm(data=request.POST)
         if form.is_valid():
-            print("Form Valid... Saving")
-            cd = form.cleaned_data
-            print(request)
+            print("Register: Form Valid")
             form.save()
             user = authenticate(username=form.cleaned_data['username'],
                                 password=form.cleaned_data['password'])
             login(request,user)
             messages.success(request, 'Your account was successfully created!')
-            return redirect('index')
+            return redirect('/')
         else:
-            print("Error: Form Invalid")
+            print("Register: Form Invalid")
+            print(form.errors)
             messages.error(request, 'Please correct the error below.')
     else:
-        print("GET Request")
+        print("Register: GET Request")
         form = CustomUserCreationForm()
     assert isinstance(request, HttpRequest)
     return render(
@@ -119,7 +120,6 @@ def register(request):
         {
             'title':'Register',
             'message':'Register a new user account.',
-            'year':datetime.now().year,
             'form':form
         }
     )
