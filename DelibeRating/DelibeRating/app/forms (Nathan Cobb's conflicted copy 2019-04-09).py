@@ -10,26 +10,39 @@ from django.utils.translation import ugettext_lazy as _
 
 class CustomUserAuthenticationForm(AuthenticationForm):
 
-    class Meta:
-        model = CustomUser
-        fields = ("username", "password")
+    username = forms.CharField(label='Username', min_length=4, max_length=254)
+    password = forms.CharField(label='Password', widget=forms.PasswordInput)
 
-    """
     def clean(self):
         cleaned_data = super().clean()
         # Get username
         username = self.cleaned_data['username'].lower()
         password = self.cleaned_data.get('password')
         return cleaned_data
-    """
+
+    class Meta:
+        model = CustomUser
+        fields = ("username", "password")
 
 class CustomUserCreationForm(UserCreationForm):
+
+    username = forms.CharField(label='Username', min_length=4, max_length=254)
+    email = forms.CharField(label='Email', max_length=254)
+    password1 = forms.CharField(label='Password', widget=forms.PasswordInput, max_length=254)
+    password2 = forms.CharField(label='Password (confirm)', widget=forms.PasswordInput, max_length=254)
+    first_name = forms.CharField(label='First name', max_length=254)
+    last_name = forms.CharField(label='Last name', max_length=254)
 
     class Meta:
         model = CustomUser
         fields = ("username", "password1", "password2", "email", "first_name", "last_name")
+        field_classes = {"username": forms.CharField,
+                         "password1": forms.CharField,
+                         "password2": forms.CharField,
+                         "email": forms.EmailField,
+                         "first_name": forms.CharField,
+                         "last_name": forms.CharField}
 
-    """
     def clean(self):
         cleaned_data = super().clean()
 
@@ -70,10 +83,8 @@ class CustomUserCreationForm(UserCreationForm):
         if commit:
             new_user.save()
         return new_user
-    """
 
 class CustomUserChangeForm(UserChangeForm):
-
     class Meta:
         model = CustomUser
         fields = ("username", "password", "email", "first_name", "last_name")

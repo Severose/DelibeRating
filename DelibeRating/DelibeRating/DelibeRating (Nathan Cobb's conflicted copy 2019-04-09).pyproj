@@ -21,8 +21,8 @@
     <DjangoSettingsModule>$(MSBuildProjectName).settings.dev</DjangoSettingsModule>
     <OutputPath>.</OutputPath>
     <SuppressCollectPythonCloudServiceFiles>true</SuppressCollectPythonCloudServiceFiles>
-    <PythonRunWebServerCommandArguments>runserver --settings DelibeRating.settings.prod %SERVER_PORT% $(CommandLineArguments)</PythonRunWebServerCommandArguments>
-    <PythonDebugWebServerCommandArguments>runserver --noreload --settings DelibeRating.settings.dev %SERVER_PORT% $(CommandLineArguments)</PythonDebugWebServerCommandArguments>
+    <PythonRunWebServerCommandArguments>runserver --settings DelibeRating.settings.prod 127.0.0.1:5432 $(CommandLineArguments)</PythonRunWebServerCommandArguments>
+    <PythonDebugWebServerCommandArguments>runserver --noreload --settings DelibeRating.settings.dev 127.0.0.1:5432 $(CommandLineArguments)</PythonDebugWebServerCommandArguments>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -33,6 +33,9 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="app\db_router.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="app\forms.py" />
     <Compile Include="app\models.py" />
     <Compile Include="app\tests.py" />

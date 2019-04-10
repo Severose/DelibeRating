@@ -28,7 +28,8 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.9/howto/deployment/checklist/
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['0.0.0.0',
+                 '127.0.0.1']
 
 
 # Application definition
@@ -100,6 +101,8 @@ PASSWORD_HASHERS = [
 ]
 
 AUTH_USER_MODEL = 'app.CustomUser'
+
+DATABASE_ROUTERS = ('app.db_router.DBRouter',)
 
 # Redirects
 LOGIN_REDIRECT_URL = '/'
