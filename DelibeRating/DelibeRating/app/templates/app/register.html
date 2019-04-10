@@ -6,22 +6,35 @@
 <div class="row">
     <div class="col-md-8">
         <section id="registrationForm">
-            <form action="." method="post" class="form-horizontal">
+            <form action="{% url 'register' %}" method="post" class="form-horizontal">
                 {% csrf_token %}
                 <h4>Create a new account</h4>
                 {{ form.as_p }}
                 <input type="submit" value="Create new user account" class="btn btn-default" />
 
                 {% if form.errors %}
-                <p class="validation-summary-errors">Please enter a correct user name and password.</p>
+                    <div class="alert alert-error">
+                        <ul>
+                            {% for error in form.non_field_errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
                 {% endif %}
             </form>
         </section>
     </div>
 </div>
 
-{% endblock %}
+{% if messages %}
+<ul class="messages">
+    {% for message in messages %}
+    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
 
+{% endblock %}
 
 {% block scripts %}
 

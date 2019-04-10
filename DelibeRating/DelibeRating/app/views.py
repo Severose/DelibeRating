@@ -7,12 +7,14 @@ from django.http import HttpRequest
 from django.template import RequestContext
 from datetime import datetime
 from app.forms import *
-from django.contrib.auth import login, authenticate
+from django.contrib.auth import authenticate as auth_authenticate
+from django.contrib.auth import login as auth_login
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.contrib import messages
 from django.contrib.auth.hashers import PBKDF2PasswordHasher as hasher
 from django.contrib.auth.hashers import make_password
+from time import sleep
 
 def home(request):
     """Renders the home page."""
@@ -22,7 +24,6 @@ def home(request):
         'app/index.html',
         {
             'title':'Home Page',
-            'year':datetime.now().year,
         }
     )
 
@@ -43,7 +44,6 @@ def contact(request):
         {
             'title':'Contact',
             'message':'Your contact page.',
-            'year':datetime.now().year,
             'form':ContactForm,
         }
     )
@@ -57,7 +57,6 @@ def about(request):
         {
             'title':'About Me',
             'message':'A brief introduction.',
-            'year':datetime.now().year,
         }
     )
 
@@ -69,10 +68,10 @@ def login(request):
         form = CustomUserAuthenticationForm(data=request.POST)
         if form.is_valid():
             print("Login: Form Valid")
-            user = authenticate(username=request.POST['username'].lower(),
-                                password=request.POST['password'])
-            login(request,user)
-            messages.success(request, 'You have been logged in!')
+            user = auth_authenticate(username=request.POST['username'].lower(),
+                                     password=request.POST['password'])
+            auth_login(request,user)
+            print(request.user.last_login)
             return redirect('/')
         else:
             print("Login: Form Invalid")
@@ -101,9 +100,6 @@ def register(request):
         if form.is_valid():
             print("Register: Form Valid")
             form.save()
-            user = authenticate(username=form.cleaned_data['username'],
-                                password=form.cleaned_data['password'])
-            login(request,user)
             messages.success(request, 'Your account was successfully created!')
             return redirect('/')
         else:
@@ -120,7 +116,7 @@ def register(request):
         {
             'title':'Register',
             'message':'Register a new user account.',
-            'form':form
+            'form':form,
         }
     )
 
@@ -133,6 +129,5 @@ def todo(request):
         {
             'title':'ToDo',
             'message':'This has not been implemented.',
-            'year':datetime.now().year,
         }
     )
