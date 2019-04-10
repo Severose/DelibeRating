@@ -8,8 +8,10 @@ from django.template import RequestContext
 from datetime import datetime
 from app.forms import *
 from django.contrib.auth import authenticate as auth_authenticate
+from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth import login as auth_login
 from django.contrib.auth.decorators import login_required
+from django.contrib.admin.views.decorators import staff_member_required
 from django.db import transaction
 from django.contrib import messages
 from django.contrib.auth.hashers import PBKDF2PasswordHasher as hasher
@@ -17,46 +19,15 @@ from django.contrib.auth.hashers import make_password
 from time import sleep
 
 def home(request):
-    """Renders the home page."""
+    """Renders the home page.
+        TODO: Update content
+    """
     assert isinstance(request, HttpRequest)
     return render(
         request,
-        'app/index.html',
+        'app/home.html',
         {
             'title':'Home Page',
-        }
-    )
-
-def contact(request):
-    """Renders the contact page."""
-    if request.method == 'POST':
-        form = ContactForm(request.POST)
-        if form.is_valid():
-            form.save()
-            messages.add_message(request, messages.INFO, 'Feedback Submitted.')
-            return redirect('contact')
-    else:
-        form = ContactForm()
-    assert isinstance(request, HttpRequest)
-    return render(
-        request,
-        'app/contact.html',
-        {
-            'title':'Contact',
-            'message':'Your contact page.',
-            'form':ContactForm,
-        }
-    )
-
-def about(request):
-    """Renders the about page."""
-    assert isinstance(request, HttpRequest)
-    return render(
-        request,
-        'app/about.html',
-        {
-            'title':'About Me',
-            'message':'A brief introduction.',
         }
     )
 
@@ -120,14 +91,86 @@ def register(request):
         }
     )
 
-def todo(request):
-    """Renders the todo page."""
+@login_required
+def settings(request):
+    """Renders the edit account info page.
+        TODO: Implement changing account information
+    """
+    print("Settings View")
+    if request.method == 'POST':
+        print("Settings: POST Request")
+        form = CustomUserChangeForm(request.user, request.POST)
+        if form.is_valid():
+            form.save()
+            messages.add_message(request, messages.INFO, 'Settings changed.')
+            return redirect('settings')
+        else:
+            print("Settings: Form Invalid")
+            print(form.errors)
+            messages.error(request, 'Please correct the error below.')
+    else:
+        print("Settings: GET Request")
+        form = CustomUserChangeForm(request.user)
     assert isinstance(request, HttpRequest)
     return render(
         request,
-        'app/todo.html',
+        'app/settings.html',
         {
-            'title':'ToDo',
-            'message':'This has not been implemented.',
+            'title':'Settings',
+            'message':'Your settings page.',
+            'form':form,
         }
     )
+
+@login_required
+def password(request):
+    """Renders the edit account info page.
+        TODO: Implement changing password
+    """
+    print("Password View")
+    if request.method == 'POST':
+        print("Password: POST Request")
+        form = CustomPasswordChangeForm(request.user, request.POST)
+        if form.is_valid():
+            user = form.save()
+            update_session_auth_hash(request, user)
+            messages.add_message(request, messages.INFO, 'Password changed.')
+            return redirect('password')
+        else:
+            print("Password: Form Invalid")
+            print(form.errors)
+            messages.error(request, 'Please correct the error below.')
+    else:
+        print("Password: GET Request")
+        form = CustomPasswordChangeForm(request.user)
+    assert isinstance(request, HttpRequest)
+    return render(
+        request,
+        'app/password.html',
+        {
+            'title':'Password',
+            'message':'Change password page.',
+            'form':form,
+        }
+    )
+
+@staff_member_required
+def delete_user(request, username):
+    """Delete user view (NO TEMPLATE)
+        TODO: Actually delete users
+    """
+    context = {}
+
+    try:
+        user = CustomUser.objects.get(username = username)
+        user.delete()
+        context['msg'] = 'The user is deleted.'            
+
+    except CustomUser.DoesNotExist:
+        messages.error(request, "User does not exist")    
+        context['msg'] = 'User does not exist.'
+
+    except Exception as e: 
+        pass
+
+    return render(request, 'home.html', context=context)

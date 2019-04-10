@@ -23,10 +23,25 @@ class ViewTest(TestCase):
         response = self.client.get('/')
         self.assertContains(response, 'Home Page', 1, 200)
 
-    def test_contact(self):
-        """Tests the contact page."""
-        response = self.client.get('/contact')
-        self.assertContains(response, 'Contact', 3, 200)
+    def test_settings(self):
+        """Tests the settings page."""
+        response = self.client.get('/settings')
+        self.assertContains(response, 'Settings', 3, 200)
+
+    def test_login(self):
+        """Tests the login page."""
+        response = self.client.get('/login')
+        self.assertContains(response, 'Login', 3, 200)
+
+    def test_register(self):
+        """Tests the register page."""
+        response = self.client.get('/register')
+        self.assertContains(response, 'Register', 3, 200)
+
+    def test_password(self):
+        """Tests the register page."""
+        response = self.client.get('/password')
+        self.assertContains(response, 'Password', 3, 200)
 
     def test_about(self):
         """Tests the about page."""

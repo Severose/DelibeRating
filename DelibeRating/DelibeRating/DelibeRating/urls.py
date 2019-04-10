@@ -18,17 +18,13 @@ urlpatterns = [
     # Examples:
     url(r'^favicon\.ico$',RedirectView.as_view(url='/static/images/favicon.ico')),
     url(r'^$', app_views.home, name='home'),
-    url(r'^contact$', app_views.contact, name='contact'),
     url(r'^about', app_views.about, name='about'),
-    url(r'^todo', app_views.todo, name='todo'),
     url(r'^login/$', app_views.login, name='login'),
-    url(r'^logout$',
-        auth_views.logout,
-        {
-            'next_page': '/',
-        },
-        name='logout'),
+    url(r'^logout$', auth_views.logout, {'next_page': '/',}, name='logout'),
     url(r'^register', app_views.register, name='register'),
+    url(r'^password', app_views.password, name='password'),
+    url(r'^settings', app_views.settings, name='settings'),
+    url(r'^delete_user/(?P<username>[\w|\W.-]+)/$', app_views.delete_user, name='delete-user'), 
 
     # Uncomment the admin/doc line below to enable admin documentation:
     url(r'^admin/doc/', include('django.contrib.admindocs.urls')),

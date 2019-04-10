@@ -70,8 +70,6 @@
   <ItemGroup>
     <Content Include="app\static\images\favicon.ico" />
     <Content Include="app\templates\app\register.html" />
-    <Content Include="app\templates\app\todo.html" />
-    <Content Include="app\templates\app\updateprofile.html" />
     <Content Include="DelibeRating\settings\dev.json">
       <SubType>Code</SubType>
     </Content>
@@ -103,9 +101,9 @@
     <Content Include="app\static\app\scripts\respond.js" />
     <Content Include="app\static\app\scripts\respond.min.js" />
     <Content Include="app\static\app\scripts\_references.js" />
-    <Content Include="app\templates\app\about.html" />
-    <Content Include="app\templates\app\contact.html" />
-    <Content Include="app\templates\app\index.html" />
+    <Content Include="app\templates\app\password.html" />
+    <Content Include="app\templates\app\settings.html" />
+    <Content Include="app\templates\app\home.html" />
     <Content Include="app\templates\app\layout.html" />
     <Content Include="app\templates\app\login.html" />
     <Content Include="app\templates\app\loginpartial.html" />
