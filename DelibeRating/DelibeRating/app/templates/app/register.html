@@ -1,5 +1,7 @@
 {% extends "app/layout.html" %}
 
+{% load crispy_forms_tags %}
+
 {% block content %}
 
 <h2>{{ title }}</h2>
@@ -8,9 +10,37 @@
         <section id="registrationForm">
             <form action="{% url 'register' %}" method="post" class="form-horizontal">
                 {% csrf_token %}
-                <h4>Create a new account</h4>
-                {{ form.as_p }}
-                <input type="submit" value="Create new user account" class="btn btn-default" />
+                <div class="form-row">
+                    <div class="form-group col-md-6 mb-0">
+                        {{ form.username|as_crispy_field }}
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-6 mb-0">
+                        {{ form.password1|as_crispy_field }}
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-6 mb-0">
+                        {{ form.password2|as_crispy_field }}
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-6 mb-0">
+                        {{ form.email|as_crispy_field }}
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-6 mb-0">
+                        {{ form.first_name|as_crispy_field }}
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-6 mb-0">
+                        {{ form.last_name|as_crispy_field }}
+                    </div>
+                </div>
+                <input type="submit" value="Create new user account" class="btn btn-primary" />
 
                 {% if form.errors %}
                     <div class="alert alert-error">

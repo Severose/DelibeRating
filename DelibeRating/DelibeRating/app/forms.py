@@ -12,6 +12,8 @@ class CustomUserAuthenticationForm(AuthenticationForm):
     """Custom User Authentication Form for the CustomUser model:
         username, password
     """
+    username = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Username'}))
+    password = forms.CharField(widget=forms.PasswordInput())
 
     class Meta:
         model = CustomUser
@@ -21,6 +23,13 @@ class CustomUserCreationForm(UserCreationForm):
     """Custom User Creation Form for the CustomUser model
         username, password1, password2, email, first_name, last_name
     """
+    username = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Username'}))
+    password1 = forms.CharField(widget=forms.PasswordInput(attrs={'placeholder': 'Password'}))
+    password2 = forms.CharField(widget=forms.PasswordInput(attrs={'placeholder': 'Password (again)'}))
+    email = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Email'}))
+    first_name = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'First name'}))
+    last_name = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Last name'}))
+
     class Meta:
         model = CustomUser
         fields = ("username", "password1", "password2", "email", "first_name", "last_name")
@@ -29,10 +38,10 @@ class CustomUserChangeForm(UserChangeForm):
     """Custom User Change Form for the CustomUser model
         username, password, email, first_name, last_name
     """
-    #username = forms.CharField(initial=user.username)
-    #email = forms.CharField(initial=user.email)
-    #first_name = forms.CharField(initial=user.first_name)
-    #last_name = forms.CharField(initial=user.last_name)
+    username = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Username'}))
+    email = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Email'}))
+    first_name = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'First name'}))
+    last_name = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Last name'}))
 
     def __init__(self, *args, **kwargs):
         super(CustomUserChangeForm, self).__init__(*args, **kwargs)
@@ -46,6 +55,9 @@ class CustomPasswordChangeForm(PasswordChangeForm):
     """Custom Password Change Form for the CustomUser model
         password1, password2
     """
+    password1 = forms.CharField(widget=forms.PasswordInput(attrs={'placeholder': 'Password'}))
+    password2 = forms.CharField(widget=forms.PasswordInput(attrs={'placeholder': 'Password (again)'}))
+
     class Meta:
         model = CustomUser
         fields = ("password1", "password2")

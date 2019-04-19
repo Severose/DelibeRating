@@ -2,28 +2,33 @@
 
 {% block content %}
 
-<div class="jumbotron">
-    <h1>DelibeRating</h1>
-    <p class="lead">DelibeRating is a free web app to help you or your group make a decision.</p>
-    <p><a href="{% url 'about'%}" class="btn btn-primary btn-large">Learn more &raquo;</a></p>
-</div>
+    <!-- Main jumbotron for a primary marketing message or call to action -->
+    <div class="jumbotron">
+        <div class="container">
+            <h1 class="display-3">DelibeRating</h1>
+            <p class="lead">A free web app to help you or your group make a decision.</p>
+        </div>
+    </div>
 
-<div class="row">
-    <div class="col-md-4">
-        <h2>I can't decide...</h2>
-        <p>Help me narrow down my choices, so that I can make a decision.</p>
-        <p><a class="btn btn-default" href="{% url 'home' %}">Help me choose &raquo;</a></p>
+    <div class="container">
+        <!-- Example row of columns -->
+        <div class="row">
+            <div class="col-md-4">
+                <h2>I can't decide...</h2>
+                <p>Help me narrow down my choices, so that I can make a decision.</p>
+                <p><a class="btn btn-secondary" href="#" role="button">Help me choose &raquo;</a></p>
+            </div>
+            <div class="col-md-4">
+                <h2>We can't decide/agree...</h2>
+                <p>Start a group vote, so everyone can have input.</p>
+                <p><a class="btn btn-secondary" href="#" role="button">Help us vote &raquo;</a></p>
+            </div>
+            <div class="col-md-4">
+                <h2>I/we just have no idea...</h2>
+                <p>Have us make a choice for you, based on what you've shared with us.</p>
+                <p><a class="btn btn-secondary" href="#" role="button">Choose for me &raquo;</a></p>
+            </div>
+        </div>
     </div>
-    <div class="col-md-4">
-        <h2>We can't decide/agree...</h2>
-        <p>Start a group vote, so everyone can have input.</p>
-        <p><a class="btn btn-default" href="{% url 'home' %}">Help us vote &raquo;</a></p>
-    </div>
-    <div class="col-md-4">
-        <h2>I/we just have no idea...</h2>
-        <p>Have us make a choice for you, based on what you've shared with us.</p>
-        <p><a class="btn btn-default" href="{% url 'home' %}">Choose for me &raquo;</a></p>
-    </div>
-</div>
 
 {% endblock %}

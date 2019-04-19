@@ -68,6 +68,24 @@
     <Folder Include="DelibeRating\settings\" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="app\static\app\content\bootstrap-grid.css" />
+    <Content Include="app\static\app\content\bootstrap-grid.css.map" />
+    <Content Include="app\static\app\content\bootstrap-grid.min.css" />
+    <Content Include="app\static\app\content\bootstrap-grid.min.css.map" />
+    <Content Include="app\static\app\content\bootstrap-reboot.css" />
+    <Content Include="app\static\app\content\bootstrap-reboot.css.map" />
+    <Content Include="app\static\app\content\bootstrap-reboot.min.css" />
+    <Content Include="app\static\app\content\bootstrap-reboot.min.css.map" />
+    <Content Include="app\static\app\content\bootstrap.css.map" />
+    <Content Include="app\static\app\content\bootstrap.min.css.map" />
+    <Content Include="app\static\app\content\jumbotron.css" />
+    <Content Include="app\static\app\scripts\bootstrap.bundle.js" />
+    <Content Include="app\static\app\scripts\bootstrap.bundle.js.map" />
+    <Content Include="app\static\app\scripts\bootstrap.bundle.min.js" />
+    <Content Include="app\static\app\scripts\bootstrap.bundle.min.js.map" />
+    <Content Include="app\static\app\scripts\bootstrap.js.map" />
+    <Content Include="app\static\app\scripts\bootstrap.min.js.map" />
+    <Content Include="app\static\app\scripts\jquery.min.js" />
     <Content Include="app\static\images\favicon.ico" />
     <Content Include="app\templates\app\register.html" />
     <Content Include="DelibeRating\settings\dev.json">

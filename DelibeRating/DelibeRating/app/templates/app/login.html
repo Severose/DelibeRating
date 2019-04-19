@@ -1,5 +1,7 @@
 {% extends "app/layout.html" %}
 
+{% load crispy_forms_tags %}
+
 {% block content %}
 
 <h2>{{ title }}</h2>
@@ -8,10 +10,18 @@
         <section id="loginForm">
             <form action="." method="post" class="form-horizontal">
                 {% csrf_token %}
-                <h4>Use a local account to log in.</h4>
-                {{ form.as_p }}
-                <input type="submit" value="Log in" class="btn btn-default" />
-                <a href="{% url 'register' %}" class="btn btn-default">Register</a>
+                <div class="form-row">
+                    <div class="form-group col-md-6 mb-0">
+                        {{ form.username|as_crispy_field }}
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-6 mb-0">
+                        {{ form.password|as_crispy_field }}
+                    </div>
+                </div>
+                <input type="submit" value="Log in" class="btn btn-primary" />
+                <a class="btn btn-secondary" href="{% url 'register' %}">Register</a>
 
                 {% if form.errors %}
                 {{ form.errors }}

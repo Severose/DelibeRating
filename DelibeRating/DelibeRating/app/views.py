@@ -17,6 +17,7 @@ from django.contrib import messages
 from django.contrib.auth.hashers import PBKDF2PasswordHasher as hasher
 from django.contrib.auth.hashers import make_password
 from time import sleep
+import datetime
 
 def home(request):
     """Renders the home page.
@@ -91,6 +92,19 @@ def register(request):
         }
     )
 
+def search(request):
+    """Renders the search page.
+        TODO: Update content
+    """
+    assert isinstance(request, HttpRequest)
+    return render(
+        request,
+        'app/search.html',
+        {
+            'title':'Search Page',
+        }
+    )
+
 @login_required
 def settings(request):
     """Renders the edit account info page.
@@ -110,7 +124,7 @@ def settings(request):
             messages.error(request, 'Please correct the error below.')
     else:
         print("Settings: GET Request")
-        form = CustomUserChangeForm(request.user)
+        form = CustomUserChangeForm(instance=request.user)
     assert isinstance(request, HttpRequest)
     return render(
         request,
