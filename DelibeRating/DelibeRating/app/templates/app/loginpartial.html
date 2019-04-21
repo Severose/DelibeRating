@@ -1,18 +1,18 @@
 {% if user.is_authenticated %}
+<li class="nav-item active">
+    <a class="nav-link" href="{% url 'settings' %}">Settings</a>
+</li>
 <form id="logoutForm" action="/logout" method="post" class="navbar-right">
     {% csrf_token %}
-    <li class="nav-item">
-        <a class="nav-link active" href="{% url 'settings' %}">Settings</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link active" href="javascript:document.getElementById('logoutForm').submit()">Log off</a>
+    <li class="nav-item nav-right active">
+        <a class="nav-link" href="javascript:document.getElementById('logoutForm').submit()">Log off</a>
     </li>
 </form>
 
 {% else %}
 
-<li class="nav-item">
-    <a class="nav-link active" href="{% url 'login' %}">Log in</a>
+<li class="nav-item active">
+    <a class="nav-link" href="{% url 'login' %}">Log in</a>
 </li>
 
 {% endif %}

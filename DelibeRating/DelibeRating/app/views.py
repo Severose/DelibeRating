@@ -113,7 +113,7 @@ def settings(request):
     print("Settings View")
     if request.method == 'POST':
         print("Settings: POST Request")
-        form = CustomUserChangeForm(request.user, request.POST)
+        form = CustomUserChangeForm(instance=request.user, data=request.POST)
         if form.is_valid():
             form.save()
             messages.add_message(request, messages.INFO, 'Settings changed.')
