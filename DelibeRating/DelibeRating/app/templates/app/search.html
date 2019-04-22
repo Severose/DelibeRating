@@ -8,7 +8,15 @@
         <section id="search">
             <form action="." method="post" class="form-horizontal">
                 {% csrf_token %}
+                
                 <h4>Search results:</h4>
+                <ul>
+                {% if results %}
+                {% for element in results.businesses %}
+                    <li>{{ element }}</li>
+                {% endfor %}
+                {% endif %}
+                </ul>
 
                 {% if form.errors %}
                 {{ form.errors }}

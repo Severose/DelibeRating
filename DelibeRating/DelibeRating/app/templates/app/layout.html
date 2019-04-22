@@ -33,8 +33,8 @@
           </li>
           {% include 'app/loginpartial.html' %}
         </ul>
-        <form class="form-inline my-2 my-lg-0">
-          <input class="form-control mr-sm-2" type="text" placeholder="Search">
+        <form class="form-inline my-2 my-lg-0" type="get" action="{% url 'search' %}">
+          <input name="q" class="form-control mr-sm-2" type="text" placeholder="Search" required>
           <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
         </form>
       </div>
@@ -50,6 +50,20 @@
     <script type="text/javascript" src="{% static 'app/scripts/jquery.min.js' %}"></script>
     <script type="text/javascript" src="{% static 'app/scripts/bootstrap.min.js' %}"></script>
 {% block scripts %}{% endblock %}
+
+<script>
+function setGetParameter(){
+    var query = $("#search").val();
+    $.ajax({
+      type: "GET",
+      url: {% url 'search' %},
+      data: query,
+      success: function(result){
+        alert("Success");
+      }
+    });
+}
+</script>
 
 </body>
 </html>

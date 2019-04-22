@@ -2,8 +2,10 @@
 Definition of views.
 """
 
+import operator
+import datetime
 from django.shortcuts import render, redirect
-from django.http import HttpRequest
+from django.http import HttpRequest, Http404
 from django.template import RequestContext
 from datetime import datetime
 from app.forms import *
@@ -13,11 +15,17 @@ from django.contrib.auth import login as auth_login
 from django.contrib.auth.decorators import login_required
 from django.contrib.admin.views.decorators import staff_member_required
 from django.db import transaction
+from django.db.models import Q
 from django.contrib import messages
 from django.contrib.auth.hashers import PBKDF2PasswordHasher as hasher
 from django.contrib.auth.hashers import make_password
 from time import sleep
-import datetime
+from yelpapi import YelpAPI
+import argparse
+from pprint import pprint
+from django.conf import settings
+
+yelp_api = YelpAPI(settings.API_KEY, timeout_s=3.0)
 
 def home(request):
     """Renders the home page.
@@ -96,14 +104,38 @@ def search(request):
     """Renders the search page.
         TODO: Update content
     """
-    assert isinstance(request, HttpRequest)
-    return render(
-        request,
-        'app/search.html',
-        {
-            'title':'Search Page',
-        }
-    )
+    print("Search View")
+    paginate_by = 10
+
+    if request.method == 'GET':
+        query = request.GET.get('q', None)
+        
+        #argparser = argparse.ArgumentParser()
+        #argparser.add_argument('api_key', type=str, help=settings.API_KEY)
+        #args = argparser.parse_args()
+
+        if 'q' in request.GET:
+            print(request.GET)
+        else:
+            print('q not found!')
+
+        results = yelp_api.search_query(term=query, location='irvine, ca', sort_by='distance', limit=10)
+        pprint(results)
+        #CustomUser.objects.filter((Q(title_icontains=q) for q in yelp_q) | (Q(content_icontains=q) for q in yelp_q))
+        
+        print("Settings: GET Request")
+        context = {'title':'Search',
+                   'message':'Search Page',
+                   'results':results,
+                  }
+        assert isinstance(request, HttpRequest)
+        return render(
+            request,
+            'app/search.html',
+            context
+        )
+    else:
+        return render(request,"app/search.html",{})
 
 @login_required
 def settings(request):

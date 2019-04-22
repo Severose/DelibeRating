@@ -88,6 +88,7 @@
     <Content Include="app\static\app\scripts\jquery.min.js" />
     <Content Include="app\static\images\favicon.ico" />
     <Content Include="app\templates\app\register.html" />
+    <Content Include="app\templates\app\search.html" />
     <Content Include="DelibeRating\settings\dev.json">
       <SubType>Code</SubType>
     </Content>

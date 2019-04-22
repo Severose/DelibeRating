@@ -15,10 +15,9 @@ from django.contrib import admin
 admin.autodiscover()
 
 urlpatterns = [
-    # Examples:
     url(r'^favicon\.ico$',RedirectView.as_view(url='/static/images/favicon.ico')),
     url(r'^$', app_views.home, name='home'),
-    url(r'^search/(?P<drname>\w+)/$', app_views.search, name='search'),
+    url(r'^search/$', app_views.search, name='search'),
     url(r'^login/$', app_views.login, name='login'),
     url(r'^logout$', auth_views.logout, {'next_page': '/',}, name='logout'),
     url(r'^register', app_views.register, name='register'),

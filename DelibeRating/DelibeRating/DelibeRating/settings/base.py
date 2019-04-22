@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'app',
     'crispy_forms',
+    'yelpapi',
 ]
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'

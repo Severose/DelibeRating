@@ -1,6 +1,7 @@
 {
-  "DB_NAME" : "deliberating",
-  "DB_USER": "nathanrcobb",
-  "DB_PASS" : "DelibeRatedNate",
-  "SECRET_KEY": "3567b5a5-a632-48d7-ad5e-1d5351ec853d"
+  "DB_NAME":    "deliberating",
+  "DB_USER":    "nathanrcobb",
+  "DB_PASS":    "DelibeRatedNate",
+  "SECRET_KEY": "3567b5a5-a632-48d7-ad5e-1d5351ec853d",
+  "API_KEY":    "8AMsNam5xQrtkRtSshfidZn45vE0CSiN6Y0pAVfrOov-N8N1bLws9RSxb1oZR7MUpVNAFa6m0JR86Ux1kVNJZGosggc9JrlkBZNSG7amIkP1QuTRDXulzyHW6Sq9XHYx"
 }
