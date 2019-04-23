@@ -24,6 +24,7 @@ from yelpapi import YelpAPI
 import argparse
 from pprint import pprint
 from django.conf import settings
+import json
 
 yelp_api = YelpAPI(settings.API_KEY, timeout_s=3.0)
 
@@ -106,27 +107,36 @@ def search(request):
     """
     print("Search View")
     paginate_by = 10
+    cached = True
 
     if request.method == 'GET':
         query = request.GET.get('q', None)
-        
-        #argparser = argparse.ArgumentParser()
-        #argparser.add_argument('api_key', type=str, help=settings.API_KEY)
-        #args = argparser.parse_args()
 
         if 'q' in request.GET:
             print(request.GET)
         else:
             print('q not found!')
 
-        results = yelp_api.search_query(term=query, location='irvine, ca', sort_by='distance', limit=10)
-        pprint(results)
-        #CustomUser.objects.filter((Q(title_icontains=q) for q in yelp_q) | (Q(content_icontains=q) for q in yelp_q))
+        if cached:
+            print("Using cached results!")
+            with open('app/example.json', 'r') as file:
+                data = file.read().replace('\n', '')
+        else:
+            print("Querying Yelp Fusion API")
+            data = yelp_api.search_query(term=query, location='irvine, ca', sort_by='distance', limit=12)
         
+        results = json.loads(data)
+        businesses = results['businesses']
+        total = results['total']
+        region = results['region']
+        num_businesses = len(businesses)
+
         print("Settings: GET Request")
         context = {'title':'Search',
                    'message':'Search Page',
                    'results':results,
+                   'businesses':businesses,
+                   'ten':10,
                   }
         assert isinstance(request, HttpRequest)
         return render(

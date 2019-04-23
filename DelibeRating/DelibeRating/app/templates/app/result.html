@@ -1,0 +1,38 @@
+﻿<!--
+{'id': 'omgqdRCtv0X9IZ9mqH1qIA',
+'alias': 'carls-jr-irvine-7',
+'name': "Carl's Jr.",
+'image_url': 'https://s3-media1.fl.yelpcdn.com/bphoto/aprqHVojIBzgKwmedDvEtg/o.jpg',
+'is_closed': False,
+'url': 'https://www.yelp.com/biz/carls-jr-irvine-7?adjust_creative=tKYz_d_z71DeYreiDbTsEw&utm_campaign=yelp_api_v3&utm_medium=api_v3_business_search&utm_source=tKYz_d_z71DeYreiDbTsEw',
+'review_count': 60,
+'categories': [{'alias': 'hotdogs', 'title': 'Fast Food'}, {'alias': 'burgers', 'title': 'Burgers'}],
+'rating': 2.5,
+'coordinates': {'latitude': 33.6758945, 'longitude': -117.7945514},
+'transactions': ['delivery', 'pickup'],
+'price': '$',
+'location': {'address1': '4960 Barranca Pkwy', 'address2': '', 'address3': '', 'city': 'Irvine', 'zip_code': '92604', 'country': 'US', 'state': 'CA', 'display_address': ['4960 Barranca Pkwy', 'Irvine, CA 92604']},
+'phone': '+19495590882',
+'display_phone': '(949) 559-0882',
+'distance': 320.41475858270235}    
+-->
+
+    <div class="thumbnail">
+        <a href="{{ element.url }}" ><img src="{{ element.image_url }}" alt="Photo" height="308" width="308"></a>
+        <div class="caption">
+            <h5><a href="{{ element.url }}">{{ element.name }}     </a></h5>
+            {% for category in element.categories %}
+                {{ category.title }} &nbsp;
+            {% endfor %}
+            {% include 'app/star_rating.html' %}
+            <p class="small">
+                <b>{{ element.price }}</b>
+            </p>
+            {% for i in element.location.display_address %}
+                <p class="small">{{ i }}</p>
+            {% endfor %}
+            <p class="small"></p>
+            <p class="small">{{ element.display_phone }}</p>
+            <p class="small"><a href="#" class="btn btn-primary" role="button">♥</a> <a href="#" class="btn btn-default" role="button">★</a></p>
+        </div>
+    </div>

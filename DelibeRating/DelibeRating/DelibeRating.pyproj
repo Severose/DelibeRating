@@ -18,10 +18,10 @@
     <WorkingDirectory>.</WorkingDirectory>
     <WebBrowserUrl>http://localhost</WebBrowserUrl>
     <LaunchProvider>Django launcher</LaunchProvider>
-    <DjangoSettingsModule>$(MSBuildProjectName).settings.dev</DjangoSettingsModule>
+    <DjangoSettingsModule>$(MSBuildProjectName).settings.prod</DjangoSettingsModule>
     <OutputPath>.</OutputPath>
     <SuppressCollectPythonCloudServiceFiles>true</SuppressCollectPythonCloudServiceFiles>
-    <PythonRunWebServerCommandArguments>runserver --settings DelibeRating.settings.prod %SERVER_PORT% $(CommandLineArguments)</PythonRunWebServerCommandArguments>
+    <PythonRunWebServerCommandArguments>runserver --settings DelibeRating.settings.dev %SERVER_PORT% $(CommandLineArguments)</PythonRunWebServerCommandArguments>
     <PythonDebugWebServerCommandArguments>runserver --noreload --settings DelibeRating.settings.dev %SERVER_PORT% $(CommandLineArguments)</PythonDebugWebServerCommandArguments>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
@@ -68,6 +68,7 @@
     <Folder Include="DelibeRating\settings\" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="app\example.json" />
     <Content Include="app\static\app\content\bootstrap-grid.css" />
     <Content Include="app\static\app\content\bootstrap-grid.css.map" />
     <Content Include="app\static\app\content\bootstrap-grid.min.css" />
@@ -86,9 +87,12 @@
     <Content Include="app\static\app\scripts\bootstrap.js.map" />
     <Content Include="app\static\app\scripts\bootstrap.min.js.map" />
     <Content Include="app\static\app\scripts\jquery.min.js" />
+    <Content Include="app\static\app\deliberating.css" />
     <Content Include="app\static\images\favicon.ico" />
     <Content Include="app\templates\app\register.html" />
+    <Content Include="app\templates\app\result.html" />
     <Content Include="app\templates\app\search.html" />
+    <Content Include="app\templates\app\star_rating.html" />
     <Content Include="DelibeRating\settings\dev.json">
       <SubType>Code</SubType>
     </Content>
