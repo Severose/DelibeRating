@@ -1,8 +1,8 @@
 .thumbnail {
     display: block;
     padding: 4px;
-    background-color: #fff;
-    border: 1px solid #ddd;
+    background-color: #fffadf;
+    border: 1px solid #808080;
     border-radius: 4px;
     width: 318px;
     height: 595px;
@@ -10,6 +10,15 @@
 }
 
 p.small {
+    line-height: 1.0;
+    font-size: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+p.address {
+    height: 48px;
     line-height: 1.0;
     font-size: 100%;
     overflow: hidden;

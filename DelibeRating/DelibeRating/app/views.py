@@ -111,32 +111,41 @@ def search(request):
 
     if request.method == 'GET':
         query = request.GET.get('q', None)
+        location = request.GET.get('loc', None)
 
         if 'q' in request.GET:
             print(request.GET)
         else:
             print('q not found!')
 
-        if cache.get(query):
+        if 'loc' in request.GET:
+            print(request.GET)
+        else:
+            print('loc not found!')
+
+        if cache.get((query,location)):
             print("Using cached results!")
-            raw_data = cache.get(query)
+            raw_data = cache.get((query,location))
         else:
             print("Querying Yelp Fusion API")
-            raw_data = str(yelp_api.search_query(term=query, location='irvine, ca', sort_by='distance', limit=24))
-            data = json.loads(json.dumps(raw_data))
-            cache.set(query, data, 86400)  #TODO: Use DEFAULT_TIMEOUT
+            raw_data = yelp_api.search_query(term=query, location=location, sort_by='distance', limit=24)
+            
+        data = json.loads(json.dumps(raw_data))
+        cache.set((query,location), data, 86400)  #TODO: Use DEFAULT_TIMEOUT
 
-        print(data)
-        page = request.GET.get('page', 1)
-        paginator = Paginator(raw_data, 12)
+        results_page = request.GET.get('page', 1)
+        paginator = Paginator(data['businesses'], 12)
 
-        results = paginator.page(page)
+        results = paginator.page(results_page)
 
         print("Settings: GET Request")
         context = {'title':'Search',
                    'message':'Search Page',
                    'results':results,
+                   'query':query,
+                   'location':location,
                   }
+
         assert isinstance(request, HttpRequest)
         return render(
             request,

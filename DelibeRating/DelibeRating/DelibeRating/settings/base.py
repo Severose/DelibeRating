@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'app',
     'crispy_forms',
     'yelpapi',
+    'mathfilters',
 ]
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
@@ -105,7 +106,8 @@ PASSWORD_HASHERS = [
 
 CACHES = {
     'default': {
-        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+        'LOCATION': 'deliberating_cache_table',
     }
 }
 

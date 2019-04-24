@@ -6,7 +6,7 @@
 
 {% if results %}
     {% include 'app/pagination.html' %}
-    {% for element in results.businesses %}
+    {% for element in results.object_list %}
         {% include 'app/result.html' %}
     {% endfor %}
 {% else %}

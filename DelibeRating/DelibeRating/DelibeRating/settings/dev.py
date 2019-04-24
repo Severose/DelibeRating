@@ -20,7 +20,6 @@ DB_NAME = get_var("DB_NAME")
 DB_USER = get_var("DB_USER")
 DB_PASS = get_var("DB_PASS")
 API_KEY = get_var("API_KEY")
-DEFAULT_TIMEOUT = get_var("DEFAULT_TIMEOUT")
 
 # Database
 # https://docs.djangoproject.com/en/1.9/ref/settings/#databases

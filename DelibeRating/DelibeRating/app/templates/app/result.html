@@ -28,7 +28,7 @@
             <p class="small">
                 <b>{{ element.price }}</b>
             </p>
-            <p class="small">{% for i in element.location.display_address %}
+            <p class="address">{% for i in element.location.display_address %}
                 {{ i }}<br/>
             {% endfor %}</p>
             <p class="small">{{ element.display_phone }}</p>

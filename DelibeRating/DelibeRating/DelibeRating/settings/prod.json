@@ -2,6 +2,5 @@
   "DB_NAME": "deliberating",
   "DB_USER": "nathanrcobb",
   "DB_PASS": "DelibeRatedNate",
-  "SECRET_KEY": "3567b5a5-a632-48d7-ad5e-1d5351ec853d",
-  "DEFAULT_TIMEOUT": "86400"
+  "SECRET_KEY": "3567b5a5-a632-48d7-ad5e-1d5351ec853d"
 }
