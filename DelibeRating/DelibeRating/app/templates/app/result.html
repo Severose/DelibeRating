@@ -28,11 +28,14 @@
             <p class="small">
                 <b>{{ element.price }}</b>
             </p>
-            {% for i in element.location.display_address %}
-                <p class="small">{{ i }}</p>
-            {% endfor %}
-            <p class="small"></p>
+            <p class="small">{% for i in element.location.display_address %}
+                {{ i }}<br/>
+            {% endfor %}</p>
             <p class="small">{{ element.display_phone }}</p>
-            <p class="small"><a href="#" class="btn btn-primary" role="button">♥</a> <a href="#" class="btn btn-default" role="button">★</a></p>
+            <p class="blocktext">
+                <a href="#" class="btn btn-primary" role="button">♥</a>
+                <a href="#" class="btn btn-primary" role="button">⊘</a>
+                <a href="#" class="btn btn-primary" role="button">☑</a>
+            </p>
         </div>
     </div>

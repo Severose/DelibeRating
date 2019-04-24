@@ -25,6 +25,8 @@ import argparse
 from pprint import pprint
 from django.conf import settings
 import json
+from django.core.cache import cache
+from django.core.paginator import Paginator
 
 yelp_api = YelpAPI(settings.API_KEY, timeout_s=3.0)
 
@@ -106,8 +108,6 @@ def search(request):
         TODO: Update content
     """
     print("Search View")
-    paginate_by = 10
-    cached = True
 
     if request.method == 'GET':
         query = request.GET.get('q', None)
@@ -117,26 +117,25 @@ def search(request):
         else:
             print('q not found!')
 
-        if cached:
+        if cache.get(query):
             print("Using cached results!")
-            with open('app/example.json', 'r') as file:
-                data = file.read().replace('\n', '')
+            raw_data = cache.get(query)
         else:
             print("Querying Yelp Fusion API")
-            data = yelp_api.search_query(term=query, location='irvine, ca', sort_by='distance', limit=12)
-        
-        results = json.loads(data)
-        businesses = results['businesses']
-        total = results['total']
-        region = results['region']
-        num_businesses = len(businesses)
+            raw_data = str(yelp_api.search_query(term=query, location='irvine, ca', sort_by='distance', limit=24))
+            data = json.loads(json.dumps(raw_data))
+            cache.set(query, data, 86400)  #TODO: Use DEFAULT_TIMEOUT
+
+        print(data)
+        page = request.GET.get('page', 1)
+        paginator = Paginator(raw_data, 12)
+
+        results = paginator.page(page)
 
         print("Settings: GET Request")
         context = {'title':'Search',
                    'message':'Search Page',
                    'results':results,
-                   'businesses':businesses,
-                   'ten':10,
                   }
         assert isinstance(request, HttpRequest)
         return render(
