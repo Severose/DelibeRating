@@ -34,18 +34,23 @@ def home(request):
     """Renders the home page.
         TODO: Update content
     """
+    time_form = CustomTimeForm()
+
     assert isinstance(request, HttpRequest)
     return render(
         request,
         'app/home.html',
         {
             'title':'Home Page',
+            'time_form': time_form,
         }
     )
 
 def login(request):
     """Renders the login page."""
     print("Login View")
+    time_form = CustomTimeForm()
+
     if request.method == 'POST':
         print("Login: POST Request")
         form = CustomUserAuthenticationForm(data=request.POST)
@@ -71,12 +76,15 @@ def login(request):
             'title':'Login',
             'message':'Login to your account.',
             'form': form,
+            'time_form': time_form,
         }
     )
 
 def register(request):
     """Renders the register page."""
     print("Register View")
+    time_form = CustomTimeForm()
+
     if request.method == 'POST':
         print("Register: POST Request")
         form = CustomUserCreationForm(data=request.POST)
@@ -100,6 +108,7 @@ def register(request):
             'title':'Register',
             'message':'Register a new user account.',
             'form':form,
+            'time_form': time_form,
         }
     )
 
@@ -108,10 +117,14 @@ def search(request):
         TODO: Update content
     """
     print("Search View")
+    #time_form = CustomTimeForm()
 
     if request.method == 'GET':
         query = request.GET.get('q', None)
         location = request.GET.get('loc', None)
+        radius = request.GET.get('rad', None)
+        pricerange = request.GET.get('price', None)
+        opennow = request.GET.get('open', None)
 
         if 'q' in request.GET:
             print(request.GET)
@@ -123,12 +136,27 @@ def search(request):
         else:
             print('loc not found!')
 
+        if 'rad' in request.GET:
+            print(request.GET)
+        else:
+            print('rad not found!')
+
+        if 'price' in request.GET:
+            print(request.GET)
+        else:
+            print('price not found!')
+
+        if 'open' in request.GET:
+            print(request.GET)
+        else:
+            print('open not found!')
+
         if cache.get((query,location)):
             print("Using cached results!")
             raw_data = cache.get((query,location))
         else:
             print("Querying Yelp Fusion API")
-            raw_data = yelp_api.search_query(term=query, location=location, sort_by='distance', limit=24)
+            raw_data = yelp_api.search_query(term=query, location=location, sort_by='distance', limit=48)
             
         data = json.loads(json.dumps(raw_data))
         cache.set((query,location), data, 86400)  #TODO: Use DEFAULT_TIMEOUT
@@ -144,14 +172,14 @@ def search(request):
                    'results':results,
                    'query':query,
                    'location':location,
-                  }
+                   'time_form': time_form,}
 
         assert isinstance(request, HttpRequest)
         return render(
             request,
             'app/search.html',
-            context
-        )
+            context)
+
     else:
         return render(request,"app/search.html",{})
 
@@ -161,6 +189,8 @@ def settings(request):
         TODO: Implement changing account information
     """
     print("Settings View")
+    time_form = CustomTimeForm()
+
     if request.method == 'POST':
         print("Settings: POST Request")
         form = CustomUserChangeForm(instance=request.user, data=request.POST)
@@ -183,6 +213,7 @@ def settings(request):
             'title':'Settings',
             'message':'Your settings page.',
             'form':form,
+            'time_form': time_form,
         }
     )
 
@@ -192,6 +223,8 @@ def password(request):
         TODO: Implement changing password
     """
     print("Password View")
+    time_form = CustomTimeForm()
+
     if request.method == 'POST':
         print("Password: POST Request")
         form = CustomPasswordChangeForm(request.user, request.POST)
@@ -215,6 +248,7 @@ def password(request):
             'title':'Password',
             'message':'Change password page.',
             'form':form,
+            'time_form': time_form,
         }
     )
 
@@ -223,6 +257,7 @@ def delete_user(request, username):
     """Delete user view (NO TEMPLATE)
         TODO: Actually delete users
     """
+
     context = {}
 
     try:

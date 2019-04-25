@@ -16,26 +16,29 @@
 'display_phone': '(949) 559-0882',
 'distance': 320.41475858270235}    
 -->
+{% load staticfiles %}
 
-    <div class="thumbnail">
-        <a href="{{ element.url }}" ><img src="{{ element.image_url }}" alt="Photo" height="308" width="308"></a>
-        <div class="caption">
-            <h5><a href="{{ element.url }}">{{ element.name }}     </a></h5>
-            {% for category in element.categories %}
-                {{ category.title }} &nbsp;
-            {% endfor %}
-            {% include 'app/star_rating.html' %}
-            <p class="small">
-                <b>{{ element.price }}</b>
-            </p>
-            <p class="address">{% for i in element.location.display_address %}
-                {{ i }}<br/>
-            {% endfor %}</p>
-            <p class="small">{{ element.display_phone }}</p>
-            <p class="blocktext">
-                <a href="#" class="btn btn-primary" role="button">♥</a>
-                <a href="#" class="btn btn-primary" role="button">⊘</a>
-                <a href="#" class="btn btn-primary" role="button">☑</a>
-            </p>
-        </div>
+<div class="thumbnail">
+    <a href="{{ element.url }}">
+        <img src="{% if element.image_url %}{{ element.image_url }}{% else %}{% static 'images/no_photo.png' %}{% endif %}" alt="" height="308" width="308">
+    </a>
+    <div class="caption">
+        <h5><a href="{{ element.url }}">{{ element.name }}     </a></h5>
+        {% for category in element.categories %}
+            {{ category.title }} &nbsp;
+        {% endfor %}
+        {% include 'app/star_rating.html' %}
+        <p class="small">
+            <b>{{ element.price }}</b>
+        </p>
+        <p class="address">{% for i in element.location.display_address %}
+            {{ i }}<br/>
+        {% endfor %}</p>
+        <p class="small">{{ element.display_phone }}</p>
+        <p class="blocktext">
+            <a href="#" class="btn btn-primary" role="button">♥</a>
+            <a href="#" class="btn btn-primary" role="button">⊘</a>
+            <a href="#" class="btn btn-primary" role="button">☑</a>
+        </p>
     </div>
+</div>

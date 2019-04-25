@@ -2,11 +2,13 @@
 Definition of forms.
 """
 
+import datetime
 from django import forms
 from app.models import *
 from django.forms import ModelForm
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm, UserChangeForm, PasswordChangeForm
 from django.utils.translation import ugettext_lazy as _
+from tempus_dominus.widgets import TimePicker
 
 class CustomUserAuthenticationForm(AuthenticationForm):
     """Custom User Authentication Form for the CustomUser model:
@@ -75,3 +77,16 @@ class CustomPasswordChangeForm(PasswordChangeForm):
     class Meta:
         model = CustomUser
         fields = ("password1", "password2")
+
+class CustomTimeForm(forms.Form):
+    time_picker = forms.TimeField(
+        widget=TimePicker(
+            options={
+                'enabledHours': [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23],
+            },
+            attrs={
+                'input_toggle': True,
+                'input_group': False,
+            },
+        ),
+    )

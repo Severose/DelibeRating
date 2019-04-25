@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'crispy_forms',
     'yelpapi',
     'mathfilters',
+    'tempus_dominus',
 ]
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
