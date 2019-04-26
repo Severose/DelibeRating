@@ -123,6 +123,7 @@ def search(request):
         query = request.GET.get('q', None)
         location = request.GET.get('loc', None)
         radius = request.GET.get('rad', None)
+        sortby = request.GET.get('sort', None)
         pricerange = request.GET.get('price', None)
         opennow = request.GET.get('open', None)
 
@@ -141,6 +142,11 @@ def search(request):
         else:
             print('rad not found!')
 
+        if 'sort' in request.GET:
+            print(request.GET)
+        else:
+            print('sort not found!')
+
         if 'price' in request.GET:
             print(request.GET)
         else:
@@ -151,15 +157,22 @@ def search(request):
         else:
             print('open not found!')
 
-        if cache.get((query,location)):
+        if cache.get(''.join(i for i in str(query+location+radius+sortby+pricerange+opennow) if i.isalnum())):
             print("Using cached results!")
-            raw_data = cache.get((query,location))
+            print(''.join(i for i in str(query+location+radius+sortby+pricerange+opennow) if i.isalnum()))
+            raw_data = cache.get(''.join(i for i in str(query+location+radius+sortby+pricerange+opennow) if i.isalnum()))
         else:
             print("Querying Yelp Fusion API")
-            raw_data = yelp_api.search_query(term=query, location=location, sort_by='distance', limit=48)
+            raw_data = yelp_api.search_query(term=query,
+                                             location=location,
+                                             radius=radius,
+                                             limit=48,
+                                             sort_by=sortby,
+                                             price=pricerange,
+                                             open_now=opennow)
             
         data = json.loads(json.dumps(raw_data))
-        cache.set((query,location), data, 86400)  #TODO: Use DEFAULT_TIMEOUT
+        cache.set(''.join(i for i in str(query+location+radius+sortby+pricerange+opennow) if i.isalnum()), data, 86400)  #TODO: Use DEFAULT_TIMEOUT
 
         results_page = request.GET.get('page', 1)
         paginator = Paginator(data['businesses'], 12)
@@ -171,8 +184,8 @@ def search(request):
                    'message':'Search Page',
                    'results':results,
                    'query':query,
-                   'location':location,
-                   'time_form': time_form,}
+                   'location':location,}
+                   #'time_form': time_form,
 
         assert isinstance(request, HttpRequest)
         return render(

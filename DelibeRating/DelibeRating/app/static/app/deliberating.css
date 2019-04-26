@@ -5,7 +5,7 @@
     border: 1px solid #808080;
     border-radius: 4px;
     width: 318px;
-    height: 595px;
+    height: 621px;
     float: left;
 }
 
@@ -24,6 +24,12 @@ p.address {
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
+}
+
+div.categories {
+    height: 25px;
+    line-height: 1.0;
+    font-size: 100%;
 }
 
 input[type="radio"]:disabled, input[type="checkbox"]:disabled {
@@ -61,6 +67,7 @@ ul li:hover ul {
 .dropdown, .dropdown-submenu {
     padding-left: 0;
     padding: .5rem .75rem;
+    right: 0;
 }
 
 a.nav-link {

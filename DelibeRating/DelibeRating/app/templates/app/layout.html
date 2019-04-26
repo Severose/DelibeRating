@@ -21,7 +21,7 @@
     <script src="{% static 'app/scripts/modernizr-2.6.2.js' %}"></script>
 
     {# Django Tempus Dominus assets #}
-    {{ time_form.media }}
+    {# time_form.media }} #}
 </head>
 
 <body>
@@ -48,11 +48,20 @@
                     <li class="dropdown-submenu button-group">
                         <a class="drop dropdown-item dropdown-toggle" href="#">Radius</a>
                         <ul class="dropdown-menu rdo">
-                            <li><a href="#" class="dropdown-item" tabIndex="-1"><input id="rad1" class="rdobtn" data-value="1610" type="radio" disabled/>&nbsp;1 mile</a></li>
-                            <li><a href="#" class="dropdown-item" tabIndex="-1"><input id="rad2" class="rdobtn" data-value="3220" type="radio" disabled/>&nbsp;2 miles</a></li>
-                            <li><a href="#" class="dropdown-item" tabIndex="-1"><input id="rad5" class="rdobtn" data-value="8050" type="radio" disabled/>&nbsp;5 miles</a></li>
-                            <li><a href="#" class="dropdown-item" tabIndex="-1"><input id="rad10" class="rdobtn" data-value="16100" type="radio" disabled/>&nbsp;10 miles</a></li>
-                            <li><a href="#" class="dropdown-item" tabIndex="-1"><input id="rad20" class="rdobtn" data-value="32200" type="radio" disabled/>&nbsp;20 miles</a></li>
+                            <li><a href="#" class="dropdown-item" tabIndex="-1"><input id="rad1" class="rdobtn1" data-value="1610" type="radio" disabled/>&nbsp;1 mile</a></li>
+                            <li><a href="#" class="dropdown-item" tabIndex="-1"><input id="rad2" class="rdobtn1" data-value="3220" type="radio" disabled/>&nbsp;2 miles</a></li>
+                            <li><a href="#" class="dropdown-item" tabIndex="-1"><input id="rad5" class="rdobtn1" data-value="8050" type="radio" disabled/>&nbsp;5 miles</a></li>
+                            <li><a href="#" class="dropdown-item" tabIndex="-1"><input id="rad10" class="rdobtn1" data-value="16100" type="radio" disabled/>&nbsp;10 miles</a></li>
+                            <li><a href="#" class="dropdown-item" tabIndex="-1"><input id="rad20" class="rdobtn1" data-value="32200" type="radio" disabled/>&nbsp;20 miles</a></li>
+                        </ul>
+                    </li>
+                    <li class="dropdown-submenu button-group">
+                        <a class="drop dropdown-item dropdown-toggle" href="#">Sort by</a>
+                        <ul class="dropdown-menu rdo">
+                            <li><a href="#" class="dropdown-item" tabIndex="-1"><input id="sort_best" class="rdobtn2" data-value="best_match" type="radio" disabled/>&nbsp;Best match</a></li>
+                            <li><a href="#" class="dropdown-item" tabIndex="-1"><input id="sort_rating" class="rdobtn2" data-value="rating" type="radio" disabled/>&nbsp;Rating</a></li>
+                            <li><a href="#" class="dropdown-item" tabIndex="-1"><input id="sort_review" class="rdobtn2" data-value="review_count" type="radio" disabled/>&nbsp;Review count</a></li>
+                            <li><a href="#" class="dropdown-item" tabIndex="-1"><input id="sort_distance" class="rdobtn2" data-value="distance" type="radio" disabled/>&nbsp;Distance</a></li>
                         </ul>
                     </li>
                     <li class="dropdown-submenu">
@@ -68,7 +77,13 @@
                     <!--TODO: Time Picker <li><a class="dropdown-item" tabindex="-1" href="#">Open at</a></li>-->
                 </ul>
             </div>
-            <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+            <input name="q" type="hidden" value="">
+            <input name="loc" type="hidden" value="">
+            <input name="rad" type="hidden" value="">
+            <input name="sort" type="hidden" value="">
+            <input name="price" type="hidden" value="">
+            <input name="open" type="hidden" value="">
+            <button id="srchbtn" class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
             {#  TODO: Time Picker {{ time_form.as_p }}#}
         </form>
         </div>
@@ -103,7 +118,11 @@
             $('.rdo a').on("click", function (event) {
                 var $radio_button = $(this).find(':radio');
 
-                $('input[type="radio"]').prop('checked', false);
+                if (($radio_button).attr('class') === 'rdobtn1') {
+                    $('input[class="rdobtn1"]').prop('checked', false);
+                } else {
+                    $('input[class="rdobtn2"]').prop('checked', false);
+                }
                 $radio_button.prop("checked", true);
                 event.stopPropagation();
                 event.preventDefault();
@@ -111,12 +130,21 @@
             });
 
             $('#search').submit(function (event) {
-                var action = ($('#search').attr('action'));
-                var query = String(($('input[id="q"]').val()))
-                var location = String(($('input[id="loc"]').val()))
+                var $q = ($('input[name="q"]'));
+                var $loc = ($('input[name="loc"]'));
+                var $rad = ($('input[name="rad"]'));
+                var $sort = ($('input[name="sort"]'));
+                var $price = ($('input[name="price"]'));
+                var $open = ($('input[name="open"]'));
+
+                var query = String(($('input[id="q"]').val())) ? String(($('input[id="q"]').val())) : 'food';
+                var location = String(($('input[id="loc"]').val())) ? String(($('input[id="loc"]').val())) : 'Irvine, CA';
+                var radius = ($('input[class="rdobtn1"]:checked').is(':checked')) ? ($('input[class="rdobtn1"]:checked').attr('data-value')) : 8050;
+                var sortby = ($('input[class="rdobtn2"]:checked').is(':checked')) ? ($('input[class="rdobtn2"]:checked').attr('data-value')) : 'best_match';
                 var price = [];
-                var radius = ($('input[type="radio"]:checked').is(':checked')) ? ($('input[type="radio"]:checked').attr('data-value')) : 8050;
                 var opennow = ($('input[id="opennow"]').attr('checked')) ? true : false;
+                
+                event.preventDefault();
 
                 if ($('#price1').is(':checked')) {
                     price.push('1');
@@ -133,15 +161,15 @@
                 if (price.length === 0) {
                     price = ['1', '2', '3', '4']
                 }
-
-                var parameters = String('?q=' + String(query) + '&loc=' + String(location) +
-                    '&rad=' + String(radius) + '&price=' + String(price) + '&open=' + String(opennow))
-
-                $('#search').attr('action', action + parameters );
                 
-                $('#search').unbind().submit();
+                $q.attr('value', String(query));
+                $loc.attr('value', String(location));
+                $rad.attr('value', String(radius));
+                $sort.attr('value', String(sortby));
+                $price.attr('value', String(price));
+                $open.attr('value', String(opennow));
 
-                return true;
+                ($('form[id="search"]')).off('submit').submit();
             });
         });
     </script>
