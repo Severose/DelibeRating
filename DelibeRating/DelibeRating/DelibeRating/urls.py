@@ -17,12 +17,16 @@ admin.autodiscover()
 urlpatterns = [
     url(r'^favicon\.ico$',RedirectView.as_view(url='/static/images/favicon.ico')),
     url(r'^$', app_views.home, name='home'),
-    url(r'^search/$', app_views.search, name='search'),
+    url(r'^create_group', app_views.create_group, name='create_group'),
     url(r'^login/$', app_views.login, name='login'),
     url(r'^logout$', auth_views.logout, {'next_page': '/',}, name='logout'),
+    url(r'^random', app_views.randomizer, name='random'),
     url(r'^register', app_views.register, name='register'),
     url(r'^password', app_views.password, name='password'),
+    url(r'^search/$', app_views.search, name='search'),
     url(r'^settings', app_views.settings, name='settings'),
+    url(r'^suggestions', app_views.suggestions, name='suggestions'),
+    url(r'^vote', app_views.vote, name='vote'),
     url(r'^delete_user/(?P<username>[\w|\W.-]+)/$', app_views.delete_user, name='delete-user'), 
 
     # Uncomment the admin/doc line below to enable admin documentation:

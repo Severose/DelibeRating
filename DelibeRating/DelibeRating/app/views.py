@@ -3,6 +3,7 @@ Definition of views.
 """
 
 import operator
+import random
 import datetime
 from django.shortcuts import render, redirect
 from django.http import HttpRequest, Http404
@@ -27,13 +28,48 @@ from django.conf import settings
 import json
 from django.core.cache import cache
 from django.core.paginator import Paginator
+from django import template
 
+registerT = template.Library()
 yelp_api = YelpAPI(settings.API_KEY, timeout_s=3.0)
+
+def create_group(request):
+    """Renders the create group page."""
+    print("Create Group View")
+    time_form = CustomTimeForm()
+
+    if request.method == 'POST':
+        print("Register: POST Request")
+        form = CustomUserCreationForm(data=request.POST)
+        if form.is_valid():
+            print("Register: Form Valid")
+            form.save()
+            messages.success(request, 'Your account was successfully created!')
+            return redirect('/')
+        else:
+            print("Register: Form Invalid")
+            print(form.errors)
+            messages.error(request, 'Please correct the error below.')
+    else:
+        print("Register: GET Request")
+        form = CustomUserCreationForm()
+    assert isinstance(request, HttpRequest)
+    return render(
+        request,
+        'app/register.html',
+        {
+            'title':'Register',
+            'message':'Register a new user account.',
+            'form':form,
+            'time_form': time_form,
+        }
+    )
 
 def home(request):
     """Renders the home page.
         TODO: Update content
     """
+    print("Home View")
     time_form = CustomTimeForm()
 
     assert isinstance(request, HttpRequest)
@@ -80,6 +116,128 @@ def login(request):
         }
     )
 
+@login_required
+def password(request):
+    """Renders the edit account info page.
+        TODO: Implement changing password
+    """
+    print("Password View")
+    time_form = CustomTimeForm()
+
+    if request.method == 'POST':
+        print("Password: POST Request")
+        form = CustomPasswordChangeForm(request.user, request.POST)
+        if form.is_valid():
+            user = form.save()
+            update_session_auth_hash(request, user)
+            messages.add_message(request, messages.INFO, 'Password changed.')
+            return redirect('password')
+        else:
+            print("Password: Form Invalid")
+            print(form.errors)
+            messages.error(request, 'Please correct the error below.')
+    else:
+        print("Password: GET Request")
+        form = CustomPasswordChangeForm(request.user)
+    assert isinstance(request, HttpRequest)
+    return render(
+        request,
+        'app/password.html',
+        {
+            'title':'Password',
+            'message':'Change password page.',
+            'form':form,
+            'time_form': time_form,
+        }
+    )
+
+def randomizer(request):
+    """Renders the randomizer page.
+        TODO: Implement
+    """
+    print("Randomizer View")
+    time_form = CustomTimeForm()
+    rindex = 0
+
+    if request.method == 'GET':
+        query = request.GET.get('q', None)
+        location = request.GET.get('loc', None)
+        radius = request.GET.get('rad', None)
+        sortby = request.GET.get('sort', None)
+        pricerange = request.GET.get('price', None)
+        opennow = request.GET.get('open', None)
+
+        if 'q' in request.GET:
+            print(request.GET)
+        else:
+            print('q not found!')
+
+        if 'loc' in request.GET:
+            print(request.GET)
+        else:
+            print('loc not found!')
+
+        if 'rad' in request.GET:
+            print(request.GET)
+        else:
+            print('rad not found!')
+
+        if 'sort' in request.GET:
+            print(request.GET)
+        else:
+            print('sort not found!')
+
+        if 'price' in request.GET:
+            print(request.GET)
+        else:
+            print('price not found!')
+
+        if 'open' in request.GET:
+            print(request.GET)
+        else:
+            print('open not found!')
+
+        if cache.get(''.join(i for i in str(query+location+radius+sortby+pricerange+opennow) if i.isalnum())):
+            print("Using cached results!")
+            print(''.join(i for i in str(query+location+radius+sortby+pricerange+opennow) if i.isalnum()))
+            raw_data = cache.get(''.join(i for i in str(query+location+radius+sortby+pricerange+opennow) if i.isalnum()))
+        else:
+            print("Querying Yelp Fusion API")
+            raw_data = yelp_api.search_query(term=query,
+                                             location=location,
+                                             radius=radius,
+                                             limit=48,
+                                             sort_by=sortby,
+                                             price=pricerange,
+                                             open_now=opennow)
+            
+        data = json.loads(json.dumps(raw_data))
+        cache.set(''.join(i for i in str(query+location+radius+sortby+pricerange+opennow) if i.isalnum()), data, 86400)  #TODO: Use DEFAULT_TIMEOUT
+
+        random.randint(0,len(data['businesses']))
+
+        results = [data['businesses'][random.randint(0,len(data['businesses']))]]
+
+        print(results)
+
+        print("Random: GET Request")
+        context = {'title':'Randomizer',
+                   'message':'Randomizer Page',
+                   'results':results,
+                   'query':query,
+                   'location':location,
+                   'time_form': time_form,
+                   }
+
+        assert isinstance(request, HttpRequest)
+        return render(
+            request,
+            'app/random.html',
+            context)
+
+    else:
+        return render(request,"app/random.html",{})
+
 def register(request):
     """Renders the register page."""
     print("Register View")
@@ -117,7 +275,7 @@ def search(request):
         TODO: Update content
     """
     print("Search View")
-    #time_form = CustomTimeForm()
+    time_form = CustomTimeForm()
 
     if request.method == 'GET':
         query = request.GET.get('q', None)
@@ -184,8 +342,9 @@ def search(request):
                    'message':'Search Page',
                    'results':results,
                    'query':query,
-                   'location':location,}
-                   #'time_form': time_form,
+                   'location':location,
+                   'time_form': time_form,
+                   }
 
         assert isinstance(request, HttpRequest)
         return render(
@@ -230,37 +389,36 @@ def settings(request):
         }
     )
 
-@login_required
-def password(request):
-    """Renders the edit account info page.
-        TODO: Implement changing password
+def suggestions(request):
+    """Renders the suggestions page.
+        TODO: Implement
     """
-    print("Password View")
+    print("Suggestions View")
     time_form = CustomTimeForm()
 
-    if request.method == 'POST':
-        print("Password: POST Request")
-        form = CustomPasswordChangeForm(request.user, request.POST)
-        if form.is_valid():
-            user = form.save()
-            update_session_auth_hash(request, user)
-            messages.add_message(request, messages.INFO, 'Password changed.')
-            return redirect('password')
-        else:
-            print("Password: Form Invalid")
-            print(form.errors)
-            messages.error(request, 'Please correct the error below.')
-    else:
-        print("Password: GET Request")
-        form = CustomPasswordChangeForm(request.user)
     assert isinstance(request, HttpRequest)
     return render(
         request,
-        'app/password.html',
+        'app/suggestions.html',
         {
-            'title':'Password',
-            'message':'Change password page.',
-            'form':form,
+            'title':'Suggestions Page',
+            'time_form': time_form,
+        }
+    )
+
+def vote(request):
+    """Renders the vote page.
+        TODO: Implement
+    """
+    print("Vote View")
+    time_form = CustomTimeForm()
+
+    assert isinstance(request, HttpRequest)
+    return render(
+        request,
+        'app/vote.html',
+        {
+            'title':'Group Vote Page',
             'time_form': time_form,
         }
     )

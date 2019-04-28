@@ -17,7 +17,7 @@
     <link rel="stylesheet" type="text/css" href="{% static 'app/content/bootstrap.min.css' %}" />
     <link rel="stylesheet" type="text/css" href="{% static 'app/content/site.css' %}" />
     <link rel="stylesheet" type="text/css" href="{% static 'app/content/font-awesome.css' %}" />
-    <link rel="stylesheet" type="text/css" href="{% static 'app/deliberating.css' %}" />
+    <link rel="stylesheet" type="text/css" href="{% static 'app/content/deliberating.css' %}" />
     <script src="{% static 'app/scripts/modernizr-2.6.2.js' %}"></script>
 
     {# Django Tempus Dominus assets #}
@@ -32,60 +32,14 @@
         <a class="navbar-brand" href="{% url 'home' %}">DelibeRating</a>
 
         <div class="collapse navbar-collapse" id="navbarsExampleDefault">
-        <ul class="navbar-nav mr-auto">
-            <li class="nav-item">
-                <a class="nav-link nav-right" href="#">Link</a>
-            </li>
-            {% include 'app/loginpartial.html' %}
-        </ul>
-        <form id="search" name="search" class="form-inline my-2 my-lg-0" type="get" action="{% url 'search' %}">
-            <input id="q" class="form-control mr-sm-2" type="text" placeholder="Search" required>
-            <input id="loc" class="form-control mr-sm-2" type="text" placeholder="Location" value="Irvine, CA" required>
-                       
-            <div class="dropdown">
-                <button class="btn btn-info dropdown-toggle" type="button" data-toggle="dropdown">Filters</button>
-                <ul class="dropdown-menu">
-                    <li class="dropdown-submenu button-group">
-                        <a class="drop dropdown-item dropdown-toggle" href="#">Radius</a>
-                        <ul class="dropdown-menu rdo">
-                            <li><a href="#" class="dropdown-item" tabIndex="-1"><input id="rad1" class="rdobtn1" data-value="1610" type="radio" disabled/>&nbsp;1 mile</a></li>
-                            <li><a href="#" class="dropdown-item" tabIndex="-1"><input id="rad2" class="rdobtn1" data-value="3220" type="radio" disabled/>&nbsp;2 miles</a></li>
-                            <li><a href="#" class="dropdown-item" tabIndex="-1"><input id="rad5" class="rdobtn1" data-value="8050" type="radio" disabled/>&nbsp;5 miles</a></li>
-                            <li><a href="#" class="dropdown-item" tabIndex="-1"><input id="rad10" class="rdobtn1" data-value="16100" type="radio" disabled/>&nbsp;10 miles</a></li>
-                            <li><a href="#" class="dropdown-item" tabIndex="-1"><input id="rad20" class="rdobtn1" data-value="32200" type="radio" disabled/>&nbsp;20 miles</a></li>
-                        </ul>
-                    </li>
-                    <li class="dropdown-submenu button-group">
-                        <a class="drop dropdown-item dropdown-toggle" href="#">Sort by</a>
-                        <ul class="dropdown-menu rdo">
-                            <li><a href="#" class="dropdown-item" tabIndex="-1"><input id="sort_best" class="rdobtn2" data-value="best_match" type="radio" disabled/>&nbsp;Best match</a></li>
-                            <li><a href="#" class="dropdown-item" tabIndex="-1"><input id="sort_rating" class="rdobtn2" data-value="rating" type="radio" disabled/>&nbsp;Rating</a></li>
-                            <li><a href="#" class="dropdown-item" tabIndex="-1"><input id="sort_review" class="rdobtn2" data-value="review_count" type="radio" disabled/>&nbsp;Review count</a></li>
-                            <li><a href="#" class="dropdown-item" tabIndex="-1"><input id="sort_distance" class="rdobtn2" data-value="distance" type="radio" disabled/>&nbsp;Distance</a></li>
-                        </ul>
-                    </li>
-                    <li class="dropdown-submenu">
-                        <a class="drop dropdown-item dropdown-toggle" href="#">Price</a>
-                        <ul class="dropdown-menu chk">
-                            <li><a href="#" class="dropdown-item" tabIndex="-1"><input id ="price1" class="chkbox" data-value="1" type="checkbox" disabled>&nbsp;$</a></li>
-                            <li><a href="#" class="dropdown-item" tabIndex="-1"><input id ="price2" class="chkbox" data-value="2" type="checkbox" disabled>&nbsp;$$</a></li>
-                            <li><a href="#" class="dropdown-item" tabIndex="-1"><input id ="price3" class="chkbox" data-value="3" type="checkbox" disabled>&nbsp;$$$</a></li>
-                            <li><a href="#" class="dropdown-item" tabIndex="-1"><input id ="price4" class="chkbox" data-value="4" type="checkbox" disabled>&nbsp;$$$$</a></li>
-                        </ul>
-                    </li>
-                    <li class="chk"><a href="#" class="dropdown-item" tabIndex="-1"><input id="opennow" type="checkbox" data-value="true" disabled/>&nbsp;Open now</a></li>
-                    <!--TODO: Time Picker <li><a class="dropdown-item" tabindex="-1" href="#">Open at</a></li>-->
-                </ul>
-            </div>
-            <input name="q" type="hidden" value="">
-            <input name="loc" type="hidden" value="">
-            <input name="rad" type="hidden" value="">
-            <input name="sort" type="hidden" value="">
-            <input name="price" type="hidden" value="">
-            <input name="open" type="hidden" value="">
-            <button id="srchbtn" class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-            {#  TODO: Time Picker {{ time_form.as_p }}#}
-        </form>
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    <a class="nav-link nav-right" href="{% url 'suggestions' %}">Suggestions</a>
+                    <a class="nav-link nav-right" href="{% url 'vote' %}">Group vote</a>
+                </li>
+                {% include 'app/loginpartial.html' %}
+            </ul>
+            {% include 'app/search_form.html' %}
         </div>
     </nav>
 
@@ -96,83 +50,8 @@
 <script type="text/javascript" src="{% static 'app/scripts/bootstrap.min.js' %}"></script>
 <script type="text/javascript" src="{% static 'app/scripts/moment.js' %}"></script>
 <script type="text/javascript" src="{% static 'app/scripts/alert.js' %}"></script>
+<script type="text/javascript" src="{% static 'app/scripts/deliberating.js' %}"></script>
 {% block scripts %}{% endblock %}
-
-    <script>
-        $(document).ready(function () {
-            var options = [];
-
-            $('.dropdown-menu a').on('click', function (event) {
-                event.stopPropagation();
-                event.preventDefault();
-            });
-            
-            $('.chk a').on('click', function () {
-                var $checkbox = $(this).find(':checkbox');
-
-                $checkbox.attr('checked', !$checkbox.attr('checked'));
-                event.stopPropagation();
-                event.preventDefault();
-            });
-            
-            $('.rdo a').on("click", function (event) {
-                var $radio_button = $(this).find(':radio');
-
-                if (($radio_button).attr('class') === 'rdobtn1') {
-                    $('input[class="rdobtn1"]').prop('checked', false);
-                } else {
-                    $('input[class="rdobtn2"]').prop('checked', false);
-                }
-                $radio_button.prop("checked", true);
-                event.stopPropagation();
-                event.preventDefault();
-                
-            });
-
-            $('#search').submit(function (event) {
-                var $q = ($('input[name="q"]'));
-                var $loc = ($('input[name="loc"]'));
-                var $rad = ($('input[name="rad"]'));
-                var $sort = ($('input[name="sort"]'));
-                var $price = ($('input[name="price"]'));
-                var $open = ($('input[name="open"]'));
-
-                var query = String(($('input[id="q"]').val())) ? String(($('input[id="q"]').val())) : 'food';
-                var location = String(($('input[id="loc"]').val())) ? String(($('input[id="loc"]').val())) : 'Irvine, CA';
-                var radius = ($('input[class="rdobtn1"]:checked').is(':checked')) ? ($('input[class="rdobtn1"]:checked').attr('data-value')) : 8050;
-                var sortby = ($('input[class="rdobtn2"]:checked').is(':checked')) ? ($('input[class="rdobtn2"]:checked').attr('data-value')) : 'best_match';
-                var price = [];
-                var opennow = ($('input[id="opennow"]').attr('checked')) ? true : false;
-                
-                event.preventDefault();
-
-                if ($('#price1').is(':checked')) {
-                    price.push('1');
-                }
-                if ($('#price2').is(':checked')) {
-                    price.push('2');
-                }
-                if ($('#price3').is(':checked')) {
-                    price.push('3');
-                }
-                if ($('#price4').is(':checked')) {
-                    price.push('4');
-                }
-                if (price.length === 0) {
-                    price = ['1', '2', '3', '4']
-                }
-                
-                $q.attr('value', String(query));
-                $loc.attr('value', String(location));
-                $rad.attr('value', String(radius));
-                $sort.attr('value', String(sortby));
-                $price.attr('value', String(price));
-                $open.attr('value', String(opennow));
-
-                ($('form[id="search"]')).off('submit').submit();
-            });
-        });
-    </script>
 
 </body>
 </html>

@@ -1,0 +1,52 @@
+﻿{% load staticfiles %}
+
+<form id="search" name="search" class="form-inline my-2 my-lg-0" type="get" action="{% url 'search' %}">
+    {% csrf_token %}
+    <input id="q" class="form-control mr-sm-2" type="text" placeholder="Search" required>
+    <input id="loc" class="form-control mr-sm-2" type="text" placeholder="Location" value="Irvine, CA" required>
+                       
+    <div class="dropdown">
+        <button class="btn btn-info dropdown-toggle" type="button" data-toggle="dropdown">Filters</button>
+        <ul class="dropdown-menu">
+            <li class="dropdown-submenu button-group">
+                <a class="drop dropdown-item dropdown-toggle" href="#">Radius</a>
+                <ul class="dropdown-menu rdo">
+                    <li><a href="#" class="dropdown-item" tabIndex="-1"><input id="rad1" class="rdobtn1" data-value="1610" type="radio" disabled/>&nbsp;1 mile</a></li>
+                    <li><a href="#" class="dropdown-item" tabIndex="-1"><input id="rad2" class="rdobtn1" data-value="3220" type="radio" disabled/>&nbsp;2 miles</a></li>
+                    <li><a href="#" class="dropdown-item" tabIndex="-1"><input id="rad5" class="rdobtn1" data-value="8050" type="radio" disabled/>&nbsp;5 miles</a></li>
+                    <li><a href="#" class="dropdown-item" tabIndex="-1"><input id="rad10" class="rdobtn1" data-value="16100" type="radio" disabled/>&nbsp;10 miles</a></li>
+                    <li><a href="#" class="dropdown-item" tabIndex="-1"><input id="rad20" class="rdobtn1" data-value="32200" type="radio" disabled/>&nbsp;20 miles</a></li>
+                </ul>
+            </li>
+            <li class="dropdown-submenu button-group">
+                <a class="drop dropdown-item dropdown-toggle" href="#">Sort by</a>
+                <ul class="dropdown-menu rdo">
+                    <li><a href="#" class="dropdown-item" tabIndex="-1"><input id="sort_best" class="rdobtn2" data-value="best_match" type="radio" disabled/>&nbsp;Best match</a></li>
+                    <li><a href="#" class="dropdown-item" tabIndex="-1"><input id="sort_rating" class="rdobtn2" data-value="rating" type="radio" disabled/>&nbsp;Rating</a></li>
+                    <li><a href="#" class="dropdown-item" tabIndex="-1"><input id="sort_review" class="rdobtn2" data-value="review_count" type="radio" disabled/>&nbsp;Review count</a></li>
+                    <li><a href="#" class="dropdown-item" tabIndex="-1"><input id="sort_distance" class="rdobtn2" data-value="distance" type="radio" disabled/>&nbsp;Distance</a></li>
+                </ul>
+            </li>
+            <li class="dropdown-submenu">
+                <a class="drop dropdown-item dropdown-toggle" href="#">Price</a>
+                <ul class="dropdown-menu chk">
+                    <li><a href="#" class="dropdown-item" tabIndex="-1"><input id ="price1" class="chkbox" data-value="1" type="checkbox" disabled>&nbsp;$</a></li>
+                    <li><a href="#" class="dropdown-item" tabIndex="-1"><input id ="price2" class="chkbox" data-value="2" type="checkbox" disabled>&nbsp;$$</a></li>
+                    <li><a href="#" class="dropdown-item" tabIndex="-1"><input id ="price3" class="chkbox" data-value="3" type="checkbox" disabled>&nbsp;$$$</a></li>
+                    <li><a href="#" class="dropdown-item" tabIndex="-1"><input id ="price4" class="chkbox" data-value="4" type="checkbox" disabled>&nbsp;$$$$</a></li>
+                </ul>
+            </li>
+            <li class="chk"><a href="#" class="dropdown-item" tabIndex="-1"><input id="opennow" type="checkbox" data-value="true" disabled/>&nbsp;Open now</a></li>
+            <!--TODO: Time Picker <li><a class="dropdown-item" tabindex="-1" href="#">Open at</a></li>-->
+        </ul>
+    </div>
+    <input name="q" type="hidden" value="">
+    <input name="loc" type="hidden" value="">
+    <input name="rad" type="hidden" value="">
+    <input name="sort" type="hidden" value="">
+    <input name="price" type="hidden" value="">
+    <input name="open" type="hidden" value="">
+    <button id="srchbtn" class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+    <button id="rndmbtn" class="btn btn-outline-warning my-2 my-sm-0" type="submit">Random</button>
+    {#  TODO: Time Picker {{ time_form.as_p }}#}
+</form>

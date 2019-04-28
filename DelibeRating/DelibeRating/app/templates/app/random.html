@@ -2,11 +2,10 @@
 
 {% block content %}
 
-<h2>Search results:</h2>
+<h2>Randomizer result:</h2>
 
 {% if results %}
-    {% include 'app/pagination.html' %}
-    {% for element in results.object_list %}
+    {% for element in results %}
         {% include 'app/result.html' %}
     {% endfor %}
 {% else %}

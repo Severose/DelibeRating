@@ -10,6 +10,48 @@ from django.contrib.auth.forms import AuthenticationForm, UserCreationForm, User
 from django.utils.translation import ugettext_lazy as _
 from tempus_dominus.widgets import TimePicker
 
+class CustomGroupCreationForm(UserCreationForm):
+    """Custom User Creation Form for the CustomUser model
+        username, password1, password2, email, first_name, last_name
+    """
+    username = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Username'}),
+                               label='Username')
+    password1 = forms.CharField(widget=forms.PasswordInput(attrs={'placeholder': 'Password'}),
+                               label='Password')
+    password2 = forms.CharField(widget=forms.PasswordInput(attrs={'placeholder': 'Password (again)'}),
+                               label='Password confirmation')
+    email = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Email'}),
+                               label='Email')
+    first_name = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'First name'}),
+                               label='First name', required=False)
+    last_name = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Last name'}),
+                               label='Last name', required=False)
+
+    class Meta:
+        model = CustomGroup
+        fields = ("username", "password1", "password2", "email", "first_name", "last_name")
+
+class CustomGroupChangeForm(UserChangeForm):
+    """Custom User Change Form for the CustomUser model
+        username, password, email, first_name, last_name
+    """
+    username = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Username'}),
+                               label='Username', required=False)
+    email = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Email'}),
+                               label='Email', required=False)
+    first_name = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'First name'}),
+                               label='First name', required=False)
+    last_name = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Last name'}),
+                               label='Last name', required=False)
+
+    def __init__(self, *args, **kwargs):
+        super(CustomUserChangeForm, self).__init__(*args, **kwargs)
+        self.fields.pop('password')
+
+    class Meta:
+        model = CustomUser
+        fields = ("username", "email", "first_name", "last_name")
+
 class CustomUserAuthenticationForm(AuthenticationForm):
     """Custom User Authentication Form for the CustomUser model:
         username, password

@@ -1,0 +1,74 @@
+{% extends "app/layout.html" %}
+
+{% load crispy_forms_tags %}
+
+{% block content %}
+
+<h2>{{ title }}</h2>
+<div class="row">
+    <div class="col-md-8">
+        <section id="registrationForm">
+            <form action="{% url 'register' %}" method="post" class="form-horizontal">
+                {% csrf_token %}
+                <div class="form-row">
+                    <div class="form-group col-md-6 mb-0">
+                        {{ form.username|as_crispy_field }}
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-6 mb-0">
+                        {{ form.password1|as_crispy_field }}
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-6 mb-0">
+                        {{ form.password2|as_crispy_field }}
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-6 mb-0">
+                        {{ form.email|as_crispy_field }}
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-6 mb-0">
+                        {{ form.first_name|as_crispy_field }}
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-6 mb-0">
+                        {{ form.last_name|as_crispy_field }}
+                    </div>
+                </div>
+                <input type="submit" value="Create new user account" class="btn btn-primary" />
+
+                {% if form.errors %}
+                    <div class="alert alert-error">
+                        <ul>
+                            {% for error in form.non_field_errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+            </form>
+        </section>
+    </div>
+</div>
+
+{% if messages %}
+<ul class="messages">
+    {% for message in messages %}
+        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+
+{% endblock %}
+
+{% block scripts %}
+
+    {% load staticfiles %}
+<script src="{% static 'app/scripts/jquery.validate.min.js' %}"></script>
+
+{% endblock %}

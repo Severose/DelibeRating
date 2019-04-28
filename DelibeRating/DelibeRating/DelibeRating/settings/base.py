@@ -113,6 +113,7 @@ CACHES = {
 }
 
 AUTH_USER_MODEL = 'app.CustomUser'
+AUTH_PROFILE_MODULE = 'app.UserProfile'
 
 # Redirects
 LOGIN_REDIRECT_URL = '/'
