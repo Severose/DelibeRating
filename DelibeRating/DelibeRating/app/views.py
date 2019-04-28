@@ -33,35 +33,95 @@ from django import template
 registerT = template.Library()
 yelp_api = YelpAPI(settings.API_KEY, timeout_s=3.0)
 
+@login_required
 def create_group(request):
     """Renders the create group page."""
     print("Create Group View")
     time_form = CustomTimeForm()
 
     if request.method == 'POST':
-        print("Register: POST Request")
-        form = CustomUserCreationForm(data=request.POST)
+        print("Create Group: POST Request")
+        form = CustomGroupCreationForm(data=request.POST)
         if form.is_valid():
-            print("Register: Form Valid")
-            form.save()
-            messages.success(request, 'Your account was successfully created!')
-            return redirect('/')
+            print("Create Group: Form Valid")
+            group, created = Group.objects.get_or_create(name=form.cleaned_data['name'])
+            user = request.user
+            if created:
+                user.groups.add(group)
+                group.save()
+                messages.success(request, 'Your group was successfully created!')
+            else:
+                messages.error(request, 'That group already exists!')
+            return redirect('group/?g=' + group.name)
         else:
-            print("Register: Form Invalid")
+            print("Create Group: Form Invalid")
             print(form.errors)
             messages.error(request, 'Please correct the error below.')
     else:
         print("Register: GET Request")
-        form = CustomUserCreationForm()
+        form = CustomGroupCreationForm()
     assert isinstance(request, HttpRequest)
     return render(
         request,
-        'app/register.html',
+        'app/create_group.html',
         {
-            'title':'Register',
+            'title':'Create Group',
             'message':'Register a new user account.',
             'form':form,
             'time_form': time_form,
+        }
+    )
+
+@login_required
+def group(request):
+    """Renders the group page.
+        TODO: Implement
+    """
+    print("Group View")
+    time_form = CustomTimeForm()
+
+    if request.method == 'GET':
+        print("Group: GET Request")
+        form = CustomGroupChangeForm()
+        groupname = request.GET.get('g', None)
+
+        if 'g' in request.GET:
+            print(request.GET)
+        else:
+            print('g not found!')
+
+        group = Group.objects.get(name = groupname)
+        users = CustomUser.objects.filter(groups__name=groupname)
+    else:
+        print("Group: POST Request")
+        form = CustomGroupChangeForm(data=request.POST)
+        if form.is_valid():
+            print("Group: Form Valid")
+            groupname = request.GET.get('g', None)
+
+            if 'g' in request.GET:
+                print(request.GET)
+            else:
+                print('g not found!')
+
+            group = Group.objects.get(name = groupname)
+            user = CustomUser.objects.get(username=form.cleaned_data['username'])
+            users = CustomUser.objects.filter(groups__name=groupname)
+            user.groups.add(group)
+            group.save()
+            messages.success(request, 'Your group was successfully created!')
+
+    assert isinstance(request, HttpRequest)
+    return render(
+        request,
+        'app/group.html',
+        {
+            'title':'Group',
+            'message':'Your group page.',
+            'time_form': time_form,
+            'form': form,
+            'group': group,
+            'users': users,
         }
     )
 
@@ -147,6 +207,32 @@ def password(request):
             'title':'Password',
             'message':'Change password page.',
             'form':form,
+            'time_form': time_form,
+        }
+    )
+
+@login_required
+def profile(request):
+    """Renders the user profile info page.
+        TODO: Implement
+    """
+    print("User Profile View")
+    time_form = CustomTimeForm()
+
+    if request.method == 'POST':
+        print("User Profile: POST Request")
+    else:
+        print("User Profile: GET Request")
+
+    user = CustomUser.objects.get(username = request.user.username)
+
+    assert isinstance(request, HttpRequest)
+    return render(
+        request,
+        'app/profile.html',
+        {
+            'title':'Profile',
+            'message':'Your profile page.',
             'time_form': time_form,
         }
     )
@@ -406,12 +492,18 @@ def suggestions(request):
         }
     )
 
+@login_required
 def vote(request):
     """Renders the vote page.
         TODO: Implement
     """
     print("Vote View")
     time_form = CustomTimeForm()
+    groups = []
+
+    user = CustomUser.objects.get(username = request.user.username)
+    for g in user.groups.all():
+        groups.append(g.name)
 
     assert isinstance(request, HttpRequest)
     return render(
@@ -420,6 +512,7 @@ def vote(request):
         {
             'title':'Group Vote Page',
             'time_form': time_form,
+            'groups': groups,
         }
     )
 

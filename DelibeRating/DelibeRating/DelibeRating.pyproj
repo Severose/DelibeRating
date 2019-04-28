@@ -98,7 +98,9 @@
     <Content Include="app\static\app\scripts\moment.js" />
     <Content Include="app\static\images\favicon.ico" />
     <Content Include="app\templates\app\create_group.html" />
+    <Content Include="app\templates\app\group.html" />
     <Content Include="app\templates\app\search_form.html" />
+    <Content Include="app\templates\app\profile.html" />
     <Content Include="app\templates\app\suggestions.html" />
     <Content Include="app\templates\app\vote.html" />
     <Content Include="app\templates\app\random.html" />
