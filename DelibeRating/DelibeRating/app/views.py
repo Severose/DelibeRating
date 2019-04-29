@@ -66,7 +66,6 @@ def create_group(request):
         'app/create_group.html',
         {
             'title':'Create Group',
-            'message':'Register a new user account.',
             'form':form,
             'time_form': time_form,
         }
@@ -117,7 +116,6 @@ def group(request):
         'app/group.html',
         {
             'title':'Group',
-            'message':'Your group page.',
             'time_form': time_form,
             'form': form,
             'group': group,
@@ -170,7 +168,6 @@ def login(request):
         'app/login.html',
         {
             'title':'Login',
-            'message':'Login to your account.',
             'form': form,
             'time_form': time_form,
         }
@@ -205,7 +202,6 @@ def password(request):
         'app/password.html',
         {
             'title':'Password',
-            'message':'Change password page.',
             'form':form,
             'time_form': time_form,
         }
@@ -218,13 +214,23 @@ def profile(request):
     """
     print("User Profile View")
     time_form = CustomTimeForm()
+    groups = []
 
-    if request.method == 'POST':
-        print("User Profile: POST Request")
-    else:
+    if request.method == 'GET':
         print("User Profile: GET Request")
+        name = request.GET.get('u', None)
 
-    user = CustomUser.objects.get(username = request.user.username)
+        if 'u' in request.GET:
+            print(request.GET)
+        else:
+            print('u not found!')
+    else:
+        print("User Profile: POST Request")
+        name = ""
+
+    user = CustomUser.objects.get(username = name)
+    for g in user.groups.all():
+        groups.append(g.name)
 
     assert isinstance(request, HttpRequest)
     return render(
@@ -232,8 +238,9 @@ def profile(request):
         'app/profile.html',
         {
             'title':'Profile',
-            'message':'Your profile page.',
             'time_form': time_form,
+            'user': user,
+            'groups': groups,
         }
     )
 
@@ -300,7 +307,7 @@ def randomizer(request):
         data = json.loads(json.dumps(raw_data))
         cache.set(''.join(i for i in str(query+location+radius+sortby+pricerange+opennow) if i.isalnum()), data, 86400)  #TODO: Use DEFAULT_TIMEOUT
 
-        random.randint(0,len(data['businesses']))
+        random.randint(0,len(data['businesses'])-1)
 
         results = [data['businesses'][random.randint(0,len(data['businesses']))]]
 
@@ -308,11 +315,11 @@ def randomizer(request):
 
         print("Random: GET Request")
         context = {'title':'Randomizer',
-                   'message':'Randomizer Page',
                    'results':results,
                    'query':query,
                    'location':location,
                    'time_form': time_form,
+                   'messages': messages,
                    }
 
         assert isinstance(request, HttpRequest)
@@ -350,7 +357,6 @@ def register(request):
         'app/register.html',
         {
             'title':'Register',
-            'message':'Register a new user account.',
             'form':form,
             'time_form': time_form,
         }
@@ -425,7 +431,6 @@ def search(request):
 
         print("Settings: GET Request")
         context = {'title':'Search',
-                   'message':'Search Page',
                    'results':results,
                    'query':query,
                    'location':location,
@@ -469,7 +474,6 @@ def settings(request):
         'app/settings.html',
         {
             'title':'Settings',
-            'message':'Your settings page.',
             'form':form,
             'time_form': time_form,
         }

@@ -1,23 +1,19 @@
 {% extends "app/layout.html" %}
 
+{% load staticfiles %}
+
+{% include 'app/messages.html' %}
+{% include 'app/form_errors.html' %}
+
 {% block content %}
+<h2>Search results:</h2>
 
-    <!-- Main jumbotron for a primary marketing message or call to action -->
-    <div class="jumbotron">
-        <div class="container">
-            <h1 class="display-3">Suggestions</h1>
-            <p class="lead">A free web app to help you or your group make a decision.</p>
-        </div>
-    </div>
-
-    <div class="container">
-        <div class="row">
-            <div class="col-md-4">
-                <h2>We can't decide/agree...</h2>
-                <p>Start a group vote, so everyone can have input.</p>
-                <p><a class="btn btn-secondary" href="#" role="button">Help us vote &raquo;</a></p>
-            </div>
-        </div>
-    </div>
-
+{% if results %}
+{% include 'app/pagination.html' %}
+{% for element in results.object_list %}
+    {% include 'app/result.html' %}
+{% endfor %}
+{% else %}
+    <h3>No results!</h3>
+{% endif %}
 {% endblock %}

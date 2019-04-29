@@ -1,9 +1,12 @@
 {% extends "app/layout.html" %}
 
 {% load crispy_forms_tags %}
+{% load staticfiles %}
+
+{% include 'app/messages.html' %}
+{% include 'app/form_errors.html' %}
 
 {% block content %}
-
 <h2>{{ title }}</h2>
 <div class="row">
     <div class="col-md-8">
@@ -22,11 +25,6 @@
                 </div>
                 <input type="submit" value="Log in" class="btn btn-primary" />
                 <a class="btn btn-secondary" href="{% url 'register' %}">Register</a>
-
-                {% if form.errors %}
-                {{ form.errors }}
-                <p class="validation-summary-errors">Please enter a correct user name and password.</p>
-                {% endif %}
             </form>
         </section>
     </div>
@@ -34,21 +32,4 @@
         <section id="socialLoginForm"></section>
     </div>
 </div>
-
-{% if messages %}
-<ul class="messages">
-    {% for message in messages %}
-    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
-    {% endfor %}
-</ul>
-{% endif %}
-
-{% endblock %}
-
-
-{% block scripts %}
-
-    {% load staticfiles %}
-<script src="{% static 'app/scripts/jquery.validate.min.js' %}"></script>
-
 {% endblock %}

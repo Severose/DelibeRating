@@ -1,32 +1,32 @@
 {% extends "app/layout.html" %}
 
+{% include 'app/messages.html' %}
+{% include 'app/form_errors.html' %}
+
 {% block content %}
-
-    <!-- Main jumbotron for a primary marketing message or call to action -->
-    <div class="jumbotron">
-        <div class="container">
-            <h1 class="display-3">Group Voting</h1>
-            <p class="lead">Start a group, and start voting!</p>
-            <a class="btn btn-secondary" href="{% url 'create_group' %}">Create Group</a>
-        </div>
-    </div>
-
+<div class="jumbotron">
     <div class="container">
-        <h3>Your groups:</h3>
-        <div class="row">
-            {% if groups %}
-                <ul>
-                    {% for group in groups %}
-                        <li>
-                            <a class="dropdown-item" href="{% url 'group' %}/?g={{ group }}">{{ group }}</a>
-                        </li>
-                    {% endfor %}
-                </ul>
-            {% endif %}
-        </div>
-        <div class="row">
-            
-        </div>
+        <h1 class="display-3">Group Voting</h1>
+        <p class="lead">Start a group, and start voting!</p>
+        <a class="btn btn-secondary" href="{% url 'create_group' %}">Create Group</a>
     </div>
+</div>
 
+<div class="container">
+    <h4>Your groups:</h4>
+    <div class="row">
+        {% if groups %}
+        <ul>
+            {% for group in groups %}
+            <li>
+                <a class="dropdown-item" href="{% url 'group' %}/?g={{ group }}">{{ group }}</a>
+            </li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+    </div>
+    <div class="row">
+            
+    </div>
+</div>
 {% endblock %}

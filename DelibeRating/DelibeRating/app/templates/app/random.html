@@ -1,36 +1,34 @@
 {% extends "app/layout.html" %}
 
-{% block content %}
+{% load staticfiles %}
 
+{% include 'app/messages.html' %}
+{% include 'app/form_errors.html' %}
+
+{% block content %}
 <h2>Randomizer result:</h2>
 
-{% if results %}
-    {% for element in results %}
-        {% include 'app/result.html' %}
-    {% endfor %}
-{% else %}
-    <h3>No results!</h3>
-{% endif %}
+<div class="row">
+    <div class="col-md-8">
+        {% if results %}
+        {% for element in results %}
+            {% include 'app/result.html' %}
+        {% endfor %}
 
-{% if form.errors %}
-{{ form.errors }}
-    <p class="validation-summary-errors">Please enter a correct user name and password.</p>
-{% endif %}
+        {% else %}
+        <h3>No results!</h3>
 
-{% if messages %}
-<ul class="messages">
-    {% for message in messages %}
-    <li {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
-    {% endfor %}
-</ul>
-{% endif %}
+        {% endif %}
+    </div>
+</div>
 
-{% endblock %}
-
-
-{% block scripts %}
-
-    {% load staticfiles %}
-<script src="{% static 'app/scripts/jquery.validate.min.js' %}"></script>
-
+<div class="row">
+    <div class="col-7">
+        <ul>
+            <li class="ctr">
+                <button class="btn btn-warning ctr" onClick="window.location.reload();">Try again</button>
+            </li>
+        </ul>
+    </div>
+</div>
 {% endblock %}

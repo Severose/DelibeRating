@@ -1,37 +1,19 @@
 {% extends "app/layout.html" %}
 
-{% block content %}
+{% load staticfiles %}
 
+{% include 'app/messages.html' %}
+{% include 'app/form_errors.html' %}
+
+{% block content %}
 <h2>Search results:</h2>
 
 {% if results %}
-    {% include 'app/pagination.html' %}
-    {% for element in results.object_list %}
-        {% include 'app/result.html' %}
-    {% endfor %}
+{% include 'app/pagination.html' %}
+{% for element in results.object_list %}
+    {% include 'app/result.html' %}
+{% endfor %}
 {% else %}
     <h3>No results!</h3>
 {% endif %}
-
-{% if form.errors %}
-{{ form.errors }}
-    <p class="validation-summary-errors">Please enter a correct user name and password.</p>
-{% endif %}
-
-{% if messages %}
-<ul class="messages">
-    {% for message in messages %}
-    <li {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
-    {% endfor %}
-</ul>
-{% endif %}
-
-{% endblock %}
-
-
-{% block scripts %}
-
-    {% load staticfiles %}
-<script src="{% static 'app/scripts/jquery.validate.min.js' %}"></script>
-
 {% endblock %}

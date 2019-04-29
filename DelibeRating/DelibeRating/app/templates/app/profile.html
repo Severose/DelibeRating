@@ -1,42 +1,25 @@
 {% extends "app/layout.html" %}
 
 {% load crispy_forms_tags %}
+{% load staticfiles %}
+
+{% include 'app/messages.html' %}
 
 {% block content %}
-
-<h2>{{ title }}</h2>
+<h3>Profile of {{ user.username }}</h3>
+<br/>
 <div class="row">
     <div class="col-md-8">
-        {% csrf_token %}
-        {{ user.username }}
-        {{ user.first_name }}
-        {{ user.last_name }}
-                
-        {% if form.errors %}
-            <div class="alert alert-error">
-                <ul>
-                    {% for error in form.non_field_errors %}
-                        <li>{{ error }}</li>
-                    {% endfor %}
-                </ul>
+        <div class="thumbnail user">
+            <img src="{% static 'images/no_user_photo.jpg' %}" alt="" height="308" width="308">
+            <div class="caption">
+                <h4><b>Name: </b>{{ user.first_name }} {{ user.last_name }}</h4>
+                <h4><b>Groups: </b></h4>
+                <ul>{% for g in groups %}
+                    <li>{{ g }}</li>
+                {% endfor %}</ul>
             </div>
-        {% endif %}
+        </div>
     </div>
 </div>
-
-{% if messages %}
-<ul class="messages">
-    {% for message in messages %}
-    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
-    {% endfor %}
-</ul>
-{% endif %}
-
-{% endblock %}
-
-{% block scripts %}
-
-    {% load staticfiles %}
-<script src="{% static 'app/scripts/jquery.validate.min.js' %}"></script>
-
 {% endblock %}

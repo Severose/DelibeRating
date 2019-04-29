@@ -9,6 +9,14 @@
     float: left;
 }
 
+.thumbnail.user {
+    display: block;
+    padding: 4px;
+    background-color: #ffffff;
+    border: none;
+    float: left;
+}
+
 p.small {
     line-height: 1.0;
     font-size: 100%;
@@ -24,6 +32,16 @@ p.address {
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
+}
+
+li.ctr {
+    padding-top: 10px;
+    padding-left: 10px;
+    width: 300px
+}
+
+button.ctr {
+    width: 100%;
 }
 
 div.categories {
@@ -85,7 +103,14 @@ a.nav-link {
     padding-left: 0;
 }
 
-h1, h2, h3, h4 {
+h1 {
+    padding-top: 10px;
+    padding-left: 10px;
+    padding-bottom: 20px;
+    line-height: 2.0;
+}
+
+h2, h3 {
     padding-top: 10px;
     padding-left: 10px;
     overflow: hidden;

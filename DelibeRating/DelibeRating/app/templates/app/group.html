@@ -1,18 +1,20 @@
 {% extends "app/layout.html" %}
 
 {% load crispy_forms_tags %}
+{% load staticfiles %}
+
+{% include 'app/messages.html' %}
+{% include 'app/form_errors.html' %}
 
 {% block content %}
-
 <h2>{{ title }}</h2>
 <div class="row">
     <div class="col-md-8">
-        {% csrf_token %}
         <h4>{{ group.name }}</h4>
         <ul>
             {% for u in users %}
             <li class="dropdown-item">
-                {{ u.username }}
+                <a href="{% url 'profile' %}?u={{ u.username }}">{{ u.username }}</a>
             </li>
             {% endfor %}
         </ul>
@@ -22,32 +24,6 @@
             {{ form.username|as_crispy_field }}
             <input type="submit" value="Add user" class="btn btn-primary" />
         </form>
-                
-        {% if form.errors %}
-            <div class="alert alert-error">
-                <ul>
-                    {% for error in form.non_field_errors %}
-                        <li>{{ error }}</li>
-                    {% endfor %}
-                </ul>
-            </div>
-        {% endif %}
     </div>
 </div>
-
-{% if messages %}
-<ul class="messages">
-    {% for message in messages %}
-    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
-    {% endfor %}
-</ul>
-{% endif %}
-
-{% endblock %}
-
-{% block scripts %}
-
-    {% load staticfiles %}
-<script src="{% static 'app/scripts/jquery.validate.min.js' %}"></script>
-
 {% endblock %}
