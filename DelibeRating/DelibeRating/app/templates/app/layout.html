@@ -33,7 +33,7 @@
         <a class="navbar-brand" href="{% url 'home' %}">DelibeRating</a>
 
         <div class="collapse navbar-collapse" id="navbarsExampleDefault">
-            <ul class="dropdown">
+            <div class="dropdown">
                 <button class="btn btn-link dropdown-toggle" type="button" data-toggle="dropdown">Decide</button>
                 <ul class="dropdown-menu">
                     <li class="dropdown-submenu">
@@ -43,7 +43,7 @@
                         {% endif %}
                     </li>
                 </ul>
-            </ul>
+            </div>
             {% include 'app/loginpartial.html' %}
             {% include 'app/search_form.html' %}
         </div>

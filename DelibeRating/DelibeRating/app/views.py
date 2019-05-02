@@ -118,19 +118,24 @@ def group(request):
         form = CustomGroupChangeForm(data=request.POST)
         if form.is_valid():
             print("Group: Form Valid")
-            groupname = request.GET.get('g', None)
-
-            if 'g' in request.GET:
-                print(request.GET)
+            if 'ga' in form.cleaned_data:
+                group = Group.objects.get(name = form.cleaned_data['ga'])
+                user = CustomUser.objects.get(username = form.cleaned_data['username'])
+                users = CustomUser.objects.filter(groups__name=group.name)
+                user.groups.add(group)
+                group.save()
+            elif 'gr' in form.cleaned_data:
+                group = Group.objects.get(name = form.cleaned_data['gr'])
+                user = CustomUser.objects.get(username = form.cleaned_data['u'])
+                users = CustomUser.objects.filter(groups__name=group.name)
+                user.groups.remove(group)
+                group.save()
             else:
-                print('g not found!')
+                print('no params found!')
+                group = ''
+                users = []
 
-            group = Group.objects.get(name = groupname)
-            user = CustomUser.objects.get(username=form.cleaned_data['username'])
-            users = CustomUser.objects.filter(groups__name=groupname)
-            user.groups.add(group)
-            group.save()
-            messages.success(request, 'Your group was successfully created!')
+            messages.success(request, 'Your group action was successful!')
 
     assert isinstance(request, HttpRequest)
     return render(
