@@ -6,20 +6,30 @@
 {% include 'app/messages.html' %}
 
 {% block content %}
-<h3>Profile of {{ user.username }}</h3>
-<br/>
-<div class="row">
-    <div class="col-md-8">
-        <div class="thumbnail user">
-            <img src="{% static 'images/no_user_photo.jpg' %}" alt="" height="308" width="308">
-            <div class="caption">
-                <h4><b>Name: </b>{{ user.first_name }} {{ user.last_name }}</h4>
-                <h4><b>Groups: </b></h4>
-                <ul>{% for g in groups %}
-                    <li>{{ g }}</li>
-                {% endfor %}</ul>
-            </div>
+
+<div class="jumbotron">
+    <div class="container">
+        <div class="row">
+            <img src="{% static 'images/no_user_photo.jpg' %}" alt="" height="200" width="200">
         </div>
+        <div class="row">
+            <h3><b>{{ user.first_name }} {{ user.last_name }}</b></h3>
+        </div>
+    </div>
+</div>
+<br/>
+
+<div class="container">
+    <div class="row">
+        <h4><b>Username: </b>{{ user.username }}</h4>
+    </div>
+    <div class="row">
+        <ul>
+            <h4><b>Groups: </b></h4>
+            {% for g in groups %}
+                <li>{{ g }}</li>
+            {% endfor %}
+        </ul>
     </div>
 </div>
 {% endblock %}

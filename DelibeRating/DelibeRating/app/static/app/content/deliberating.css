@@ -1,12 +1,13 @@
 .thumbnail {
     display: block;
     padding: 4px;
-    background-color: #fffadf;
+    background-color: #eceeef;
     border: 1px solid #808080;
     border-radius: 4px;
     width: 318px;
     height: 621px;
     float: left;
+    margin: 8px 8px 8px 8px;
 }
 
 .thumbnail.user {
@@ -17,9 +18,50 @@
     float: left;
 }
 
+form button, div button {
+    padding: .5rem .5rem 0 0;
+}
+
+.resize_fit_center {
+    width: 308px;
+    height: 308px;
+    vertical-align: middle;
+    overflow: hidden;
+    object-fit: cover;
+}
+
 p.small {
     line-height: 1.0;
     font-size: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+p.price {
+    height: 16px;
+    line-height: 1.0;
+    font-size: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+p.phone {
+    height: 16px;
+    line-height: 1.0;
+    font-size: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.navbar {
+    z-index: 50;
+}
+
+.nav-item {
+    display: inline-block;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
@@ -37,7 +79,15 @@ p.address {
 li.ctr {
     padding-top: 10px;
     padding-left: 10px;
-    width: 300px
+    width: 100%;
+}
+
+.btn {
+    margin-right: 10px;
+}
+
+.btn-info {
+    margin-left:0;
 }
 
 button.ctr {
@@ -54,12 +104,47 @@ input[type="radio"]:disabled, input[type="checkbox"]:disabled {
     cursor: auto;
 }
 
+.navbar-nav li {
+    display: inline;
+}
+
 .navbar-nav {
     padding-top: 0.5rem;
+    position: relative;
 }
 
 .drop {
     padding: 0px 0.75rem;
+}
+
+.btn-link {
+    margin-top: 8px;
+    color: #ffffff;
+}
+
+.btn-link:link {
+    color: #ffffff;
+    text-decoration: none;
+}
+
+.btn-link:visited {
+    color: #c5c5c5;
+    text-decoration: none;
+}
+
+.btn-link:focus {
+        color: #c5c5c5;
+        text-decoration: none;
+    }
+
+.btn-link:hover {
+    color: #c5c5c5;
+    text-decoration: none;
+}
+
+.btn-linkk:active {
+    color: #ffffff;
+    text-decoration: none;
 }
 
 ul li:hover ul {
@@ -94,7 +179,7 @@ ul {
 
 .dropdown, .dropdown-submenu {
     padding-left: 0;
-    padding: .5rem .75rem;
+    padding-right: 0;
     right: 0;
 }
 

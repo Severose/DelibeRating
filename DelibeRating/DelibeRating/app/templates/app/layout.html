@@ -18,6 +18,7 @@
     <link rel="stylesheet" type="text/css" href="{% static 'app/content/site.css' %}" />
     <link rel="stylesheet" type="text/css" href="{% static 'app/content/font-awesome.css' %}" />
     <link rel="stylesheet" type="text/css" href="{% static 'app/content/deliberating.css' %}" />
+    <link rel="stylesheet" type="text/css" href="{% static 'app/content/jquery-ui.css' %}" />
     <script src="{% static 'app/scripts/modernizr-2.6.2.js' %}"></script>
 
     {# Django Tempus Dominus assets #}
@@ -25,23 +26,25 @@
 </head>
 
 <body>
-    <nav class="navbar navbar-toggleable-md navbar-inverse fixed-top bg-inverse">
+    <nav class="navbar navbar-toggleable-lg navbar-inverse fixed-top bg-inverse">
         <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
         <a class="navbar-brand" href="{% url 'home' %}">DelibeRating</a>
 
         <div class="collapse navbar-collapse" id="navbarsExampleDefault">
-            <ul class="navbar-nav mr-auto">
-                <li class="nav-item">
-                    <a class="nav-link nav-right" href="{% url 'suggestions' %}">Suggestions</a>
-                    {% if user.is_authenticated %}
-                    <a class="nav-link nav-right" href="{% url 'vote' %}">Group vote</a>
-                    <a class="nav-link nav-right" href="{% url 'profile' %}?u={{ user.username }}">Profile</a>
-                    {% endif %}
-                </li>
-                {% include 'app/loginpartial.html' %}
+            <ul class="dropdown">
+                <button class="btn btn-link dropdown-toggle" type="button" data-toggle="dropdown">Decide</button>
+                <ul class="dropdown-menu">
+                    <li class="dropdown-submenu">
+                        <a class="dropdown-item" href="{% url 'suggestions' %}">Suggestions</a>
+                        {% if user.is_authenticated %}
+                        <a class="dropdown-item" href="{% url 'vote' %}">Group vote</a>
+                        {% endif %}
+                    </li>
+                </ul>
             </ul>
+            {% include 'app/loginpartial.html' %}
             {% include 'app/search_form.html' %}
         </div>
     </nav>
@@ -49,12 +52,13 @@
 {% block content %}{% endblock %}
 
 <script type="text/javascript" src="{% static 'app/scripts/respond.js' %}"></script>
-<script type="text/javascript" src="{% static 'app/scripts/jquery.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'app/scripts/jquery-1.12.4.js' %}"></script>
 <script type="text/javascript" src="{% static 'app/scripts/bootstrap.min.js' %}"></script>
 <script type="text/javascript" src="{% static 'app/scripts/moment.js' %}"></script>
-<script type="text/javascript" src="{% static 'app/scripts/alert.js' %}"></script>
-<script type="text/javascript" src="{% static 'app/scripts/deliberating.js' %}"></script> 
+<script type="text/javascript" src="{% static 'app/scripts/alert.js' %}"></script> 
 <script type="text/javascript" src="{% static 'app/scripts/jquery.validate.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'app/scripts/jquery-ui.js' %}"></script>
+<script type="text/javascript" src="{% static 'app/scripts/deliberating.js' %}"></script>
 {% block scripts %}{% endblock %}
 
 </body>

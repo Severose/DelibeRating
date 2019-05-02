@@ -4,9 +4,10 @@ Definition of views.
 
 import operator
 import random
+from random import shuffle
 import datetime
 from django.shortcuts import render, redirect
-from django.http import HttpRequest, Http404
+from django.http import HttpRequest, Http404, HttpResponse
 from django.template import RequestContext
 from datetime import datetime
 from app.forms import *
@@ -32,6 +33,27 @@ from django import template
 
 registerT = template.Library()
 yelp_api = YelpAPI(settings.API_KEY, timeout_s=3.0)
+
+def get_yelp_results(query,location,radius,sortby,pricerange,opennow,attributes):
+    if cache.get(''.join(i for i in str(query+location+radius+sortby+pricerange+opennow) if i.isalnum())):
+        print("Using cached results!")
+        print(''.join(i for i in str(query+location+radius+sortby+pricerange+opennow) if i.isalnum()))
+        raw_data = cache.get(''.join(i for i in str(query+location+radius+sortby+pricerange+opennow) if i.isalnum()))
+    else:
+        print("Querying Yelp Fusion API")
+        raw_data = yelp_api.search_query(term=query,
+                                         location=location,
+                                         radius=radius,
+                                         limit=48,
+                                         sort_by=sortby,
+                                         price=pricerange,
+                                         open_now=opennow,
+                                         attributes=attributes)
+            
+    data = json.loads(json.dumps(raw_data))
+    cache.set(''.join(i for i in str(query+location+radius+sortby+pricerange+opennow) if i.isalnum()), data, 86400)  #TODO: Use DEFAULT_TIMEOUT
+    
+    return data
 
 @login_required
 def create_group(request):
@@ -125,20 +147,49 @@ def group(request):
 
 def home(request):
     """Renders the home page.
-        TODO: Update content
+        TODO: Implement
     """
     print("Home View")
     time_form = CustomTimeForm()
 
-    assert isinstance(request, HttpRequest)
-    return render(
-        request,
-        'app/home.html',
-        {
-            'title':'Home Page',
-            'time_form': time_form,
-        }
-    )
+    location = "Irvine, CA" #Update to use user's preferred location
+
+    if request.method == 'GET':
+        query = 'food'
+        location = 'Irvine, CA'
+        radius = '16100'
+        sortby = 'rating'
+        pricerange = '1,2,3,4'
+        opennow = 'false'
+        attributes = 'hot_and_new'
+
+        data = get_yelp_results(query,location,radius,sortby,pricerange,opennow,attributes)
+
+        shuffle(data['businesses'])
+
+        results_page = request.GET.get('page', 1)
+        paginator = Paginator(data['businesses'], 2)
+        pages = []
+
+        results = paginator.page(results_page)
+
+        print("Home: GET Request")
+        context = {'title':'Home',
+                   'results':results,
+                   'query':'',
+                   'location':'Irvine, CA',
+                   'time_form': time_form,
+                   'pages': pages,
+                   }
+
+        assert isinstance(request, HttpRequest)
+        return render(
+            request,
+            'app/home.html',
+            context)
+
+    else:
+        return render(request,"app/home.html",{})
 
 def login(request):
     """Renders the login page."""
@@ -307,9 +358,9 @@ def randomizer(request):
         data = json.loads(json.dumps(raw_data))
         cache.set(''.join(i for i in str(query+location+radius+sortby+pricerange+opennow) if i.isalnum()), data, 86400)  #TODO: Use DEFAULT_TIMEOUT
 
-        random.randint(0,len(data['businesses'])-1)
+        shuffle(data['businesses'])
 
-        results = [data['businesses'][random.randint(0,len(data['businesses']))]]
+        results = [data['businesses'][0]]
 
         print(results)
 
@@ -407,25 +458,11 @@ def search(request):
         else:
             print('open not found!')
 
-        if cache.get(''.join(i for i in str(query+location+radius+sortby+pricerange+opennow) if i.isalnum())):
-            print("Using cached results!")
-            print(''.join(i for i in str(query+location+radius+sortby+pricerange+opennow) if i.isalnum()))
-            raw_data = cache.get(''.join(i for i in str(query+location+radius+sortby+pricerange+opennow) if i.isalnum()))
-        else:
-            print("Querying Yelp Fusion API")
-            raw_data = yelp_api.search_query(term=query,
-                                             location=location,
-                                             radius=radius,
-                                             limit=48,
-                                             sort_by=sortby,
-                                             price=pricerange,
-                                             open_now=opennow)
-            
-        data = json.loads(json.dumps(raw_data))
-        cache.set(''.join(i for i in str(query+location+radius+sortby+pricerange+opennow) if i.isalnum()), data, 86400)  #TODO: Use DEFAULT_TIMEOUT
+        data = get_yelp_results(query,location,radius,sortby,pricerange,opennow,"")
 
         results_page = request.GET.get('page', 1)
         paginator = Paginator(data['businesses'], 12)
+        pages = paginator.page_range
 
         results = paginator.page(results_page)
 
@@ -435,6 +472,7 @@ def search(request):
                    'query':query,
                    'location':location,
                    'time_form': time_form,
+                   'pages': pages,
                    }
 
         assert isinstance(request, HttpRequest)
@@ -481,20 +519,48 @@ def settings(request):
 
 def suggestions(request):
     """Renders the suggestions page.
-        TODO: Implement
+        TODO: Update content
     """
     print("Suggestions View")
     time_form = CustomTimeForm()
 
-    assert isinstance(request, HttpRequest)
-    return render(
-        request,
-        'app/suggestions.html',
-        {
-            'title':'Suggestions Page',
-            'time_form': time_form,
-        }
-    )
+    location = "Irvine, CA" #Update to use user's preferred location
+
+    if request.method == 'GET':
+        query = 'food'
+        location = 'Irvine, CA'
+        radius = '16100'
+        sortby = 'rating'
+        pricerange = '1,2,3,4'
+        opennow = 'false'
+        attributes = 'hot_and_new'
+
+        data = get_yelp_results(query,location,radius,sortby,pricerange,opennow,attributes)
+        shuffle(data['businesses'])
+
+        results_page = request.GET.get('page', 1)
+        paginator = Paginator(data['businesses'], 12)
+        pages = paginator.page_range
+
+        results = paginator.page(results_page)
+
+        print("Suggestions: GET Request")
+        context = {'title':'Suggestions',
+                   'results':results,
+                   'query':'',
+                   'location':'Irvine, CA',
+                   'time_form': time_form,
+                   'pages': pages,
+                   }
+
+        assert isinstance(request, HttpRequest)
+        return render(
+            request,
+            'app/search.html',
+            context)
+
+    else:
+        return render(request,"app/search.html",{})
 
 @login_required
 def vote(request):
@@ -541,3 +607,36 @@ def delete_user(request, username):
         pass
 
     return render(request, 'home.html', context=context)
+
+def yelp_autocomplete(request):
+    if request.is_ajax():
+        if 'term' in request.GET:
+            print(request.GET)
+            q = request.GET.get('term', '').capitalize()
+
+            if cache.get(''.join(i for i in str('autoc-'+q) if i.isalnum())):
+                print("Using cached autocomplete results!")
+                print(''.join(i for i in str('autoc-'+q) if i.isalnum()))
+                data = cache.get(''.join(i for i in str('autoc-'+q) if i.isalnum()))
+            else:
+                print("Querying Yelp Fusion Autocomplete API")
+                raw_data = yelp_api.autocomplete_query(text=q)
+                autoc_results = []
+
+                if len(raw_data['terms']) > 0:
+                    for t in raw_data['terms']:
+                        autoc_results.append(t['text'])
+                if len(raw_data['businesses']) > 0:
+                    for b in raw_data['businesses']:
+                        if c['text']:
+                            autoc_results.append(c['text'])
+                        elif c['name']:
+                            autoc_results.append(c['name'])
+                if len(raw_data['categories']) > 0:
+                    for c in raw_data['categories']:
+                        autoc_results.append(c['title'])
+                data = json.dumps(autoc_results)
+                cache.set(''.join(i for i in str('autoc-'+q) if i.isalnum()), data, 86400)
+        else:
+            print('term not found!')
+    return HttpResponse(data, 'application/json')

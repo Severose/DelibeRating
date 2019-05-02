@@ -1,17 +1,18 @@
 {% if user.is_authenticated %}
-<li class="nav-item active">
-    <a class="nav-link" href="{% url 'settings' %}">Settings</a>
-</li>
-<form id="logoutForm" action="/logout" method="post" class="navbar-right">
-    {% csrf_token %}
-    <li class="nav-item nav-right active">
-        <a class="nav-link" href="javascript:document.getElementById('logoutForm').submit()">Log off</a>
-    </li>
-</form>
-
+<div class="dropdown">
+    <button class="btn btn-link dropdown-toggle" type="button" data-toggle="dropdown">{{ user.username }}</button>
+    <ul class="dropdown-menu">
+        <li class="dropdown-submenu">
+            <a class="dropdown-item" href="{% url 'profile' %}?u={{ user.username }}">Profile</a>
+            <a class="dropdown-item" href="{% url 'settings' %}">Settings</a>
+            <form id="logoutForm" action="/logout" method="post">
+                {% csrf_token %}
+                <li><a class="dropdown-item" href="javascript:document.getElementById('logoutForm').submit()">Log off</a></li>
+            </form>
+        </li>
+    </ul>
+</div>
 {% else %}
-<li class="nav-item nav-right active">
-    <a class="nav-link" href="{% url 'login' %}">Log in</a>
-</li>
+<div><a class="nav-link" href="{% url 'login' %}">Log in</a></div>
 
 {% endif %}

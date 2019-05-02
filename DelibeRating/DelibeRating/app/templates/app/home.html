@@ -5,17 +5,26 @@
 {% block content %}
 <div class="jumbotron">
     <div class="container">
-        <h1 class="display-3">DelibeRating</h1>
+        <h1 class="display-4">DelibeRating</h1>
         <p class="lead">A free web app to help you or your group make a decision.</p>
     </div>
 </div>
 
-<div class="container">
-    <div class="row">
-        <h4>We can't decide/agree...</h4>
-    </div>
-    <div class="row">
-        <p><a class="btn btn-secondary" href="{% url 'suggestions' %}" role="button">Help us vote &raquo;</a></p>
+<!-- Could enhance page by including buttons for most searched categories -->
+
+{% if results %}
+<h2>Some new and popular places</h2>
+<div class="row">
+    <div class="col-2">
+        <ul>
+            <li class="ctr">
+                <button class="btn btn-secondary ctr" onClick="window.location.reload();">Refresh</button>
+            </li>
+        </ul>
     </div>
 </div>
+{% for element in results.object_list %}
+    {% include 'app/result.html' %}
+{% endfor %}
+{% endif %}
 {% endblock %}

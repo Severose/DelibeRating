@@ -1,7 +1,7 @@
 $(document).ready(function () {
     var options = [];
 
-    $('.dropdown-menu a').on('click', function (event) {
+    $('.dmenu a').on('click', function (event) {
         event.stopPropagation();
         event.preventDefault();
     });
@@ -73,5 +73,16 @@ $(document).ready(function () {
         $open.attr('value', String(opennow));
 
         ($('form[id="search"]')).off('submit').submit();
+    });
+    
+    $("#q").autocomplete({
+        source: "api/search/",
+        minLength: 2,
+        delay: 250,
+        open: function () {
+            setTimeout(function () {
+                $('.ui-autocomplete').css('z-index', 99);
+            }, 0);
+        },
     });
 });

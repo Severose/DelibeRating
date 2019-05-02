@@ -17,6 +17,7 @@ admin.autodiscover()
 urlpatterns = [
     url(r'^favicon\.ico$',RedirectView.as_view(url='/static/images/favicon.ico')),
     url(r'^$', app_views.home, name='home'),
+    url(r'^api/search/', app_views.yelp_autocomplete, name='yelp_autocomplete'),
     url(r'^create_group', app_views.create_group, name='create_group'),
     url(r'^group', app_views.group, name='group'),
     url(r'^login/$', app_views.login, name='login'),

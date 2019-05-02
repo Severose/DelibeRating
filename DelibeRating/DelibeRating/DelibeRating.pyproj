@@ -79,6 +79,7 @@
     <Content Include="app\static\app\content\bootstrap.css.map" />
     <Content Include="app\static\app\content\bootstrap.min.css.map" />
     <Content Include="app\static\app\content\font-awesome.css" />
+    <Content Include="app\static\app\content\jquery-ui.css" />
     <Content Include="app\static\app\content\jumbotron.css" />
     <Content Include="app\static\app\scripts\alert.js" />
     <Content Include="app\static\app\scripts\alert.js.map" />
@@ -93,6 +94,8 @@
     <Content Include="app\static\app\scripts\deliberating.js" />
     <Content Include="app\static\app\scripts\dropdown.js" />
     <Content Include="app\static\app\scripts\dropdown.js.map" />
+    <Content Include="app\static\app\scripts\jquery-1.12.4.js" />
+    <Content Include="app\static\app\scripts\jquery-ui.js" />
     <Content Include="app\static\app\scripts\jquery.min.js" />
     <Content Include="app\static\app\content\deliberating.css" />
     <Content Include="app\static\app\scripts\moment.js" />
@@ -103,7 +106,6 @@
     <Content Include="app\templates\app\messages.html" />
     <Content Include="app\templates\app\search_form.html" />
     <Content Include="app\templates\app\profile.html" />
-    <Content Include="app\templates\app\suggestions.html" />
     <Content Include="app\templates\app\vote.html" />
     <Content Include="app\templates\app\random.html" />
     <Content Include="app\templates\app\pagination.html" />
@@ -128,10 +130,6 @@
     <Content Include="app\static\app\fonts\glyphicons-halflings-regular.woff" />
     <Content Include="app\static\app\scripts\bootstrap.js" />
     <Content Include="app\static\app\scripts\bootstrap.min.js" />
-    <Content Include="app\static\app\scripts\jquery-1.10.2.intellisense.js" />
-    <Content Include="app\static\app\scripts\jquery-1.10.2.js" />
-    <Content Include="app\static\app\scripts\jquery-1.10.2.min.js" />
-    <Content Include="app\static\app\scripts\jquery-1.10.2.min.map" />
     <Content Include="app\static\app\scripts\jquery.validate-vsdoc.js" />
     <Content Include="app\static\app\scripts\jquery.validate.js" />
     <Content Include="app\static\app\scripts\jquery.validate.min.js" />

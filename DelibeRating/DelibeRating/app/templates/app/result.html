@@ -20,7 +20,7 @@
 
 <div class="thumbnail">
     <a href="{{ element.url }}">
-        <img src="{% if element.image_url %}{{ element.image_url }}{% else %}{% static 'images/no_photo.png' %}{% endif %}" alt="" height="308" width="308">
+        <img class="resize_fit_center" src="{% if element.image_url %}{{ element.image_url }}{% else %}{% static 'images/no_photo.png' %}{% endif %}" alt="">
     </a>
     <div class="caption">
         <h5><a href="{{ element.url }}">{{ element.name }}     </a></h5>
@@ -30,7 +30,7 @@
         {% endfor %}</div>
 
         {% include 'app/star_rating.html' %}
-        <p class="small">
+        <p class="price">
             <b>{{ element.price }}</b>
         </p>
 
@@ -38,7 +38,7 @@
             {{ i }}<br/>
         {% endfor %}</p>
 
-        <p class="small">{{ element.display_phone }}</p>
+        <p class="phone">{{ element.display_phone }}</p>
 
         <p class="blocktext">
             <a href="#" class="btn btn-primary" role="button">♥</a>
