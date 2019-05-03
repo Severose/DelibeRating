@@ -27,7 +27,7 @@ $(document).ready(function () {
         event.preventDefault();
 
     });
-    
+
     $('button[id="rndmbtn"]').on("click", function (event) {
         ($('form[id="search"]')).attr('action', 'random/');
     });
@@ -74,9 +74,43 @@ $(document).ready(function () {
 
         ($('form[id="search"]')).off('submit').submit();
     });
-    
-    $("#q").autocomplete({
+
+    $('.grp-add').on("click", function (event) {
+        var $parli = $(event.target).parent();
+        var $act = $parli.find($('input[name="act"]'));
+        var $grp = $parli.find($('input[name="grp"]'));
+        
+        $act.attr('value', $parli.find('input[name="aa"]').attr('value'));
+        $grp.attr('value', $parli.find('input[name="ga"]').attr('value'));
+    });
+
+    $('.grp-rem').on("click", function (event) {
+        var $parul = $(event.target).closest('ul');
+        var $parli = $(event.target).parent();
+        var $act = $parul.find($('input[name="act"]'));
+        var $grp = $parul.find($('input[name="grp"]'));
+        var $usrh = $parli.find($('input[name="usrh"]'));
+
+        alert(JSON.stringify($parli));
+        
+        $act.attr('value', $parul.find('input[name="ar"]').attr('value'));
+        $grp.attr('value', $parul.find('input[name="gr"]').attr('value'));
+        $usrh.attr('value', $parli.find('input[name="ur"]').attr('value'));
+    });
+        
+    $('input[name="q"]').autocomplete({
         source: "api/search/",
+        minLength: 2,
+        delay: 250,
+        open: function () {
+            setTimeout(function () {
+                $('.ui-autocomplete').css('z-index', 99);
+            }, 0);
+        },
+    });
+
+    $('input[name="usr"]').autocomplete({
+        source: "api/users/",
         minLength: 2,
         delay: 250,
         open: function () {

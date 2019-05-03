@@ -114,24 +114,28 @@ def group(request):
         group = Group.objects.get(name = groupname)
         users = CustomUser.objects.filter(groups__name=groupname)
     else:
+    #if request.method == 'POST':
         print("Group: POST Request")
         form = CustomGroupChangeForm(data=request.POST)
         if form.is_valid():
             print("Group: Form Valid")
-            if 'ga' in form.cleaned_data:
-                group = Group.objects.get(name = form.cleaned_data['ga'])
-                user = CustomUser.objects.get(username = form.cleaned_data['username'])
+            if form.cleaned_data['act'] == 'add':
+                group = Group.objects.get(name = form.cleaned_data['grp'])
+                user = CustomUser.objects.get(username = form.cleaned_data['usr'])
+                if user.groups.filter(name=group.name).exists():
+                    messages.error(request, 'User is already a member.')
+                else:
+                    user.groups.add(group)
+                    group.save()
                 users = CustomUser.objects.filter(groups__name=group.name)
-                user.groups.add(group)
-                group.save()
-            elif 'gr' in form.cleaned_data:
-                group = Group.objects.get(name = form.cleaned_data['gr'])
-                user = CustomUser.objects.get(username = form.cleaned_data['u'])
-                users = CustomUser.objects.filter(groups__name=group.name)
+            elif form.cleaned_data['act'] == 'rem':
+                group = Group.objects.get(name = form.cleaned_data['grp'])
+                user = CustomUser.objects.get(username = form.cleaned_data['usrh'])
                 user.groups.remove(group)
                 group.save()
+                users = CustomUser.objects.filter(groups__name=group.name)
             else:
-                print('no params found!')
+                print('Error: unknown action')
                 group = ''
                 users = []
 
@@ -612,6 +616,25 @@ def delete_user(request, username):
         pass
 
     return render(request, 'home.html', context=context)
+
+def user_autocomplete(request):
+    if request.is_ajax():
+        if 'term' in request.GET:
+            print(request.GET)
+            q = request.GET.get('term', '')
+
+            print("Querying Database for Users")
+            raw_data = CustomUser.objects.all()
+            users = []
+
+            for u in raw_data:
+                if u.username.startswith(q):
+                    users.append(u.username)
+            
+            data = json.dumps(users)
+        else:
+            print('term not found!')
+    return HttpResponse(data, 'application/json')
 
 def yelp_autocomplete(request):
     if request.is_ajax():

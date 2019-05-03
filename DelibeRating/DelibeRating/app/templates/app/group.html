@@ -17,12 +17,14 @@
     <div class="row">
         <ul>
             <li><p><h4>Add a member</h4></p></li>
-            <li><form action="{% url 'group' %}?g={{ group.name }}" method="post" class="form-horizontal">
+            <li><form id="addusertogroup" action="{% url 'group' %}?g={{ group.name }}" method="post" class="form-horizontal">
                 {% csrf_token %}
-                {{ form.username|as_crispy_field }}
+                {{ form.usr|as_crispy_field }}
+                {{ form.act }}
+                {{ form.grp }}
+                <input name="aa" type="hidden" value="add">
                 <input name="ga" type="hidden" value="{{ group.name }}">
-                <input name="u" type="hidden" value="{{ user.username }}">
-                <input class="btn btn-primary" type="submit" value="Add user" />
+                <input class="btn btn-primary grp-add" type="submit" value="Add user">
             </form></li>
         </ul>
         
@@ -31,17 +33,25 @@
     <div class="row">
         <ul>
             <li><h4>Group members</h4></li>
-            <li><ul>
-                {% for u in users %}
-                <li><form action="{% url 'group' %}?g={{ group.name }}" method="post" class="form-horizontal">
+            <li>
+                <form id="remuserfromgroup" action="{% url 'group' %}?g={{ group.name }}" method="post" class="form-horizontal">
                     {% csrf_token %}
-                    <input name="gr" type="hidden" value="{{ group.name }}">
-                    <input name="u" type="hidden" value="{{ user.username }}">
-                    <input class="btn btn-danger grp-rm" type="submit" value="-" />
-                    <a href="{% url 'profile' %}?u={{ u.username }}">{{ u.username }}</a>
-                </form></li>
-                {% endfor %}
-            </ul></li>
+                    <ul>
+                        {% for u in users %}
+                        <li>
+                            {{ form.act }}
+                            {{ form.grp }}
+                            {{ form.usrh }}
+                            <input name="ur" type="hidden" value="{{ u.username }}">
+                            <input class="btn btn-danger grp-rem" type="submit" value="-">
+                            <a href="{% url 'profile' %}?u={{ u.username }}">{{ u.username }}</a>
+                        </li>
+                        {% endfor %}
+                        <li><input name="ar" type="hidden" value="rem"></li>
+                        <li><input name="gr" type="hidden" value="{{ group.name }}"></li>
+                    </ul>
+                </form>
+            </li>
         </ul>
         
     </div>

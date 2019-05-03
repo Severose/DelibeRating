@@ -25,12 +25,19 @@ class CustomGroupChangeForm(ModelForm):
     """Custom User Change Form for the CustomUser model
         username
     """
-    username = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Username'}),
-                               label='Username')
+    usr = forms.CharField(widget=forms.TextInput(attrs={'name': 'usr',
+                               'placeholder': 'Username', 'id': 'addtogroup'}),
+                               label='Username',required=False)
+    act = forms.CharField(widget=forms.TextInput(attrs={'name': 'act', 'type': 'hidden'}),
+                        required=False)
+    grp = forms.CharField(widget=forms.TextInput(attrs={'name': 'grp', 'type': 'hidden'}),
+                        required=False)
+    usrh = forms.CharField(widget=forms.TextInput(attrs={'name': 'usrh', 'type': 'hidden'}),
+                        required=False)
 
     class Meta:
         model = Group
-        fields = ("username",)
+        fields = ('usr', 'act', 'grp', 'usrh')
 
 class CustomUserAuthenticationForm(AuthenticationForm):
     """Custom User Authentication Form for the CustomUser model:
