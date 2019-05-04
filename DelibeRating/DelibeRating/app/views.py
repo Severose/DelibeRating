@@ -72,8 +72,6 @@ def create_group(request):
                 user.groups.add(group)
                 group.save()
                 messages.success(request, 'Your group was successfully created!')
-            else:
-                messages.error(request, 'That group already exists!')
             return redirect('group/?g=' + group.name)
         else:
             print("Create Group: Form Invalid")
@@ -130,16 +128,20 @@ def group(request):
                 users = CustomUser.objects.filter(groups__name=group.name)
             elif form.cleaned_data['act'] == 'rem':
                 group = Group.objects.get(name = form.cleaned_data['grp'])
-                user = CustomUser.objects.get(username = form.cleaned_data['usrh'])
+                user = CustomUser.objects.get(username = form.cleaned_data['usr'])
                 user.groups.remove(group)
-                group.save()
                 users = CustomUser.objects.filter(groups__name=group.name)
+                
+                if len(users) == 0:
+                    return redirect('vote')
+                group.save()
             else:
                 print('Error: unknown action')
                 group = ''
                 users = []
 
             messages.success(request, 'Your group action was successful!')
+        
 
     assert isinstance(request, HttpRequest)
     return render(

@@ -83,20 +83,6 @@ $(document).ready(function () {
         $act.attr('value', $parli.find('input[name="aa"]').attr('value'));
         $grp.attr('value', $parli.find('input[name="ga"]').attr('value'));
     });
-
-    $('.grp-rem').on("click", function (event) {
-        var $parul = $(event.target).closest('ul');
-        var $parli = $(event.target).parent();
-        var $act = $parul.find($('input[name="act"]'));
-        var $grp = $parul.find($('input[name="grp"]'));
-        var $usrh = $parli.find($('input[name="usrh"]'));
-
-        alert(JSON.stringify($parli));
-        
-        $act.attr('value', $parul.find('input[name="ar"]').attr('value'));
-        $grp.attr('value', $parul.find('input[name="gr"]').attr('value'));
-        $usrh.attr('value', $parli.find('input[name="ur"]').attr('value'));
-    });
         
     $('input[name="q"]').autocomplete({
         source: "api/search/",

@@ -34,23 +34,18 @@
         <ul>
             <li><h4>Group members</h4></li>
             <li>
-                <form id="remuserfromgroup" action="{% url 'group' %}?g={{ group.name }}" method="post" class="form-horizontal">
-                    {% csrf_token %}
-                    <ul>
-                        {% for u in users %}
-                        <li>
-                            {{ form.act }}
-                            {{ form.grp }}
-                            {{ form.usrh }}
-                            <input name="ur" type="hidden" value="{{ u.username }}">
-                            <input class="btn btn-danger grp-rem" type="submit" value="-">
-                            <a href="{% url 'profile' %}?u={{ u.username }}">{{ u.username }}</a>
-                        </li>
-                        {% endfor %}
-                        <li><input name="ar" type="hidden" value="rem"></li>
-                        <li><input name="gr" type="hidden" value="{{ group.name }}"></li>
-                    </ul>
-                </form>
+                <ul>
+                    {% for u in users %}
+                    <li><form action="{% url 'group' %}?g={{ group.name }}" method="post" class="form-horizontal">
+                        {% csrf_token %}
+                        <input name="act" type="hidden" value="rem">
+                        <input name="grp" type="hidden" value="{{ group.name }}">
+                        <input name="usr" type="hidden" value="{{ u.username }}">
+                        <input class="btn btn-danger grp-rem" type="submit" value="-">
+                        <a href="{% url 'profile' %}?u={{ u.username }}">{{ u.username }}</a>
+                    </form></li>
+                    {% endfor %}
+                </ul>
             </li>
         </ul>
         

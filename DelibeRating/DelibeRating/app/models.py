@@ -7,6 +7,7 @@ from django.conf import settings
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from vote.models import VoteModel
 
 class CustomGroup(models.Model):
     """Custom Group Model, extending AbstractUser
@@ -23,22 +24,25 @@ class CustomUser(AbstractUser):
     """Custom User Model, extending AbstractUser
         username, email, password, first_name, last_name, groups
     """
-    username = models.CharField(max_length=254, primary_key=True)
-    email = models.CharField(max_length=254)
+    username = models.CharField(max_length=20, primary_key=True)
+    email = models.CharField(max_length=100)
     password = models.CharField(max_length=40)
-    first_name = models.CharField(max_length=50)
-    last_name = models.CharField(max_length=50)
+    first_name = models.CharField(max_length=20)
+    last_name = models.CharField(max_length=20)
 
     class Meta:
         managed = False
         db_table = 'app_customuser'
 
-class GroupMember(models.Model):
-    member = models.ForeignKey(CustomUser)
-    group = models.ForeignKey(CustomGroup)
+class VoteOption(models.Model):
+    """Vote Option in Group Vote
+    """
+    business_name = models.CharField(primary_key=True)
 
-class GroupProfile(models.Model):
-    group = models.OneToOneField(CustomGroup)
+class GroupVote(VoteModel, models.Model):
+    """Group Vote, consisting of multiple Vote Options
+    """
+    vote_option = models.ForeignKey(VoteOption)
 
-class UserProfile(models.Model):
-    user = models.OneToOneField(CustomUser)
+    class Meta:
+        db_table = 'app_votes'

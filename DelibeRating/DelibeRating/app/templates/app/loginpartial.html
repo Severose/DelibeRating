@@ -5,6 +5,9 @@
         <li class="dropdown-submenu">
             <a class="dropdown-item" href="{% url 'profile' %}?u={{ user.username }}">Profile</a>
             <a class="dropdown-item" href="{% url 'settings' %}">Settings</a>
+            {% if user.is_superuser %}
+            <a class="dropdown-item" href="admin/">Admin</a>
+            {% endif %}
             <form id="logoutForm" action="/logout" method="post">
                 {% csrf_token %}
                 <li><a class="dropdown-item" href="javascript:document.getElementById('logoutForm').submit()">Log off</a></li>

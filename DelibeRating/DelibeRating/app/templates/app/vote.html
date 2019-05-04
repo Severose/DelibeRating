@@ -13,6 +13,7 @@
 </div>
 
 <div class="container">
+    {% if groups %}
     <h4>Your groups:</h4>
     <div class="row">
         {% if groups %}
@@ -25,8 +26,9 @@
         </ul>
         {% endif %}
     </div>
-    <div class="row">
-            
-    </div>
+    {% else %}
+    <h4>You are not in any groups!</h4>
+
+    {% endif %}
 </div>
 {% endblock %}
