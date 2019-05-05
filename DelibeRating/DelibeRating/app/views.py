@@ -16,6 +16,7 @@ from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth import login as auth_login
 from django.contrib.auth.decorators import login_required
 from django.contrib.admin.views.decorators import staff_member_required
+from django.views.decorators.http import require_POST
 from django.db import transaction
 from django.db.models import Q
 from django.contrib import messages
@@ -92,6 +93,48 @@ def create_group(request):
     )
 
 @login_required
+def create_group_vote(request):
+    """Renders the create vote page."""
+    print("Create Vote View")
+    time_form = CustomTimeForm()
+
+    if request.method == 'POST':
+        print("Create Vote: POST Request")
+        form = CustomVoteCreationForm(data=request.POST)
+        if form.is_valid():
+            print("Create Vote: Form Valid")
+            groupname = request.GET.get('g', None)
+            group = Group.objects.get(name = groupname)
+            vote_id = datetime.datetime.now().strftime("%m-%d-%y--") + form.cleaned_data["name"]
+            obj = GroupVote()
+            obj.group = group
+            obj.vote_id = vote_id
+            group_vote, created = GroupVote.objects.get_or_create(obj)
+            if created:
+                messages.success(request, 'Your vote was successfully created!')
+            return redirect('group/vote/?g=' + group.name + '&v=' + group_vote.vote_id)
+        else:
+            print("Create Vote: Form Invalid")
+            print(form.errors)
+            messages.error(request, 'Please correct the error below.')
+    else:
+        print("Create Vote: GET Request")
+        form = CustomVoteCreationForm()
+        groupname = request.GET.get('g', None)
+        group = Group.objects.get(name = groupname)
+    assert isinstance(request, HttpRequest)
+    return render(
+        request,
+        'app/create_group_vote.html',
+        {
+            'title':'Create Vote',
+            'form':form,
+            'time_form': time_form,
+            'group': group,
+        }
+    )
+
+@login_required
 def group(request):
     """Renders the group page.
         TODO: Implement
@@ -133,7 +176,7 @@ def group(request):
                 users = CustomUser.objects.filter(groups__name=group.name)
                 
                 if len(users) == 0:
-                    return redirect('vote')
+                    return redirect('group')
                 group.save()
             else:
                 print('Error: unknown action')
@@ -153,6 +196,116 @@ def group(request):
             'form': form,
             'group': group,
             'users': users,
+        }
+    )
+
+@login_required
+def group_manage(request):
+    """Renders the group page.
+        TODO: Implement
+    """
+    print("Group View")
+    time_form = CustomTimeForm()
+
+    if request.method == 'GET':
+        print("Group: GET Request")
+        form = CustomGroupChangeForm()
+        groupname = request.GET.get('g', None)
+
+        if 'g' in request.GET:
+            print(request.GET)
+        else:
+            print('g not found!')
+
+        group = Group.objects.get(name = groupname)
+        users = CustomUser.objects.filter(groups__name=groupname)
+    else:
+    #if request.method == 'POST':
+        print("Group: POST Request")
+        form = CustomGroupChangeForm(data=request.POST)
+        if form.is_valid():
+            print("Group: Form Valid")
+            if form.cleaned_data['act'] == 'add':
+                group = Group.objects.get(name = form.cleaned_data['grp'])
+                user = CustomUser.objects.get(username = form.cleaned_data['usr'])
+                if user.groups.filter(name=group.name).exists():
+                    messages.error(request, 'User is already a member.')
+                else:
+                    user.groups.add(group)
+                    group.save()
+                users = CustomUser.objects.filter(groups__name=group.name)
+            elif form.cleaned_data['act'] == 'rem':
+                group = Group.objects.get(name = form.cleaned_data['grp'])
+                user = CustomUser.objects.get(username = form.cleaned_data['usr'])
+                user.groups.remove(group)
+                users = CustomUser.objects.filter(groups__name=group.name)
+                
+                if len(users) == 0:
+                    return redirect('group')
+                group.save()
+            else:
+                print('Error: unknown action')
+                group = ''
+                users = []
+
+            messages.success(request, 'Your group action was successful!')
+        
+
+    assert isinstance(request, HttpRequest)
+    return render(
+        request,
+        'app/group_manage.html',
+        {
+            'title':'Group',
+            'time_form': time_form,
+            'form': form,
+            'group': group,
+            'users': users,
+        }
+    )
+
+@login_required
+def group_vote(request):
+    """Renders the create group page."""
+    print("Create Group View")
+    time_form = CustomTimeForm()
+
+    if request.method == 'POST':
+        print("Create Group: POST Request")
+        form = CustomGroupCreationForm(data=request.POST)
+        if form.is_valid():
+            print("Create Group: Form Valid")
+            groupname = request.GET.get('g', None)
+            groupvotename = request.GET.get('v', None)
+            group = Group.objects.get(name = groupname)
+            group, created = Group.objects.get_or_create(name=form.cleaned_data['name'])
+            user = request.user
+            if created:
+                user.groups.add(group)
+                group.save()
+                messages.success(request, 'Your group was successfully created!')
+            return redirect('group/?g=' + group.name)
+        else:
+            print("Create Group: Form Invalid")
+            print(form.errors)
+            messages.error(request, 'Please correct the error below.')
+    else:
+        print("Register: GET Request")
+        groupname = request.GET.get('g', None)
+        groupvoteid = request.GET.get('v', None)
+        group = Group.objects.get(name = groupname)
+        group_vote = GroupVote.objects.get(vote_id = groupvoteid)
+        form = CustomGroupCreationForm()
+    assert isinstance(request, HttpRequest)
+    return render(
+        request,
+        'app/group_vote.html',
+        {
+            'title':'Create Group',
+            'form':form,
+            'time_form': time_form,
+            'group': group,
+            'group_vote': group_vote,
         }
     )
 
@@ -430,6 +583,7 @@ def search(request):
     """
     print("Search View")
     time_form = CustomTimeForm()
+    active_votes = []
 
     if request.method == 'GET':
         query = request.GET.get('q', None)
@@ -470,6 +624,11 @@ def search(request):
             print('open not found!')
 
         data = get_yelp_results(query,location,radius,sortby,pricerange,opennow,"")
+        user = request.user
+        for g in user.groups.all():
+            v_all = GroupVote.objects.filter(group_id__exact=g.id)
+            for v in v_all:
+                active_votes.append(v.vote_id)
 
         results_page = request.GET.get('page', 1)
         paginator = Paginator(data['businesses'], 12)
@@ -484,6 +643,7 @@ def search(request):
                    'location':location,
                    'time_form': time_form,
                    'pages': pages,
+                   'active_votes': active_votes,
                    }
 
         assert isinstance(request, HttpRequest)
@@ -574,7 +734,31 @@ def suggestions(request):
         return render(request,"app/search.html",{})
 
 @login_required
+@require_POST
 def vote(request):
+    """if request.method == 'POST':
+        user = request.user
+        slug = request.POST.get('slug', None)
+        group = GroupVote.objects.get(name = groupname)
+
+        if company.likes.filter(id=user.id).exists():
+            # user has already liked this company
+            # remove like/user
+            company.likes.remove(user)
+            message = 'You disliked this'
+        else:
+            # add a new like for a company
+            company.likes.add(user)
+            message = 'You liked this'
+
+    ctx = {'likes_count': company.total_likes, 'message': message}
+    # use mimetype instead of content_type if django < 5
+    return HttpResponse(json.dumps(ctx), content_type='application/json')
+    """
+    print("hello")
+
+@login_required
+def voting(request):
     """Renders the vote page.
         TODO: Implement
     """
@@ -582,6 +766,7 @@ def vote(request):
     time_form = CustomTimeForm()
     groups = []
 
+    
     user = CustomUser.objects.get(username = request.user.username)
     for g in user.groups.all():
         groups.append(g.name)
@@ -589,7 +774,7 @@ def vote(request):
     assert isinstance(request, HttpRequest)
     return render(
         request,
-        'app/vote.html',
+        'app/voting.html',
         {
             'title':'Group Vote Page',
             'time_form': time_form,
@@ -619,6 +804,7 @@ def delete_user(request, username):
 
     return render(request, 'home.html', context=context)
 
+@login_required
 def user_autocomplete(request):
     if request.is_ajax():
         if 'term' in request.GET:

@@ -16,18 +16,9 @@
 <div class="container">
     <div class="row">
         <ul>
-            <li><p><h4>Add a member</h4></p></li>
-            <li><form id="addusertogroup" action="{% url 'group' %}?g={{ group.name }}" method="post" class="form-horizontal">
-                {% csrf_token %}
-                {{ form.usr|as_crispy_field }}
-                {{ form.act }}
-                {{ form.grp }}
-                <input name="aa" type="hidden" value="add">
-                <input name="ga" type="hidden" value="{{ group.name }}">
-                <input class="btn btn-primary grp-add" type="submit" value="Add user">
-            </form></li>
+            <li><p><h4>Group Voting</h4></p></li>
+            <li><a class="btn btn-success" href="{% url 'create_group_vote' %}?g={{ group.name }}">Start a Vote</a></li>
         </ul>
-        
     </div>
     <br/>
     <div class="row">
@@ -35,15 +26,10 @@
             <li><h4>Group members</h4></li>
             <li>
                 <ul>
+                    <li><a class="btn btn-warning" href="{% url 'group_manage' %}?g={{ group.name }}">Manage Group</a></li>
+                    <br/>
                     {% for u in users %}
-                    <li><form action="{% url 'group' %}?g={{ group.name }}" method="post" class="form-horizontal">
-                        {% csrf_token %}
-                        <input name="act" type="hidden" value="rem">
-                        <input name="grp" type="hidden" value="{{ group.name }}">
-                        <input name="usr" type="hidden" value="{{ u.username }}">
-                        <input class="btn btn-danger grp-rem" type="submit" value="-">
-                        <a href="{% url 'profile' %}?u={{ u.username }}">{{ u.username }}</a>
-                    </form></li>
+                    <li>{{ u.username }}</li>
                     {% endfor %}
                 </ul>
             </li>

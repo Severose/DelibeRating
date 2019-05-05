@@ -1,0 +1,24 @@
+﻿{% extends "app/layout.html" %}
+
+{% load crispy_forms_tags %}
+{% load staticfiles %}
+
+{% include 'app/messages.html' %}
+{% include 'app/form_errors.html' %}
+
+{% block content %}
+<div class="jumbotron">
+    <div class="container">
+        <h1 class="display-4">{{ group.name }}</h1>
+        <h2>{{ group_vote.vote_id }}</h2>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row">
+        <ul>
+            <li><p><h4>Vote options</h4></p></li>
+        </ul>
+    </div>
+</div>
+{% endblock %}

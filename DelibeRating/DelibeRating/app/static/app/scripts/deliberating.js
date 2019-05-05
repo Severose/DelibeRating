@@ -83,6 +83,13 @@ $(document).ready(function () {
         $act.attr('value', $parli.find('input[name="aa"]').attr('value'));
         $grp.attr('value', $parli.find('input[name="ga"]').attr('value'));
     });
+
+    $('#vote-add').on("click", function (event) {
+        var $parform = $(event.target).parent();
+        var $grp = $parform.find($('input[name="grp"]'));
+        
+        $grp.attr('value', $parform.find('input[name="g"]').attr('value'));
+    });
         
     $('input[name="q"]').autocomplete({
         source: "api/search/",
@@ -104,5 +111,20 @@ $(document).ready(function () {
                 $('.ui-autocomplete').css('z-index', 99);
             }, 0);
         },
+    });
+
+    $('.vote-opt').click(function () {
+        $.ajax({
+            type: "POST",
+            url: "{% url 'vote' %}",
+            data: { /* Add data, */ 'csrfmiddlewaretoken': '{{ csrf_token }}' },
+            dataType: "json",
+            success: function (response) {
+                /* Update state (button) */
+            },
+            error: function (rs, e) {
+                /* Error condition */
+            }
+        });
     });
 });

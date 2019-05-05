@@ -7,7 +7,6 @@ from django.conf import settings
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from vote.models import VoteModel
 
 class CustomGroup(models.Model):
     """Custom Group Model, extending AbstractUser
@@ -34,15 +33,33 @@ class CustomUser(AbstractUser):
         managed = False
         db_table = 'app_customuser'
 
-class VoteOption(models.Model):
-    """Vote Option in Group Vote
-    """
-    business_name = models.CharField(primary_key=True)
+class GroupVoteQuerySet(models.query.QuerySet):
+    def get_or_create(self, obj):
+        try:
+            group_vote = GroupVote.objects.get(vote_id = obj.vote_id)
+            return group_vote, False
+        except GroupVote.DoesNotExist:
+            obj.save()
+            return group_vote, True
 
-class GroupVote(VoteModel, models.Model):
+class GroupVoteManager(models.Manager):
+    def get_queryset(self):
+        return GroupVoteQuerySet(self.model)
+
+class GroupVote(models.Model):
     """Group Vote, consisting of multiple Vote Options
     """
-    vote_option = models.ForeignKey(VoteOption)
+    # MM-DD-YY--<Name>
+    vote_id = models.CharField(max_length=30, primary_key=True)
+    group = models.ForeignKey(CustomGroup, on_delete=models.CASCADE)
+    objects = GroupVoteManager()
 
     class Meta:
         db_table = 'app_votes'
+        
+class VoteOption(models.Model):
+    """Vote Option in Group Vote
+    """
+    business_name = models.CharField(max_length=100, primary_key=True)
+    # Add JSON object for business
+    group_vote = models.ForeignKey(GroupVote, on_delete=models.CASCADE)

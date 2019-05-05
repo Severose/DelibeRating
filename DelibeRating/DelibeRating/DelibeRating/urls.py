@@ -20,7 +20,10 @@ urlpatterns = [
     url(r'^api/search/', app_views.yelp_autocomplete, name='yelp_autocomplete'),
     url(r'^api/users/', app_views.user_autocomplete, name='user_autocomplete'),
     url(r'^group/api/users/', app_views.user_autocomplete, name='user_autocomplete'), #Kludge
-    url(r'^create_group', app_views.create_group, name='create_group'),
+    url(r'^group/vote/create', app_views.create_group_vote, name='create_group_vote'),
+    url(r'^group/create', app_views.create_group, name='create_group'),
+    url(r'^group/manage', app_views.group_manage, name='group_manage'),
+    url(r'^group/vote', app_views.group_vote, name='group_vote'),
     url(r'^group', app_views.group, name='group'),
     url(r'^login/$', app_views.login, name='login'),
     url(r'^logout$', auth_views.logout, {'next_page': '/',}, name='logout'),
@@ -32,6 +35,7 @@ urlpatterns = [
     url(r'^suggestions', app_views.suggestions, name='suggestions'),
     url(r'^profile', app_views.profile, name='profile'),
     url(r'^vote', app_views.vote, name='vote'),
+    url(r'^voting', app_views.voting, name='voting'),
     url(r'^delete_user/(?P<username>[\w|\W.-]+)/$', app_views.delete_user, name='delete-user'), 
 
     # Uncomment the admin/doc line below to enable admin documentation:

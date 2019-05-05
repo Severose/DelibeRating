@@ -119,3 +119,22 @@ class CustomTimeForm(forms.Form):
             },
         ),
     )
+
+class CustomVoteCreationForm(ModelForm):
+    """Custom Group Creation Form for the CustomGroup model
+        name
+    """
+    name = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Vote name'}),
+                               label='Vote name')
+    grp = forms.CharField(widget=forms.TextInput(attrs={'type': 'hidden', 'name': 'grp'}),
+                          required=False)
+
+    def save(self, commit=True):
+        group_vote = super(ModelForm, self).save(commit=False)
+        if commit:
+            group_vote.save()
+        return group_vote
+
+    class Meta:
+        model = GroupVote
+        fields = ("name", "grp")

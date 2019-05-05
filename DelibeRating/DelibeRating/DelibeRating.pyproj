@@ -35,10 +35,16 @@
   <ItemGroup>
     <Compile Include="app\forms.py" />
     <Compile Include="app\models.py" />
+    <Compile Include="app\templates\app\vote_dropdown.html">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="app\views.py" />
     <Compile Include="app\__init__.py" />
     <Compile Include="app\migrations\__init__.py" />
     <Compile Include="DelibeRating\admin.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DelibeRating\apps.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="DelibeRating\backends.py">
@@ -100,13 +106,16 @@
     <Content Include="app\static\app\content\deliberating.css" />
     <Content Include="app\static\app\scripts\moment.js" />
     <Content Include="app\static\images\favicon.ico" />
+    <Content Include="app\templates\app\create_group_vote.html" />
     <Content Include="app\templates\app\create_group.html" />
     <Content Include="app\templates\app\form_errors.html" />
+    <Content Include="app\templates\app\group_manage.html" />
+    <Content Include="app\templates\app\group_vote.html" />
     <Content Include="app\templates\app\group.html" />
     <Content Include="app\templates\app\messages.html" />
     <Content Include="app\templates\app\search_form.html" />
     <Content Include="app\templates\app\profile.html" />
-    <Content Include="app\templates\app\vote.html" />
+    <Content Include="app\templates\app\voting.html" />
     <Content Include="app\templates\app\random.html" />
     <Content Include="app\templates\app\pagination.html" />
     <Content Include="app\templates\app\register.html" />

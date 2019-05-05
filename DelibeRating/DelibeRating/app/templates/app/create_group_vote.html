@@ -15,10 +15,12 @@
 <div class="container">
     <div class="row">
         <div class="col-md-8">
-            <form action="{% url 'create_group' %}" method="post" class="form-horizontal">
+            <form id="vote-add" action="{% url 'create_group_vote' %}?g={{ group.name }}" method="post" class="form-horizontal">
                 {% csrf_token %}
                 {{ form.name|as_crispy_field }}
-                <input type="submit" value="Create group" class="btn btn-primary" />
+                {{ form.grp }}
+                <input name="g" type="hidden" value="{{ group.name }}">
+                <input type="submit" value="Start vote" class="btn btn-primary" />
             </form>
         </div>
     </div>
