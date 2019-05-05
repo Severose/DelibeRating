@@ -1,3 +1,116 @@
+/* navbar */
+.navbar {
+    z-index: 50;
+}
+
+.navbar-nav {
+    padding-top: 0.5rem;
+    position: relative;
+}
+
+.nav-item {
+    display: inline-block;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.navbar-nav li {
+    display: inline;
+}
+
+
+/* div - content */
+div.categories {
+    height: 25px;
+    line-height: 1.0;
+    font-size: 100%;
+}
+
+
+/* dropdown */
+.drop {
+    padding: 0px 0.75rem;
+}
+
+.dropdown {
+    padding-left: 0;
+    padding-right: 0;
+    right: 0;
+}
+
+.dropdown-submenu {
+    position: relative;
+    padding-left: 0;
+    padding-right: 0;
+    right: 0;
+}
+
+.dropdown-submenu a::after {
+    transform: rotate(-90deg);
+    left: 2em;
+}
+
+.dropdown-submenu .dropdown-menu {
+    top: 0;
+    left: 100%;
+    margin-left: .1rem;
+    margin-right: .1rem;
+}
+
+
+/* button */
+form button, div button {
+    padding: .5rem .5rem 0 0;
+}
+
+button.grp-rem {
+    padding: .25rem .5rem;
+}
+
+.btn {
+    margin-right: 10px;
+}
+
+.btn-info {
+    margin-left: 0;
+}
+
+button.ctr {
+    width: 100%;
+}
+.btn-link {
+    margin-top: 8px;
+    color: #ffffff;
+}
+
+.btn-link:link {
+    color: #ffffff;
+    text-decoration: none;
+}
+
+.btn-link:visited {
+    color: #c5c5c5;
+    text-decoration: none;
+}
+
+.btn-link:focus {
+    color: #c5c5c5;
+    text-decoration: none;
+}
+
+.btn-link:hover {
+    color: #c5c5c5;
+    text-decoration: none;
+}
+
+.btn-linkk:active {
+    color: #ffffff;
+    text-decoration: none;
+}
+
+
+/* thumbnail w/ caption */
 .thumbnail {
     display: block;
     padding: 4px;
@@ -10,22 +123,6 @@
     margin: 8px 8px 8px 8px;
 }
 
-.thumbnail.user {
-    display: block;
-    padding: 4px;
-    background-color: #ffffff;
-    border: none;
-    float: left;
-}
-
-form button, div button {
-    padding: .5rem .5rem 0 0;
-}
-
-button.grp-rem {
-    padding: .25rem .5rem;
-}
-
 .resize_fit_center {
     width: 308px;
     height: 308px;
@@ -34,6 +131,16 @@ button.grp-rem {
     object-fit: cover;
 }
 
+.thumbnail.user {
+    display: block;
+    padding: 4px;
+    background-color: #ffffff;
+    border: none;
+    float: left;
+}
+
+
+/* p - paragraph */
 p.small {
     line-height: 1.0;
     font-size: 100%;
@@ -60,17 +167,6 @@ p.phone {
     text-overflow: ellipsis;
 }
 
-.navbar {
-    z-index: 50;
-}
-
-.nav-item {
-    display: inline-block;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-}
-
 p.address {
     height: 48px;
     line-height: 1.0;
@@ -80,118 +176,43 @@ p.address {
     text-overflow: ellipsis;
 }
 
-li.ctr {
-    padding-top: 10px;
-    padding-left: 10px;
-    width: 100%;
+p.blocktext {
+    justify-content: center;
 }
 
-.btn {
-    margin-right: 10px;
-}
 
-.btn-info {
-    margin-left:0;
-}
-
-button.ctr {
-    width: 100%;
-}
-
-div.categories {
-    height: 25px;
-    line-height: 1.0;
-    font-size: 100%;
-}
-
-input[type="radio"]:disabled, input[type="checkbox"]:disabled {
-    cursor: auto;
-}
-
-.navbar-nav li {
-    display: inline;
-}
-
-.navbar-nav {
-    padding-top: 0.5rem;
-    position: relative;
-}
-
-.drop {
-    padding: 0px 0.75rem;
-}
-
-.btn-link {
-    margin-top: 8px;
-    color: #ffffff;
-}
-
-.btn-link:link {
-    color: #ffffff;
-    text-decoration: none;
-}
-
-.btn-link:visited {
-    color: #c5c5c5;
-    text-decoration: none;
-}
-
-.btn-link:focus {
-        color: #c5c5c5;
-        text-decoration: none;
-    }
-
-.btn-link:hover {
-    color: #c5c5c5;
-    text-decoration: none;
-}
-
-.btn-linkk:active {
-    color: #ffffff;
-    text-decoration: none;
+/* ul - unsorted list */
+ul {
+    padding-left: 0;
+    list-style-type: none;
 }
 
 ul li:hover ul {
     display: block;
 }
 
+
+/* li - list item */
 li {
     padding-left: 0;
     list-style-type: none;
 }
 
-ul {
-    padding-left: 0;
-    list-style-type: none;
+li.ctr {
+    padding-top: 10px;
+    padding-left: 10px;
+    width: 100%;
 }
 
-.dropdown-submenu {
-    position: relative;
-}
 
-.dropdown-submenu a::after {
-    transform: rotate(-90deg);
-    left: 2em;
-}
-
-.dropdown-submenu .dropdown-menu {
-    top: 0;
-    left: 100%;
-    margin-left: .1rem;
-    margin-right: .1rem;
-}
-
-.dropdown, .dropdown-submenu {
-    padding-left: 0;
-    padding-right: 0;
-    right: 0;
-}
-
+/* a - links */
 a.nav-link {
     color: #ffffff;
     padding-left: 0;
 }
 
+
+/* headings */
 h1 {
     padding-top: 10px;
     padding-left: 10px;
@@ -214,9 +235,12 @@ h5 {
     text-overflow: ellipsis;
 }
 
-p.blocktext {
-    justify-content: center;
+
+/* Disable checkboxes & radio buttons, because they're weird */
+input[type="radio"]:disabled, input[type="checkbox"]:disabled {
+    cursor: auto;
 }
+
 
 /* Star Rating */
 @import url(//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css);

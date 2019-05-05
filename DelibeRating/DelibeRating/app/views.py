@@ -69,6 +69,8 @@ def create_group(request):
             print("Create Group: Form Valid")
             group, created = Group.objects.get_or_create(name=form.cleaned_data['name'])
             user = request.user
+            cgroup = CustomGroup.objects.create(form.cleaned_data['name'], group.id, user.username)
+            user = request.user
             if created:
                 user.groups.add(group)
                 group.save()
@@ -86,8 +88,8 @@ def create_group(request):
         request,
         'app/create_group.html',
         {
-            'title':'Create Group',
-            'form':form,
+            'title': 'Create Group',
+            'form': form,
             'time_form': time_form,
         }
     )
@@ -105,11 +107,9 @@ def create_group_vote(request):
             print("Create Vote: Form Valid")
             groupname = request.GET.get('g', None)
             group = Group.objects.get(name = groupname)
+            cgroup = CustomGroup.objects.get(group.id)
             vote_id = datetime.datetime.now().strftime("%m-%d-%y--") + form.cleaned_data["name"]
-            obj = GroupVote()
-            obj.group = group
-            obj.vote_id = vote_id
-            group_vote, created = GroupVote.objects.get_or_create(obj)
+            group_vote, created = GroupVote.objects.get_or_create(vote_id, cgroup)
             if created:
                 messages.success(request, 'Your vote was successfully created!')
             return redirect('group/vote/?g=' + group.name + '&v=' + group_vote.vote_id)
@@ -127,8 +127,8 @@ def create_group_vote(request):
         request,
         'app/create_group_vote.html',
         {
-            'title':'Create Vote',
-            'form':form,
+            'title': 'Create Vote',
+            'form': form,
             'time_form': time_form,
             'group': group,
         }
@@ -141,6 +141,7 @@ def group(request):
     """
     print("Group View")
     time_form = CustomTimeForm()
+    active_votes = []
 
     if request.method == 'GET':
         print("Group: GET Request")
@@ -153,9 +154,9 @@ def group(request):
             print('g not found!')
 
         group = Group.objects.get(name = groupname)
+        cgroup = CustomGroup.objects.get(group.id)
         users = CustomUser.objects.filter(groups__name=groupname)
     else:
-    #if request.method == 'POST':
         print("Group: POST Request")
         form = CustomGroupChangeForm(data=request.POST)
         if form.is_valid():
@@ -171,6 +172,7 @@ def group(request):
                 users = CustomUser.objects.filter(groups__name=group.name)
             elif form.cleaned_data['act'] == 'rem':
                 group = Group.objects.get(name = form.cleaned_data['grp'])
+                cgroup = CustomGroup.objects.get(group.id)
                 user = CustomUser.objects.get(username = form.cleaned_data['usr'])
                 user.groups.remove(group)
                 users = CustomUser.objects.filter(groups__name=group.name)
@@ -184,18 +186,22 @@ def group(request):
                 users = []
 
             messages.success(request, 'Your group action was successful!')
-        
+    
+    v_all = GroupVote.objects.all_active(cgroup.name)
+    for v in v_all:
+        active_votes.append(v.vote_id)
 
     assert isinstance(request, HttpRequest)
     return render(
         request,
         'app/group.html',
         {
-            'title':'Group',
+            'title': 'Group',
             'time_form': time_form,
             'form': form,
             'group': group,
             'users': users,
+            'active_votes': active_votes,
         }
     )
 
@@ -220,7 +226,6 @@ def group_manage(request):
         group = Group.objects.get(name = groupname)
         users = CustomUser.objects.filter(groups__name=groupname)
     else:
-    #if request.method == 'POST':
         print("Group: POST Request")
         form = CustomGroupChangeForm(data=request.POST)
         if form.is_valid():
@@ -256,7 +261,7 @@ def group_manage(request):
         request,
         'app/group_manage.html',
         {
-            'title':'Group',
+            'title': 'Group',
             'time_form': time_form,
             'form': form,
             'group': group,
@@ -266,7 +271,7 @@ def group_manage(request):
 
 @login_required
 def group_vote(request):
-    """Renders the create group page."""
+    """Renders the group vote page."""
     print("Create Group View")
     time_form = CustomTimeForm()
 
@@ -276,9 +281,10 @@ def group_vote(request):
         if form.is_valid():
             print("Create Group: Form Valid")
             groupname = request.GET.get('g', None)
-            groupvotename = request.GET.get('v', None)
+            groupvoteid = request.GET.get('v', None)
             group = Group.objects.get(name = groupname)
-            group, created = Group.objects.get_or_create(name=form.cleaned_data['name'])
+            group_vote = GroupVote.objects.get(groupvoteid)
+            group = Group.objects.get(name=form.cleaned_data['name'])
             user = request.user
             if created:
                 user.groups.add(group)
@@ -294,7 +300,7 @@ def group_vote(request):
         groupname = request.GET.get('g', None)
         groupvoteid = request.GET.get('v', None)
         group = Group.objects.get(name = groupname)
-        group_vote = GroupVote.objects.get(vote_id = groupvoteid)
+        group_vote = GroupVote.objects.get(groupvoteid)
         form = CustomGroupCreationForm()
     assert isinstance(request, HttpRequest)
     return render(
@@ -626,7 +632,7 @@ def search(request):
         data = get_yelp_results(query,location,radius,sortby,pricerange,opennow,"")
         user = request.user
         for g in user.groups.all():
-            v_all = GroupVote.objects.filter(group_id__exact=g.id)
+            v_all = GroupVote.objects.all_active(g.id)
             for v in v_all:
                 active_votes.append(v.vote_id)
 

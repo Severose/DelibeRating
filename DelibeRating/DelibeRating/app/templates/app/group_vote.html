@@ -11,6 +11,8 @@
     <div class="container">
         <h1 class="display-4">{{ group.name }}</h1>
         <h2>{{ group_vote.vote_id }}</h2>
+        <br/>
+        <a class="btn btn-primary" href="{% url 'group' %}?g={{ group.name }}">Back to Group Page</a>
     </div>
 </div>
 

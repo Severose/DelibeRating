@@ -18,6 +18,11 @@
         <ul>
             <li><p><h4>Group Voting</h4></p></li>
             <li><a class="btn btn-success" href="{% url 'create_group_vote' %}?g={{ group.name }}">Start a Vote</a></li>
+            <li><ul>
+                {% for v in active_votes %}
+                <li><a href="{% url 'group_vote' %}?g={{ group.name }}&v={{ v }}" class="dropdown-item" tabIndex="-1">{{ v }}</a></li>
+                {% endfor %}
+            </ul></li>
         </ul>
     </div>
     <br/>

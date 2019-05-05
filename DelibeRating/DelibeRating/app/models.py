@@ -4,9 +4,61 @@ Definition of models.
 
 from django.contrib.auth.models import AbstractUser, Group
 from django.conf import settings
-from django.db import models
+from django.db import models, connection
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+
+
+class CustomGroupQuerySet(models.query.QuerySet):
+    def get(self, id):
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute("""
+                    SELECT owner_id, name, group_id
+	                FROM public.app_customgroup
+                    WHERE group_id = %s""", [gid])
+                result_list = []
+                for row in cursor.fetchall():
+                    cg = self.model(owner_id=row[0], name=row[1], group_id=row[2])
+                    result_list.append(cg)
+            return result_list
+        except:
+            return CustomGroup()
+
+    def create(self, name, gid, oid):
+        try:
+            obj = CustomGroup()
+            obj.group = gid
+            obj.name = name
+            obj.owner_id = oid
+            obj.save()
+            return obj
+        except:
+            return CustomGroup()
+
+    def all(self):
+        with connection.cursor() as cursor:
+            cursor.execute("""
+                SELECT owner_id, name, group_id
+	            FROM public.app_customgroup""")
+            result_list = []
+            for row in cursor.fetchall():
+                cg = self.model(owner_id=row[0], name=row[1], group_id=row[2])
+                result_list.append(cg)
+        return result_list
+
+class CustomGroupManager(models.Manager):
+    def get_queryset(self):
+        return CustomGroupQuerySet(self.model)
+
+    def get(self, id):
+        return self.get_queryset().get(id)
+
+    def create(self, name, gid, oid):
+        return self.get_queryset().get_or_create(name, gid, oid)
+
+    def all(self):
+        return self.get_queryset().all()
 
 class CustomGroup(models.Model):
     """Custom Group Model, extending AbstractUser
@@ -14,6 +66,7 @@ class CustomGroup(models.Model):
     """
     name = models.CharField(max_length=50, primary_key=True)
     group = models.OneToOneField(Group, unique=True)
+    objects = CustomGroupManager()
 
     class Meta:
         ordering = ['name']
@@ -34,17 +87,76 @@ class CustomUser(AbstractUser):
         db_table = 'app_customuser'
 
 class GroupVoteQuerySet(models.query.QuerySet):
-    def get_or_create(self, obj):
+    def get(self, vid):
         try:
-            group_vote = GroupVote.objects.get(vote_id = obj.vote_id)
-            return group_vote, False
+            with connection.cursor() as cursor:
+                cursor.execute("""
+                    SELECT vote_id, group_id
+	                FROM public.app_votes
+                    WHERE vote_id = %s""", [vid])
+                result_list = []
+
+                #if row in cursor.fetchall():
+                for row in cursor.fetchall():
+                    gv = self.model(vote_id=row[0], group_id=row[1])
+            return gv
+        except:
+            return None
+
+    def get_or_create(self, vid, grp):
+        try:
+            obj = self.get(vid)
+            if obj:
+                return obj, False
+            else:
+                raise GroupVote.DoesNotExist
         except GroupVote.DoesNotExist:
+            obj = GroupVote()
+            obj.vote_id = vid
+            obj.group = grp
             obj.save()
-            return group_vote, True
+            return obj, True
+        except:
+            return GroupVote(), False
+
+    def all_active(self, gid):
+        with connection.cursor() as cursor:
+            cursor.execute("""
+                SELECT vote_id, group_id
+	            FROM public.app_votes
+                WHERE group_id = %s""", [gid])
+            result_list = []
+            for row in cursor.fetchall():
+                gv = self.model(vote_id=row[0], group_id=row[1])
+                result_list.append(gv)
+        return result_list
+
+    def all(self):
+        with connection.cursor() as cursor:
+            cursor.execute("""
+                SELECT vote_id, group_id
+	            FROM public.app_votes""")
+            result_list = []
+            for row in cursor.fetchall():
+                gv = self.model(vote_id=row[0], group_id=row[1])
+                result_list.append(gv)
+        return result_list
 
 class GroupVoteManager(models.Manager):
     def get_queryset(self):
         return GroupVoteQuerySet(self.model)
+
+    def get(self, vid):
+        return self.get_queryset().get(vid)
+
+    def get_or_create(self, vid, grp):
+        return self.get_queryset().get_or_create(vid, grp)
+
+    def all_active(self, gid):
+        return self.get_queryset().all_active(gid)
+
+    def all(self):
+        return self.get_queryset().all()
 
 class GroupVote(models.Model):
     """Group Vote, consisting of multiple Vote Options
