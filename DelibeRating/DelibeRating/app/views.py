@@ -339,6 +339,7 @@ def home(request):
         data = get_yelp_results(query,location,radius,sortby,pricerange,opennow,attributes)
 
         user = request.user
+        #Use cache to store businesses instead of a Django model
         #for g in user.groups.all():
         #    cg = CustomGroup.objects.get(g.id)
         #    v_all = GroupVote.objects.all_active(cg.name)
