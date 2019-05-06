@@ -69,7 +69,7 @@ def create_group(request):
             print("Create Group: Form Valid")
             group, created = Group.objects.get_or_create(name=form.cleaned_data['name'])
             user = request.user
-            cgroup = CustomGroup.objects.create(form.cleaned_data['name'], group.id, user.username)
+            cgroup = CustomGroup.objects.create(form.cleaned_data['name'], group.id)
             user = request.user
             if created:
                 user.groups.add(group)
@@ -163,6 +163,7 @@ def group(request):
             print("Group: Form Valid")
             if form.cleaned_data['act'] == 'add':
                 group = Group.objects.get(name = form.cleaned_data['grp'])
+                cgroup = CustomGroup.objects.get(group.id)
                 user = CustomUser.objects.get(username = form.cleaned_data['usr'])
                 if user.groups.filter(name=group.name).exists():
                     messages.error(request, 'User is already a member.')
@@ -182,7 +183,8 @@ def group(request):
                 group.save()
             else:
                 print('Error: unknown action')
-                group = ''
+                group = Group()
+                cgroup = CustomGroup()
                 users = []
 
             messages.success(request, 'Your group action was successful!')
@@ -321,6 +323,7 @@ def home(request):
     """
     print("Home View")
     time_form = CustomTimeForm()
+    active_votes = []
 
     location = "Irvine, CA" #Update to use user's preferred location
 
@@ -334,6 +337,14 @@ def home(request):
         attributes = 'hot_and_new'
 
         data = get_yelp_results(query,location,radius,sortby,pricerange,opennow,attributes)
+
+        user = request.user
+        #for g in user.groups.all():
+        #    cg = CustomGroup.objects.get(g.id)
+        #    v_all = GroupVote.objects.all_active(cg.name)
+        #    for v in v_all:
+        #        active_votes.append(v.vote_id)
+
 
         shuffle(data['businesses'])
 
@@ -350,6 +361,8 @@ def home(request):
                    'location':'Irvine, CA',
                    'time_form': time_form,
                    'pages': pages,
+                   'user': user,
+                   'active_votes': active_votes,
                    }
 
         assert isinstance(request, HttpRequest)
@@ -632,7 +645,7 @@ def search(request):
         data = get_yelp_results(query,location,radius,sortby,pricerange,opennow,"")
         user = request.user
         for g in user.groups.all():
-            v_all = GroupVote.objects.all_active(g.id)
+            v_all = GroupVote.objects.all_active(g.name)
             for v in v_all:
                 active_votes.append(v.vote_id)
 

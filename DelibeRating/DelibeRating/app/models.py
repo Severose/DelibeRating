@@ -8,9 +8,8 @@ from django.db import models, connection
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-
 class CustomGroupQuerySet(models.query.QuerySet):
-    def get(self, id):
+    def get(self, gid):
         try:
             with connection.cursor() as cursor:
                 cursor.execute("""
@@ -20,21 +19,19 @@ class CustomGroupQuerySet(models.query.QuerySet):
                 result_list = []
                 for row in cursor.fetchall():
                     cg = self.model(owner_id=row[0], name=row[1], group_id=row[2])
-                    result_list.append(cg)
-            return result_list
+            return cg
         except:
-            return CustomGroup()
+            return None
 
-    def create(self, name, gid, oid):
+    def create(self, name, gid):
         try:
             obj = CustomGroup()
-            obj.group = gid
+            obj.group_id = gid
             obj.name = name
-            obj.owner_id = oid
             obj.save()
             return obj
         except:
-            return CustomGroup()
+            return None
 
     def all(self):
         with connection.cursor() as cursor:
@@ -51,11 +48,11 @@ class CustomGroupManager(models.Manager):
     def get_queryset(self):
         return CustomGroupQuerySet(self.model)
 
-    def get(self, id):
-        return self.get_queryset().get(id)
+    def get(self, gid):
+        return self.get_queryset().get(gid)
 
-    def create(self, name, gid, oid):
-        return self.get_queryset().get_or_create(name, gid, oid)
+    def create(self, name, gid):
+        return self.get_queryset().create(name, gid)
 
     def all(self):
         return self.get_queryset().all()
@@ -65,7 +62,9 @@ class CustomGroup(models.Model):
         owner, name
     """
     name = models.CharField(max_length=50, primary_key=True)
+
     group = models.OneToOneField(Group, unique=True)
+
     objects = CustomGroupManager()
 
     class Meta:
@@ -96,7 +95,6 @@ class GroupVoteQuerySet(models.query.QuerySet):
                     WHERE vote_id = %s""", [vid])
                 result_list = []
 
-                #if row in cursor.fetchall():
                 for row in cursor.fetchall():
                     gv = self.model(vote_id=row[0], group_id=row[1])
             return gv
@@ -117,7 +115,7 @@ class GroupVoteQuerySet(models.query.QuerySet):
             obj.save()
             return obj, True
         except:
-            return GroupVote(), False
+            return None, False
 
     def all_active(self, gid):
         with connection.cursor() as cursor:
@@ -164,14 +162,9 @@ class GroupVote(models.Model):
     # MM-DD-YY--<Name>
     vote_id = models.CharField(max_length=30, primary_key=True)
     group = models.ForeignKey(CustomGroup, on_delete=models.CASCADE)
+    vote_options = models.CharField(max_length=10000)
+
     objects = GroupVoteManager()
 
     class Meta:
         db_table = 'app_votes'
-        
-class VoteOption(models.Model):
-    """Vote Option in Group Vote
-    """
-    business_name = models.CharField(max_length=100, primary_key=True)
-    # Add JSON object for business
-    group_vote = models.ForeignKey(GroupVote, on_delete=models.CASCADE)
