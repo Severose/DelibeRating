@@ -13,12 +13,12 @@ class CustomGroupQuerySet(models.query.QuerySet):
         try:
             with connection.cursor() as cursor:
                 cursor.execute("""
-                    SELECT owner_id, name, group_id
+                    SELECT name, group_id
 	                FROM public.app_customgroup
                     WHERE group_id = %s""", [gid])
                 result_list = []
                 for row in cursor.fetchall():
-                    cg = self.model(owner_id=row[0], name=row[1], group_id=row[2])
+                    cg = self.model(name=row[0], group_id=row[1])
             return cg
         except:
             return None

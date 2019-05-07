@@ -40,7 +40,7 @@
 
         <p class="phone">{{ element.display_phone }}</p>
 
-        <div class="blocktext">
+        <div class="row">
             <a href="#" class="btn btn-primary" role="button">♥</a>
             <a href="#" class="btn btn-primary" role="button">⊘</a>
             {% if user.is_authenticated %}
@@ -50,7 +50,7 @@
                     <li class="dropdown-submenu">
                         <ul>
                         {% for v in active_votes %}
-                        <li><a href="#" class="dropdown-item" tabIndex="-1">{{ v.vote_id }}</a></li>
+                        <li><a href="#" class="dropdown-item" tabIndex="-1">{{ v }}</a></li>
                         {% endfor %}
                         </ul>
                     </li>

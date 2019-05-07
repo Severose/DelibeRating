@@ -21,6 +21,10 @@
 
 
 /* div - content */
+div.caption div.row {
+    margin-left: 5px;
+}
+
 div.categories {
     height: 25px;
     line-height: 1.0;

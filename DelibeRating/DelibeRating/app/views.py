@@ -340,11 +340,11 @@ def home(request):
 
         user = request.user
         #Use cache to store businesses instead of a Django model
-        #for g in user.groups.all():
-        #    cg = CustomGroup.objects.get(g.id)
-        #    v_all = GroupVote.objects.all_active(cg.name)
-        #    for v in v_all:
-        #        active_votes.append(v.vote_id)
+        user = request.user
+        for g in user.groups.all():
+            v_all = GroupVote.objects.all_active(g.name)
+            for v in v_all:
+                active_votes.append(v.vote_id)
 
 
         shuffle(data['businesses'])
