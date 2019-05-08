@@ -84,19 +84,23 @@ class CustomUser(AbstractUser):
     class Meta:
         managed = False
         db_table = 'app_customuser'
+        #Implement for delete user
+        #permissions = (
+        #    ('delete', 'can delete')
+        #    )
 
 class GroupVoteQuerySet(models.query.QuerySet):
     def get(self, vid):
         try:
             with connection.cursor() as cursor:
                 cursor.execute("""
-                    SELECT vote_id, group_id
+                    SELECT vote_id, group_id, vote_options
 	                FROM public.app_votes
                     WHERE vote_id = %s""", [vid])
                 result_list = []
 
                 for row in cursor.fetchall():
-                    gv = self.model(vote_id=row[0], group_id=row[1])
+                    gv = self.model(vote_id=row[0], group_id=row[1], vote_options = row[2])
             return gv
         except:
             return None
@@ -112,6 +116,7 @@ class GroupVoteQuerySet(models.query.QuerySet):
             obj = GroupVote()
             obj.vote_id = vid
             obj.group = grp
+            obj.vote_options = ''
             obj.save()
             return obj, True
         except:
@@ -120,23 +125,23 @@ class GroupVoteQuerySet(models.query.QuerySet):
     def all_active(self, gid):
         with connection.cursor() as cursor:
             cursor.execute("""
-                SELECT vote_id, group_id
+                SELECT vote_id, group_id, vote_options
 	            FROM public.app_votes
                 WHERE group_id = %s""", [gid])
             result_list = []
             for row in cursor.fetchall():
-                gv = self.model(vote_id=row[0], group_id=row[1])
+                gv = self.model(vote_id=row[0], group_id=row[1], vote_options = row[2])
                 result_list.append(gv)
         return result_list
 
     def all(self):
         with connection.cursor() as cursor:
             cursor.execute("""
-                SELECT vote_id, group_id
+                SELECT vote_id, group_id, vote_options
 	            FROM public.app_votes""")
             result_list = []
             for row in cursor.fetchall():
-                gv = self.model(vote_id=row[0], group_id=row[1])
+                gv = self.model(vote_id=row[0], group_id=row[1], vote_options = row[2])
                 result_list.append(gv)
         return result_list
 
@@ -160,7 +165,7 @@ class GroupVote(models.Model):
     """Group Vote, consisting of multiple Vote Options
     """
     # MM-DD-YY--<Name>
-    vote_id = models.CharField(max_length=30, primary_key=True)
+    vote_id = models.CharField(max_length=50, primary_key=True)
     group = models.ForeignKey(CustomGroup, on_delete=models.CASCADE)
     vote_options = models.CharField(max_length=10000)
 

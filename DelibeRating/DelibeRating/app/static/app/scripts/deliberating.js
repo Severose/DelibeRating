@@ -116,8 +116,12 @@ $(document).ready(function () {
     $('.vote-opt').click(function () {
         $.ajax({
             type: "POST",
-            url: "{% url 'vote' %}",
-            data: { /* Add data, */ 'csrfmiddlewaretoken': '{{ csrf_token }}' },
+            url: "/api/addopt",
+            data: JSON.stringify({
+                'vote_name': $(this).attr('value'),
+                'element_id': $(this).attr('id'),
+                'element_info': $(this).attr('name'),
+            }),
             dataType: "json",
             success: function (response) {
                 /* Update state (button) */

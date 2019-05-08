@@ -31,5 +31,9 @@
             {% endfor %}
         </ul>
     </div>
+    <br/>
+    <div class="row">
+        <a class="btn btn-danger" href="{% url 'delete_user' %}?u={{ user.username }}" tabIndex="-1">Delete my account</a>
+    </div>
 </div>
 {% endblock %}

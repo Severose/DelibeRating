@@ -18,9 +18,24 @@
 
 <div class="container">
     <div class="row">
-        <ul>
-            <li><p><h4>Vote options</h4></p></li>
-        </ul>
+        <h4>Vote options</h4>
     </div>
+    {% if results %}
+    <div class="row">
+        {% include 'app/pagination.html' %}
+    </div>
+    <div class="row">
+        {% for element in results.object_list %}
+            {% include 'app/result.html' %}
+        {% endfor %}
+    </div>
+    <div class="row">
+        {% include 'app/pagination.html' %}
+    </div>
+    {% else %}
+    <div class="row">
+        <h3>No results!</h3>
+    </div>
+    {% endif %}
 </div>
 {% endblock %}

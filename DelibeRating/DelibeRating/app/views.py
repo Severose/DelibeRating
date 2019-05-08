@@ -16,6 +16,7 @@ from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth import login as auth_login
 from django.contrib.auth.decorators import login_required
 from django.contrib.admin.views.decorators import staff_member_required
+from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.db import transaction
 from django.db.models import Q
@@ -34,6 +35,16 @@ from django import template
 
 registerT = template.Library()
 yelp_api = YelpAPI(settings.API_KEY, timeout_s=3.0)
+
+def get_cached_business(id):
+    if cache.get(str(id)):
+        print("Using cached results!")
+        raw_data = cache.get(str(id))
+        data = json.loads(json.dumps(raw_data))
+        return data
+    else:
+        print("Business is not cached!")
+        return None
 
 def get_yelp_results(query,location,radius,sortby,pricerange,opennow,attributes):
     if cache.get(''.join(i for i in str(query+location+radius+sortby+pricerange+opennow) if i.isalnum())):
@@ -55,6 +66,23 @@ def get_yelp_results(query,location,radius,sortby,pricerange,opennow,attributes)
     cache.set(''.join(i for i in str(query+location+radius+sortby+pricerange+opennow) if i.isalnum()), data, 86400)  #TODO: Use DEFAULT_TIMEOUT
     
     return data
+
+@login_required
+@require_POST
+@csrf_exempt
+def addopt(request):
+    if request.method == 'POST':
+        raw_data = request.body.decode('utf-8')
+        data = json.loads(raw_data)
+        group_vote = GroupVote.objects.get(data['vote_name'])
+        element_data = json.loads(json.dumps(data['element_info']))
+
+        cache.set(data['element_id'], element_data, 86400)  #TODO: Use DEFAULT_TIMEOUT
+        group_vote.vote_options += data['element_id'] + ','
+        group_vote.save()
+        response = {"Success":"True"}
+
+    return HttpResponse(response, content_type='application/json')
 
 @login_required
 def create_group(request):
@@ -108,7 +136,7 @@ def create_group_vote(request):
             groupname = request.GET.get('g', None)
             group = Group.objects.get(name = groupname)
             cgroup = CustomGroup.objects.get(group.id)
-            vote_id = datetime.datetime.now().strftime("%m-%d-%y--") + form.cleaned_data["name"]
+            vote_id = str(group.id) + datetime.datetime.now().strftime("--%m-%d-%y--") + form.cleaned_data["name"]
             group_vote, created = GroupVote.objects.get_or_create(vote_id, cgroup)
             if created:
                 messages.success(request, 'Your vote was successfully created!')
@@ -276,6 +304,7 @@ def group_vote(request):
     """Renders the group vote page."""
     print("Create Group View")
     time_form = CustomTimeForm()
+    results = []
 
     if request.method == 'POST':
         print("Create Group: POST Request")
@@ -284,15 +313,9 @@ def group_vote(request):
             print("Create Group: Form Valid")
             groupname = request.GET.get('g', None)
             groupvoteid = request.GET.get('v', None)
-            group = Group.objects.get(name = groupname)
-            group_vote = GroupVote.objects.get(groupvoteid)
-            group = Group.objects.get(name=form.cleaned_data['name'])
             user = request.user
-            if created:
-                user.groups.add(group)
-                group.save()
-                messages.success(request, 'Your group was successfully created!')
-            return redirect('group/?g=' + group.name)
+            group = Group.objects.get(name = groupname)
+            cgroup = CustomGroup.objects.get(group.id)
         else:
             print("Create Group: Form Invalid")
             print(form.errors)
@@ -301,9 +324,16 @@ def group_vote(request):
         print("Register: GET Request")
         groupname = request.GET.get('g', None)
         groupvoteid = request.GET.get('v', None)
+        user = request.user
         group = Group.objects.get(name = groupname)
+        cgroup = CustomGroup.objects.get(group.id)
         group_vote = GroupVote.objects.get(groupvoteid)
         form = CustomGroupCreationForm()
+
+        for e in group_vote.vote_options.split(','):
+            business = get_cached_business(e)
+            if business:
+                results.append(json.loads(json.dumps(business)))
     assert isinstance(request, HttpRequest)
     return render(
         request,
@@ -314,6 +344,7 @@ def group_vote(request):
             'time_form': time_form,
             'group': group,
             'group_vote': group_vote,
+            'results': results,
         }
     )
 
@@ -663,6 +694,7 @@ def search(request):
                    'location':location,
                    'time_form': time_form,
                    'pages': pages,
+                   'group': group,
                    'active_votes': active_votes,
                    }
 
@@ -754,30 +786,6 @@ def suggestions(request):
         return render(request,"app/search.html",{})
 
 @login_required
-@require_POST
-def vote(request):
-    """if request.method == 'POST':
-        user = request.user
-        slug = request.POST.get('slug', None)
-        group = GroupVote.objects.get(name = groupname)
-
-        if company.likes.filter(id=user.id).exists():
-            # user has already liked this company
-            # remove like/user
-            company.likes.remove(user)
-            message = 'You disliked this'
-        else:
-            # add a new like for a company
-            company.likes.add(user)
-            message = 'You liked this'
-
-    ctx = {'likes_count': company.total_likes, 'message': message}
-    # use mimetype instead of content_type if django < 5
-    return HttpResponse(json.dumps(ctx), content_type='application/json')
-    """
-    print("hello")
-
-@login_required
 def voting(request):
     """Renders the vote page.
         TODO: Implement
@@ -801,28 +809,6 @@ def voting(request):
             'groups': groups,
         }
     )
-
-@staff_member_required
-def delete_user(request, username):
-    """Delete user view (NO TEMPLATE)
-        TODO: Actually delete users
-    """
-
-    context = {}
-
-    try:
-        user = CustomUser.objects.get(username = username)
-        user.delete()
-        context['msg'] = 'The user is deleted.'            
-
-    except CustomUser.DoesNotExist:
-        messages.error(request, "User does not exist")    
-        context['msg'] = 'User does not exist.'
-
-    except Exception as e: 
-        pass
-
-    return render(request, 'home.html', context=context)
 
 @login_required
 def user_autocomplete(request):
@@ -876,3 +862,23 @@ def yelp_autocomplete(request):
         else:
             print('term not found!')
     return HttpResponse(data, 'application/json')
+
+@staff_member_required
+@login_required
+def delete_user(request, username):
+    """Delete user view (NO TEMPLATE)
+        TODO: Actually delete users
+    """
+
+    context = {}
+
+    try:
+        username = request.GET.get('u', '')
+        user = CustomUser.objects.get(username = username)
+        user.delete()
+        context['msg'] = 'The user is deleted.'            
+
+    except CustomUser.DoesNotExist:
+        messages.error(request, "User does not exist")
+
+    return render(request, 'home.html', context=context)

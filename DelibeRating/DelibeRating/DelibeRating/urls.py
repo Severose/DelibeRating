@@ -34,9 +34,9 @@ urlpatterns = [
     url(r'^settings', app_views.settings, name='settings'),
     url(r'^suggestions', app_views.suggestions, name='suggestions'),
     url(r'^profile', app_views.profile, name='profile'),
-    url(r'^vote', app_views.vote, name='vote'),
+    url(r'^api/addopt', app_views.addopt, name='addopt'),
     url(r'^voting', app_views.voting, name='voting'),
-    url(r'^delete_user/(?P<username>[\w|\W.-]+)/$', app_views.delete_user, name='delete-user'), 
+    url(r'^delete_user', app_views.delete_user, name='delete_user'), 
 
     # Uncomment the admin/doc line below to enable admin documentation:
     url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
