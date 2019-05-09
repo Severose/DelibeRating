@@ -125,12 +125,12 @@ class GroupVoteQuerySet(models.query.QuerySet):
     def get_options(self, vid):
         with connection.cursor() as cursor:
             cursor.execute("""
-                SELECT opt_id, group_vote_id, business_id
+                SELECT opt_id, group_vote_id, business_id, upvotes, downvotes
 	            FROM public.app_vote_options
                 WHERE group_vote_id = %s""", [vid])
             result_list = []
             for row in cursor.fetchall():
-                vo = VoteOption(opt_id=row[0], group_vote_id=row[1], business_id=row[2])
+                vo = VoteOption(opt_id=row[0], group_vote_id=row[1], business_id=row[2], upvotes=row[3], downvotes=row[4])
                 result_list.append(vo)
         return result_list
 
@@ -217,10 +217,12 @@ class VoteOptionQuerySet(models.query.QuerySet):
 
                 for row in cursor.fetchall():
                     vo = self.model(opt_id=row[0], group_vote_id=row[1], business_id=row[2], upvotes=row[3], downvotes=row[4])
-                for v in upvotes.split(','):
-                    net_votes += 1
-                for d in downvotes.split(','):
-                    net_votes -= 1
+                if vo.upvotes:
+                    for v in vo.upvotes.split(','):
+                        net_votes += 1
+                if vo.downvotes:
+                    for d in vo.downvotes.split(','):
+                        net_votes -= 1
             return net_votes
         except:
             return None

@@ -46,7 +46,6 @@ INSTALLED_APPS = [
     'yelpapi',
     'mathfilters',
     'tempus_dominus',
-    'secretballot',
 ]
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'

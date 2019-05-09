@@ -21,6 +21,7 @@ urlpatterns = [
     url(r'^api/downvote', app_views.downvote, name='downvote'),
     url(r'^api/search/', app_views.yelp_autocomplete, name='yelp_autocomplete'),
     url(r'^api/upvote', app_views.upvote, name='upvote'),
+    url(r'^api/update_chart', app_views.update_chart, name='update_chart'),
     url(r'^api/users/', app_views.user_autocomplete, name='user_autocomplete'),
     url(r'^group/api/users/', app_views.user_autocomplete, name='user_autocomplete'), #Kludge
     url(r'^group/vote/create', app_views.create_group_vote, name='create_group_vote'),

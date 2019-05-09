@@ -46,3 +46,28 @@
     {% endif %}
 </div>
 {% endblock %}
+
+<script type="text/javascript">
+    window.onload(function () {
+        $.ajax({
+            type: "POST",
+            url: "/api/update_chart",
+            data: JSON.stringify({
+                // Need to fix where this is grabbing the vote_id
+                'vote_name': $(this).attr('value')
+            }),
+            dataType: "json",
+            success: function (response) {
+                alert(response.chart_data);
+                alert(response.chart_labels);
+                vote_chart.data.datasets[0].data = response.chart_data;
+                vote_chart.labels = response.chart_labels;
+                vote_chart.update();
+            },
+            error: function (rs, e) {
+                alert(e);
+            }
+        });
+    });
+
+</script>

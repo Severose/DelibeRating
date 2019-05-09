@@ -99,20 +99,34 @@ def downvote(request):
         data = json.loads(raw_data)
         user = request.user
         vote_opt = VoteOption.objects.get(data['vote_name'] + '/' + data['element_id'][:-1])
+        group_vote = GroupVote.objects.get(vote_opt.group_vote_id)
+        vote_counts = {}
+        business_names = []
 
-        if user.username in vote_opt.downvotes.split():
+        if user.username in vote_opt.downvotes.split(','):
             vote_opt.downvotes = vote_opt.downvotes.replace(user.username + ',', '')
             sel = '#' + data['element_id']
             response = {'success': False, 'element_id': sel}
         else:
             vote_opt.downvotes += user.username + ','
             sel = '#' + data['element_id']
-            if user.username in vote_opt.upvotes.split():
+            if user.username in vote_opt.upvotes.split(','):
                 vote_opt.upvotes = vote_opt.upvotes.replace(user.username + ',', '')
-                response = {'success': True, 'toggled': True, 'element_id': sel}
+                response = {'success': True, 'toggled': True, 'element_toggled': sel[:-1] + 'u', 'element_id': sel}
             else:
                 response = {'success': True, 'toggled': False, 'element_id': sel}
         vote_opt.save()
+
+        vote_options = GroupVote.objects.get_options(group_vote.vote_id)
+        for vo in vote_options:
+            vo_count = VoteOption.objects.vote_count(vo.opt_id)
+            business = get_cached_business(vo.business_id)
+            business_names.append(business['name'])
+            vote_counts[business['name']] = vo_count
+
+        response["chart_labels"] = business_names
+        response["chart_data"] = vote_counts
+
     return HttpResponse(json.dumps(response), content_type='application/json')
 
 @login_required
@@ -124,6 +138,9 @@ def upvote(request):
         data = json.loads(raw_data)
         user = request.user
         vote_opt = VoteOption.objects.get(data['vote_name'] + '/' + data['element_id'][:-1])
+        group_vote = GroupVote.objects.get(vote_opt.group_vote_id)
+        vote_counts = []
+        business_names = []
 
         if user.username in vote_opt.upvotes.split(','):
             vote_opt.upvotes = vote_opt.upvotes.replace(user.username + ',', '')
@@ -132,12 +149,47 @@ def upvote(request):
         else:
             vote_opt.upvotes += user.username + ','
             sel = '#' + data['element_id']
-            if user.username in vote_opt.downvotes.split():
+            if user.username in vote_opt.downvotes.split(','):
                 vote_opt.downvotes = vote_opt.downvotes.replace(user.username + ',', '')
-                response = {'success': True, 'toggled': True, 'element_id': sel}
+                response = {'success': True, 'toggled': True, 'element_toggled': sel[:-1] + 'd', 'element_id': sel}
             else:
                 response = {'success': True, 'toggled': False, 'element_id': sel}
         vote_opt.save()
+
+        vote_options = GroupVote.objects.get_options(group_vote.vote_id)
+        for vo in vote_options:
+            vo_count = VoteOption.objects.vote_count(vo.opt_id)
+            business = get_cached_business(vo.business_id)
+            business_names.append(business['name'])
+            vote_counts.append(vo_count)
+
+        response["chart_labels"] = business_names
+        response["chart_data"] = vote_counts
+
+    return HttpResponse(json.dumps(response), content_type='application/json')
+
+@login_required
+@require_POST
+@csrf_exempt
+def update_chart(request):
+    if request.method == 'POST':
+        raw_data = request.body.decode('utf-8')
+        data = json.loads(raw_data)
+        user = request.user
+        vote_opt = VoteOption.objects.get(data['vote_name'] + '/' + data['element_id'][:-1])
+        group_vote = GroupVote.objects.get(vote_opt.group_vote)
+        vote_counts = {}
+        business_names = []
+
+        vote_options = GroupVote.objects.get_options(group_vote.vote_id)
+        for vo in vote_options:
+            vo_count = VoteOption.objects.vote_count(vo.opt_id)
+            business = get_cached_business(vo.business_id)
+            business_names.append(business['name'])
+            vote_counts.append(vo_count)
+
+        response = {'success': True, 'chart_labels': business_names, 'chart_data': vote_counts}
+
     return HttpResponse(json.dumps(response), content_type='application/json')
 
 @login_required

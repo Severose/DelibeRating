@@ -142,13 +142,18 @@
             dataType: "json",
             success: function (response) {
                 if (response.success === true) {
-                    $(response.element_id).attr('class', 'btn btn-default upvote');
-                } else {
                     $(response.element_id).attr('class', 'btn btn-success upvote');
+                } else {
+                    $(response.element_id).attr('class', 'btn btn-secondary upvote');
                 }
                 if(response.toggled === true) {
-                    $(response.element_id).attr('class', 'btn btn-danger upvote');
+                    $(response.element_toggled).attr('class', 'btn btn-secondary downvote');
                 }
+                alert(response.chart_data);
+                alert(response.chart_labels);
+                vote_chart.data.datasets[0].data = response.chart_data;
+                vote_chart.labels = response.chart_labels;
+                vote_chart.update();
             },
             error: function (rs, e) {
                 alert(e);
@@ -167,13 +172,18 @@
             dataType: "json",
             success: function (response) {
                 if (response.success === true) {
-                    $(response.element_id).attr('class', 'btn btn-default downvote');
-                } else {
                     $(response.element_id).attr('class', 'btn btn-danger downvote');
+                } else {
+                    $(response.element_id).attr('class', 'btn btn-secondary downvote');
                 }
                 if (response.toggled === true) {
-                    $(response.element_id).attr('class', 'btn btn-success upvote');
+                    $(response.element_toggled).attr('class', 'btn btn-secondary upvote');
                 }
+                alert(response.chart_data);
+                alert(response.chart_labels);
+                vote_chart.data.datasets[0].data = response.chart_data;
+                vote_chart.labels = response.chart_labels;
+                vote_chart.update();
             },
             error: function (rs, e) {
                 alert(e);
