@@ -18,19 +18,26 @@
 
 <div class="container">
     <div class="row">
+        <h4>Vote results</h4>
+    </div>
+    <div class="row">
+        <div><canvas id="vote_chart" width="400" height="400"></canvas></div>
+    </div>
+    <div class="row">
         <h4>Vote options</h4>
     </div>
+
     {% if results %}
     <div class="row">
-        {% include 'app/pagination.html' %}
+        {% include 'app/pagination_vote.html' %}
     </div>
     <div class="row">
         {% for element in results.object_list %}
-            {% include 'app/result.html' %}
+            {% include 'app/result_vote.html' %}
         {% endfor %}
     </div>
     <div class="row">
-        {% include 'app/pagination.html' %}
+        {% include 'app/pagination_vote.html' %}
     </div>
     {% else %}
     <div class="row">

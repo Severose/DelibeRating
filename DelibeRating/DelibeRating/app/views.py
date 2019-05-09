@@ -64,6 +64,10 @@ def get_yelp_results(query,location,radius,sortby,pricerange,opennow,attributes)
             
     data = json.loads(json.dumps(raw_data))
     cache.set(''.join(i for i in str(query+location+radius+sortby+pricerange+opennow) if i.isalnum()), data, 86400)  #TODO: Use DEFAULT_TIMEOUT
+
+    # Cache businesses
+    for b in data['businesses']:
+        cache.set(b['id'], b, 86400)  #TODO: Use DEFAULT_TIMEOUT
     
     return data
 
@@ -71,18 +75,70 @@ def get_yelp_results(query,location,radius,sortby,pricerange,opennow,attributes)
 @require_POST
 @csrf_exempt
 def addopt(request):
+    # TODO: Optimize storage of businesses
     if request.method == 'POST':
         raw_data = request.body.decode('utf-8')
         data = json.loads(raw_data)
-        group_vote = GroupVote.objects.get(data['vote_name'])
-        element_data = json.loads(json.dumps(data['element_info']))
+        vote_opt = VoteOption()
+        group_vote = GroupVote.objects.get(data['vote_name'] + '/' + data['element_id'])
+        vote_opt.group_vote = group_vote
+        vote_opt.opt_id = data['vote_name'] + '/' + data['element_id']
+        vote_opt.business_id = data['element_id']
+        vote_opt.upvotes = ''
+        vote_opt.downvotes = ''
+        vote_opt.save()
+        response = {'success':True}
+    return HttpResponse(json.dumps(response), content_type='application/json')
 
-        cache.set(data['element_id'], element_data, 86400)  #TODO: Use DEFAULT_TIMEOUT
-        group_vote.vote_options += data['element_id'] + ','
-        group_vote.save()
-        response = {"Success":"True"}
+@login_required
+@require_POST
+@csrf_exempt
+def downvote(request):
+    if request.method == 'POST':
+        raw_data = request.body.decode('utf-8')
+        data = json.loads(raw_data)
+        user = request.user
+        vote_opt = VoteOption.objects.get(data['vote_name'] + '/' + data['element_id'][:-1])
 
-    return HttpResponse(response, content_type='application/json')
+        if user.username in vote_opt.downvotes.split():
+            vote_opt.downvotes = vote_opt.downvotes.replace(user.username + ',', '')
+            sel = '#' + data['element_id']
+            response = {'success': False, 'element_id': sel}
+        else:
+            vote_opt.downvotes += user.username + ','
+            sel = '#' + data['element_id']
+            if user.username in vote_opt.upvotes.split():
+                vote_opt.upvotes = vote_opt.upvotes.replace(user.username + ',', '')
+                response = {'success': True, 'toggled': True, 'element_id': sel}
+            else:
+                response = {'success': True, 'toggled': False, 'element_id': sel}
+        vote_opt.save()
+    return HttpResponse(json.dumps(response), content_type='application/json')
+
+@login_required
+@require_POST
+@csrf_exempt
+def upvote(request):
+    if request.method == 'POST':
+        raw_data = request.body.decode('utf-8')
+        data = json.loads(raw_data)
+        user = request.user
+        vote_opt = VoteOption.objects.get(data['vote_name'] + '/' + data['element_id'][:-1])
+
+        if user.username in vote_opt.upvotes.split(','):
+            vote_opt.upvotes = vote_opt.upvotes.replace(user.username + ',', '')
+            sel = '#' + data['element_id']
+            response = {'success': False, 'element_id': sel}
+        else:
+            vote_opt.upvotes += user.username + ','
+            sel = '#' + data['element_id']
+            if user.username in vote_opt.downvotes.split():
+                vote_opt.downvotes = vote_opt.downvotes.replace(user.username + ',', '')
+                response = {'success': True, 'toggled': True, 'element_id': sel}
+            else:
+                response = {'success': True, 'toggled': False, 'element_id': sel}
+        vote_opt.save()
+    return HttpResponse(json.dumps(response), content_type='application/json')
 
 @login_required
 def create_group(request):
@@ -304,22 +360,10 @@ def group_vote(request):
     """Renders the group vote page."""
     print("Create Group View")
     time_form = CustomTimeForm()
-    results = []
+    data = []
 
     if request.method == 'POST':
         print("Create Group: POST Request")
-        form = CustomGroupCreationForm(data=request.POST)
-        if form.is_valid():
-            print("Create Group: Form Valid")
-            groupname = request.GET.get('g', None)
-            groupvoteid = request.GET.get('v', None)
-            user = request.user
-            group = Group.objects.get(name = groupname)
-            cgroup = CustomGroup.objects.get(group.id)
-        else:
-            print("Create Group: Form Invalid")
-            print(form.errors)
-            messages.error(request, 'Please correct the error below.')
     else:
         print("Register: GET Request")
         groupname = request.GET.get('g', None)
@@ -328,20 +372,25 @@ def group_vote(request):
         group = Group.objects.get(name = groupname)
         cgroup = CustomGroup.objects.get(group.id)
         group_vote = GroupVote.objects.get(groupvoteid)
-        form = CustomGroupCreationForm()
+        vote_options = GroupVote.objects.get_options(groupvoteid)
 
-        for e in group_vote.vote_options.split(','):
-            business = get_cached_business(e)
-            if business:
-                results.append(json.loads(json.dumps(business)))
+        for opt in vote_options:
+            data.append(get_cached_business(opt.business_id))
+
+        results_page = request.GET.get('page', 1)
+        paginator = Paginator(data, 4)
+        pages = paginator.page_range
+
+        results = paginator.page(results_page)
     assert isinstance(request, HttpRequest)
     return render(
         request,
         'app/group_vote.html',
         {
             'title':'Create Group',
-            'form':form,
+            #'form':form,
             'time_form': time_form,
+            'pages': pages,
             'group': group,
             'group_vote': group_vote,
             'results': results,
@@ -692,6 +741,10 @@ def search(request):
                    'results':results,
                    'query':query,
                    'location':location,
+                   'radius': radius,
+                   'sortby': sortby,
+                   'pricerange': pricerange,
+                   'opennow': opennow,
                    'time_form': time_form,
                    'pages': pages,
                    'group': group,

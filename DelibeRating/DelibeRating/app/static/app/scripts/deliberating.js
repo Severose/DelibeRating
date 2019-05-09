@@ -1,4 +1,4 @@
-$(document).ready(function () {
+﻿$(document).ready(function () {
     var options = [];
 
     $('.dmenu a').on('click', function (event) {
@@ -120,7 +120,6 @@ $(document).ready(function () {
             data: JSON.stringify({
                 'vote_name': $(this).attr('value'),
                 'element_id': $(this).attr('id'),
-                'element_info': $(this).attr('name'),
             }),
             dataType: "json",
             success: function (response) {
@@ -128,6 +127,56 @@ $(document).ready(function () {
             },
             error: function (rs, e) {
                 /* Error condition */
+            }
+        });
+    });
+
+    $('.upvote').click(function () {
+        $.ajax({
+            type: "POST",
+            url: "/api/upvote",
+            data: JSON.stringify({
+                'vote_name': $(this).attr('value'),
+                'element_id': $(this).attr('id')
+            }),
+            dataType: "json",
+            success: function (response) {
+                if (response.success === true) {
+                    $(response.element_id).attr('class', 'btn btn-default upvote');
+                } else {
+                    $(response.element_id).attr('class', 'btn btn-success upvote');
+                }
+                if(response.toggled === true) {
+                    $(response.element_id).attr('class', 'btn btn-danger upvote');
+                }
+            },
+            error: function (rs, e) {
+                alert(e);
+            }
+        });
+    });
+
+    $('.downvote').click(function () {
+        $.ajax({
+            type: "POST",
+            url: "/api/downvote",
+            data: JSON.stringify({
+                'vote_name': $(this).attr('value'),
+                'element_id': $(this).attr('id')
+            }),
+            dataType: "json",
+            success: function (response) {
+                if (response.success === true) {
+                    $(response.element_id).attr('class', 'btn btn-default downvote');
+                } else {
+                    $(response.element_id).attr('class', 'btn btn-danger downvote');
+                }
+                if (response.toggled === true) {
+                    $(response.element_id).attr('class', 'btn btn-success upvote');
+                }
+            },
+            error: function (rs, e) {
+                alert(e);
             }
         });
     });

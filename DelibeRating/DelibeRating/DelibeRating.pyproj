@@ -41,9 +41,6 @@
     <Compile Include="DelibeRating\admin.py">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="DelibeRating\apps.py">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="DelibeRating\backends.py">
       <SubType>Code</SubType>
     </Compile>
@@ -92,6 +89,7 @@
     <Content Include="app\static\app\scripts\bootstrap.bundle.min.js.map" />
     <Content Include="app\static\app\scripts\bootstrap.js.map" />
     <Content Include="app\static\app\scripts\bootstrap.min.js.map" />
+    <Content Include="app\static\app\scripts\chart.js" />
     <Content Include="app\static\app\scripts\collapse.js" />
     <Content Include="app\static\app\scripts\collapse.js.map" />
     <Content Include="app\static\app\scripts\deliberating.js" />
@@ -102,6 +100,7 @@
     <Content Include="app\static\app\scripts\jquery.min.js" />
     <Content Include="app\static\app\content\deliberating.css" />
     <Content Include="app\static\app\scripts\moment.js" />
+    <Content Include="app\static\app\scripts\piechart.js" />
     <Content Include="app\static\images\favicon.ico" />
     <Content Include="app\templates\app\create_group_vote.html" />
     <Content Include="app\templates\app\create_group.html" />
@@ -110,6 +109,8 @@
     <Content Include="app\templates\app\group_vote.html" />
     <Content Include="app\templates\app\group.html" />
     <Content Include="app\templates\app\messages.html" />
+    <Content Include="app\templates\app\pagination_vote.html" />
+    <Content Include="app\templates\app\result_vote.html" />
     <Content Include="app\templates\app\search_form.html" />
     <Content Include="app\templates\app\profile.html" />
     <Content Include="app\templates\app\voting.html" />

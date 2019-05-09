@@ -121,6 +121,18 @@ class GroupVoteQuerySet(models.query.QuerySet):
             return obj, True
         except:
             return None, False
+    
+    def get_options(self, vid):
+        with connection.cursor() as cursor:
+            cursor.execute("""
+                SELECT opt_id, group_vote_id, business_id
+	            FROM public.app_vote_options
+                WHERE group_vote_id = %s""", [vid])
+            result_list = []
+            for row in cursor.fetchall():
+                vo = VoteOption(opt_id=row[0], group_vote_id=row[1], business_id=row[2])
+                result_list.append(vo)
+        return result_list
 
     def all_active(self, gid):
         with connection.cursor() as cursor:
@@ -155,6 +167,9 @@ class GroupVoteManager(models.Manager):
     def get_or_create(self, vid, grp):
         return self.get_queryset().get_or_create(vid, grp)
 
+    def get_options(self, vid):
+        return self.get_queryset().get_options(vid)
+
     def all_active(self, gid):
         return self.get_queryset().all_active(gid)
 
@@ -173,3 +188,63 @@ class GroupVote(models.Model):
 
     class Meta:
         db_table = 'app_votes'
+
+class VoteOptionQuerySet(models.query.QuerySet):
+    def get(self, oid):
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute("""
+                    SELECT opt_id, group_vote_id, business_id, upvotes, downvotes
+	                FROM public.app_vote_options
+                    WHERE opt_id = %s""", [oid])
+                result_list = []
+
+                for row in cursor.fetchall():
+                    vo = self.model(opt_id=row[0], group_vote_id=row[1], business_id=row[2], upvotes=row[3], downvotes=row[4])
+            return vo
+        except:
+            return None
+
+    def vote_count(self, oid):
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute("""
+                    SELECT opt_id, group_vote_id, business_id, upvotes, downvotes
+	                FROM public.app_vote_options
+                    WHERE opt_id = %s""", [oid])
+                result_list = []
+                net_votes = 0
+
+                for row in cursor.fetchall():
+                    vo = self.model(opt_id=row[0], group_vote_id=row[1], business_id=row[2], upvotes=row[3], downvotes=row[4])
+                for v in upvotes.split(','):
+                    net_votes += 1
+                for d in downvotes.split(','):
+                    net_votes -= 1
+            return net_votes
+        except:
+            return None
+
+class VoteOptionManager(models.Manager):
+    def get_queryset(self):
+        return VoteOptionQuerySet(self.model)
+
+    def get(self, oid):
+        return self.get_queryset().get(oid)
+
+    def vote_count(self, oid):
+        return self.get_queryset().vote_count(oid)
+
+class VoteOption(models.Model):
+    """Vote Option, associated with a Group Vote
+    """
+    opt_id = models.CharField(max_length=50, primary_key=True)
+    group_vote = models.ForeignKey(GroupVote, on_delete=models.CASCADE)
+    business_id = models.CharField(max_length=50)
+    upvotes = models.CharField(max_length=2000)
+    downvotes = models.CharField(max_length=2000)
+
+    objects = VoteOptionManager()
+
+    class Meta:
+        db_table = 'app_vote_options'

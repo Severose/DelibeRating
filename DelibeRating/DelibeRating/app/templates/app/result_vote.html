@@ -41,22 +41,8 @@
         <p class="phone">{{ element.display_phone }}</p>
 
         <div class="row">
-            <a href="#" class="btn btn-primary" role="button">♥</a>
-            <a href="#" class="btn btn-primary" role="button">⊘</a>
-            {% if user.is_authenticated %}
-            <div class="dropdown">
-                <button class="btn btn-primary dropdown-toggle" href="#" type="button" data-toggle="dropdown">☑</button>
-                <ul class="dropdown-menu">
-                    <li class="dropdown-submenu">
-                        <ul>
-                            {% for v in active_votes %}
-                            <li><a id="{{ element.id }}/{{ v }}" href="#" class="dropdown-item vote-opt" tabIndex="-1" value="{{ v }}">{{ v }}</a></li>
-                            {% endfor %}
-                        </ul>
-                    </li>
-                </ul>
-            </div>
-            {% endif %}
+            <button class="btn btn-success upvote" id="{{ element.id }}u" value="{{ group_vote.vote_id }}">↑</button>
+            <button class="btn btn-danger downvote" id="{{ element.id }}d" value="{{ group_vote.vote_id }}">↓</button>
         </div>
     </div>
 </div>

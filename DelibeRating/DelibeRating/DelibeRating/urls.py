@@ -17,7 +17,10 @@ admin.autodiscover()
 urlpatterns = [
     url(r'^favicon\.ico$',RedirectView.as_view(url='/static/images/favicon.ico')),
     url(r'^$', app_views.home, name='home'),
+    url(r'^api/addopt', app_views.addopt, name='addopt'),
+    url(r'^api/downvote', app_views.downvote, name='downvote'),
     url(r'^api/search/', app_views.yelp_autocomplete, name='yelp_autocomplete'),
+    url(r'^api/upvote', app_views.upvote, name='upvote'),
     url(r'^api/users/', app_views.user_autocomplete, name='user_autocomplete'),
     url(r'^group/api/users/', app_views.user_autocomplete, name='user_autocomplete'), #Kludge
     url(r'^group/vote/create', app_views.create_group_vote, name='create_group_vote'),
@@ -34,7 +37,6 @@ urlpatterns = [
     url(r'^settings', app_views.settings, name='settings'),
     url(r'^suggestions', app_views.suggestions, name='suggestions'),
     url(r'^profile', app_views.profile, name='profile'),
-    url(r'^api/addopt', app_views.addopt, name='addopt'),
     url(r'^voting', app_views.voting, name='voting'),
     url(r'^delete_user', app_views.delete_user, name='delete_user'), 
 
