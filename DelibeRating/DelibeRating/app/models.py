@@ -80,6 +80,12 @@ class CustomUser(AbstractUser):
     password = models.CharField(max_length=40)
     first_name = models.CharField(max_length=20)
     last_name = models.CharField(max_length=20)
+    upvotes = models.CharField(max_length=10000)
+    downvotes = models.CharField(max_length=10000)
+    favorites = models.CharField(max_length=10000)
+    likes = models.CharField(max_length=10000)
+    tastes = models.CharField(max_length=50000, default='{}')
+    dislikes = models.CharField(max_length=10000)
 
     class Meta:
         managed = False
@@ -218,10 +224,10 @@ class VoteOptionQuerySet(models.query.QuerySet):
                 for row in cursor.fetchall():
                     vo = self.model(opt_id=row[0], group_vote_id=row[1], business_id=row[2], upvotes=row[3], downvotes=row[4])
                 if vo.upvotes:
-                    for v in vo.upvotes.split(','):
+                    for v in vo.upvotes[:-1].split(','):
                         net_votes += 1
                 if vo.downvotes:
-                    for d in vo.downvotes.split(','):
+                    for d in vo.downvotes[:-1].split(','):
                         net_votes -= 1
             return net_votes
         except:

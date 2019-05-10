@@ -18,12 +18,12 @@
 -->
 {% load staticfiles %}
 
-<div class="thumbnail">
+<div class="thumbnail" value="{{ element.confidence_score }}">
     <a href="{{ element.url }}">
         <img class="resize_fit_center" src="{% if element.image_url %}{{ element.image_url }}{% else %}{% static 'images/no_photo.png' %}{% endif %}" alt="">
     </a>
     <div class="caption">
-        <h5><a href="{{ element.url }}">{{ element.name }}     </a></h5>
+        <h5><a href="{{ element.url }}">{{ element.name }}</a></h5>
 
         <div class="categories">{% for category in element.categories %}
             {{ category.title }} &nbsp;
@@ -41,11 +41,13 @@
         <p class="phone">{{ element.display_phone }}</p>
 
         <div class="row">
-            <a href="#" class="btn btn-primary" role="button">♥</a>
-            <a href="#" class="btn btn-primary" role="button">⊘</a>
+            <button id="{{ element.id }}fv" class="btn btn-secondary favorite" type="button">☆</button>
+            <button id="{{ element.id }}tu" class="btn btn-secondary like" type="button"
+                    value="{% for category in element.categories %}{{ category.title }},{% endfor %}">👍</button>
+            <button id="{{ element.id }}td" class="btn btn-secondary dislike" type="button">👎</button>
             {% if user.is_authenticated %}
             <div class="dropdown">
-                <button class="btn btn-primary dropdown-toggle" href="#" type="button" data-toggle="dropdown">☑</button>
+                <button class="btn btn-info dropdown-toggle" type="button" data-toggle="dropdown">☑</button>
                 <ul class="dropdown-menu">
                     <li class="dropdown-submenu">
                         <ul>

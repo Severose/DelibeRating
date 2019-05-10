@@ -32,9 +32,14 @@ import json
 from django.core.cache import cache
 from django.core.paginator import Paginator
 from django import template
+import ast #literal evaluation
 
 registerT = template.Library()
 yelp_api = YelpAPI(settings.API_KEY, timeout_s=3.0)
+
+"""
+View helper functions
+"""
 
 def get_cached_business(id):
     if cache.get(str(id)):
@@ -45,6 +50,31 @@ def get_cached_business(id):
     else:
         print("Business is not cached!")
         return None
+
+def get_confidence_score(user, business):
+    if business['id'] in user.downvotes[:-1].split(','):
+        return -1.0
+    
+    tastes = ast.literal_eval(user.tastes)
+    confidence = 0
+    total = 0
+
+    for cat in business['categories']:
+        total += 1
+        if cat['title'] in tastes:
+            confidence += 1
+    
+    return float(confidence / total)
+
+def add_confidence_scores(user, businesses):
+    confidence_sum = 0.0
+    total = 0.0
+    confidence_score = 0.0
+
+    for business in businesses:
+        business['confidence_score'] = get_confidence_score(user, business)
+
+    return businesses
 
 def get_yelp_results(query,location,radius,sortby,pricerange,opennow,attributes):
     if cache.get(''.join(i for i in str(query+location+radius+sortby+pricerange+opennow) if i.isalnum())):
@@ -68,14 +98,18 @@ def get_yelp_results(query,location,radius,sortby,pricerange,opennow,attributes)
     # Cache businesses
     for b in data['businesses']:
         cache.set(b['id'], b, 86400)  #TODO: Use DEFAULT_TIMEOUT
-    
+
     return data
+
+
+"""
+Ajax functions
+"""
 
 @login_required
 @require_POST
 @csrf_exempt
 def addopt(request):
-    # TODO: Optimize storage of businesses
     if request.method == 'POST':
         raw_data = request.body.decode('utf-8')
         data = json.loads(raw_data)
@@ -93,26 +127,98 @@ def addopt(request):
 @login_required
 @require_POST
 @csrf_exempt
+def dislike(request):
+    if request.method == 'POST':
+        raw_data = request.body.decode('utf-8')
+        data = json.loads(raw_data)
+        user = request.user
+        business_id = data['element_id'][:-2]
+
+        if business_id in user.dislikes[:-1].split(','):
+            user.dislikes = user.dislikes.replace(business_id + ',', '')
+            sel = '#' + data['element_id']
+            response = {'success': False, 'element_id': sel}
+        else:
+            user.dislikes += business_id + ','
+            sel = '#' + data['element_id']
+            if business_id in user.likes[:-1].split(','):
+                user.likes = user.likes.replace(business_id + ',', '')
+                response = {'success': True, 'toggled': True, 'element_toggled': sel[:-2] + 'tu', 'element_id': sel}
+            else:
+                response = {'success': True, 'toggled': False, 'element_id': sel}
+        user.save()
+
+    return HttpResponse(json.dumps(response), content_type='application/json')
+
+@login_required
+@require_POST
+@csrf_exempt
+def like(request):
+    if request.method == 'POST':
+        raw_data = request.body.decode('utf-8')
+        data = json.loads(raw_data)
+        user = request.user
+        business_id = data['element_id'][:-2]
+        tastes = ast.literal_eval(user.tastes)
+
+        if business_id in user.likes[:-1].split(','):
+            for cat in data['categories'][:-1].split(','):
+                if tastes[cat] == 1:
+                    del tastes[cat]
+                else:
+                    tastes[cat] -= 1
+
+            user.likes = user.likes.replace(business_id + ',', '')
+            user.tastes = str(tastes)
+
+            sel = '#' + data['element_id']
+            response = {'success': False, 'element_id': sel}
+        else:
+            for cat in data['categories'][:-1].split(','):
+                if cat in tastes:
+                    tastes[cat] += 1
+                else:
+                    tastes[cat] = 1
+
+            user.likes += business_id + ','
+            user.tastes = str(tastes)
+
+            sel = '#' + data['element_id']
+            if business_id in user.dislikes[:-1].split(','):
+                user.dislikes = user.dislikes.replace(business_id + ',', '')
+                response = {'success': True, 'toggled': True, 'element_toggled': sel[:-2] + 'td', 'element_id': sel}
+            else:
+                response = {'success': True, 'toggled': False, 'element_id': sel}
+        user.save()
+
+    return HttpResponse(json.dumps(response), content_type='application/json')
+
+@login_required
+@require_POST
+@csrf_exempt
 def downvote(request):
     if request.method == 'POST':
         raw_data = request.body.decode('utf-8')
         data = json.loads(raw_data)
         user = request.user
-        vote_opt = VoteOption.objects.get(data['vote_name'] + '/' + data['element_id'][:-1])
+        vote_opt = VoteOption.objects.get(data['vote_name'] + '/' + data['element_id'][:-2])
         group_vote = GroupVote.objects.get(vote_opt.group_vote_id)
         vote_counts = []
         business_names = []
 
-        if user.username in vote_opt.downvotes.split(','):
+        if user.username in vote_opt.downvotes[:-1].split(','):
             vote_opt.downvotes = vote_opt.downvotes.replace(user.username + ',', '')
+            user.downvotes = user.downvotes.replace(data['element_id'][:-2] + ',', '')
             sel = '#' + data['element_id']
             response = {'success': False, 'element_id': sel}
         else:
             vote_opt.downvotes += user.username + ','
+            user.downvotes += data['element_id'][:-2] + ','
             sel = '#' + data['element_id']
-            if user.username in vote_opt.upvotes.split(','):
+            if user.username in vote_opt.upvotes[:-1].split(','):
                 vote_opt.upvotes = vote_opt.upvotes.replace(user.username + ',', '')
-                response = {'success': True, 'toggled': True, 'element_toggled': sel[:-1] + 'u', 'element_id': sel}
+                user.upvotes = user.upvotes.replace(data['element_id'][:-2] + ',', '')
+                response = {'success': True, 'toggled': True, 'element_toggled': sel[:-2] + 'u', 'element_id': sel}
             else:
                 response = {'success': True, 'toggled': False, 'element_id': sel}
         vote_opt.save()
@@ -137,21 +243,24 @@ def upvote(request):
         raw_data = request.body.decode('utf-8')
         data = json.loads(raw_data)
         user = request.user
-        vote_opt = VoteOption.objects.get(data['vote_name'] + '/' + data['element_id'][:-1])
+        vote_opt = VoteOption.objects.get(data['vote_name'] + '/' + data['element_id'][:-2])
         group_vote = GroupVote.objects.get(vote_opt.group_vote_id)
         vote_counts = []
         business_names = []
 
-        if user.username in vote_opt.upvotes.split(','):
+        if user.username in vote_opt.upvotes[:-1].split(','):
             vote_opt.upvotes = vote_opt.upvotes.replace(user.username + ',', '')
+            user.upvotes = user.downvotes.replace(data['element_id'][:-2] + ',', '')
             sel = '#' + data['element_id']
             response = {'success': False, 'element_id': sel}
         else:
             vote_opt.upvotes += user.username + ','
+            user.upvotes += data['element_id'][:-2] + ','
             sel = '#' + data['element_id']
-            if user.username in vote_opt.downvotes.split(','):
+            if user.username in vote_opt.downvotes[:-1].split(','):
                 vote_opt.downvotes = vote_opt.downvotes.replace(user.username + ',', '')
-                response = {'success': True, 'toggled': True, 'element_toggled': sel[:-1] + 'd', 'element_id': sel}
+                user.downvotes = user.downvotes.replace(data['element_id'][:-2] + ',', '')
+                response = {'success': True, 'toggled': True, 'element_toggled': sel[:-2] + 'd', 'element_id': sel}
             else:
                 response = {'success': True, 'toggled': False, 'element_id': sel}
         vote_opt.save()
@@ -190,6 +299,11 @@ def update_chart(request):
         response = {'success': True, 'chart_labels': business_names, 'chart_data': vote_counts}
 
     return HttpResponse(json.dumps(response), content_type='application/json')
+
+
+"""
+Django page views
+"""
 
 @login_required
 def create_group(request):
@@ -776,6 +890,8 @@ def search(request):
 
         data = get_yelp_results(query,location,radius,sortby,pricerange,opennow,"")
         user = request.user
+        data['businesses'] = add_confidence_scores(user, data['businesses'])
+
         for g in user.groups.all():
             v_all = GroupVote.objects.all_active(g.name)
             for v in v_all:

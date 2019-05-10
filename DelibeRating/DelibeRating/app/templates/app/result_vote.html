@@ -18,7 +18,7 @@
 -->
 {% load staticfiles %}
 
-<div class="thumbnail">
+<div class="thumbnail" value="{{ element.confidence_score }}">
     <a href="{{ element.url }}">
         <img class="resize_fit_center" src="{% if element.image_url %}{{ element.image_url }}{% else %}{% static 'images/no_photo.png' %}{% endif %}" alt="">
     </a>
@@ -41,8 +41,8 @@
         <p class="phone">{{ element.display_phone }}</p>
 
         <div class="row">
-            <button class="btn btn-secondary upvote" id="{{ element.id }}u" value="{{ group_vote.vote_id }}">↑</button>
-            <button class="btn btn-secondary downvote" id="{{ element.id }}d" value="{{ group_vote.vote_id }}">↓</button>
+            <button class="btn btn-secondary upvote" id="{{ element.id }}vu" value="{{ group_vote.vote_id }}">↑</button>
+            <button class="btn btn-secondary downvote" id="{{ element.id }}vd" value="{{ group_vote.vote_id }}">↓</button>
         </div>
     </div>
 </div>

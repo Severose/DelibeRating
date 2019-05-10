@@ -113,6 +113,75 @@
         },
     });
 
+    $('.like').click(function () {
+        $.ajax({
+            type: "POST",
+            url: "/api/like",
+            data: JSON.stringify({
+                'element_id': $(this).attr('id'),
+                'categories': $(this).attr('value')
+            }),
+            dataType: "json",
+            success: function (response) {
+                if (response.success === true) {
+                    $(response.element_id).attr('class', 'btn btn-primary like');
+                } else {
+                    $(response.element_id).attr('class', 'btn btn-secondary like');
+                }
+                if (response.toggled === true) {
+                    $(response.element_toggled).attr('class', 'btn btn-secondary dislike');
+                }
+            },
+            error: function (rs, e) {
+                alert(e);
+            }
+        });
+    });
+
+    $('.dislike').click(function () {
+        $.ajax({
+            type: "POST",
+            url: "/api/dislike",
+            data: JSON.stringify({
+                'element_id': $(this).attr('id')
+            }),
+            dataType: "json",
+            success: function (response) {
+                if (response.success === true) {
+                    $(response.element_id).attr('class', 'btn btn-warning dislike');
+                } else {
+                    $(response.element_id).attr('class', 'btn btn-secondary dislike');
+                }
+                if (response.toggled === true) {
+                    $(response.element_toggled).attr('class', 'btn btn-secondary like');
+                }
+            },
+            error: function (rs, e) {
+                alert(e);
+            }
+        });
+    });
+    
+    // Update colors of thumbnails based on confidence score
+    var thumbnails = document.getElementsByClassName("thumbnail");
+
+    for (var i = 0, len = thumbnails.length; i < len; i++) {
+        var color1 = '3EA6FF';
+        var color2 = 'ECEEEF';
+        var ratio = parseFloat(thumbnails[i].getAttribute('value'));
+        var hex = function (x) {
+            x = x.toString(16);
+            return (x.length === 1) ? '0' + x : x;
+        };
+
+        var r = Math.ceil(parseInt(color1.substring(0, 2), 16) * ratio + parseInt(color2.substring(0, 2), 16) * (1 - ratio));
+        var g = Math.ceil(parseInt(color1.substring(2, 4), 16) * ratio + parseInt(color2.substring(2, 4), 16) * (1 - ratio));
+        var b = Math.ceil(parseInt(color1.substring(4, 6), 16) * ratio + parseInt(color2.substring(4, 6), 16) * (1 - ratio));
+
+        var gradient = "#" + hex(r) + hex(g) + hex(b);
+        thumbnails[i].style.backgroundColor = gradient;
+    }
+
     $('.vote-opt').click(function () {
         $.ajax({
             type: "POST",
@@ -278,12 +347,6 @@
             }),
             dataType: "json",
             success: function (response) {
-                //alert(response.chart_data);
-                //vote_chart.labels = ['4', '3', '2', '1'];//response.chart_labels;
-                //alert(response.chart_data);
-                //vote_chart.data.datasets.data = [4, 3, 2, 1];//response.chart_data.split(",");
-                //vote_chart.update();
-
                 var ctx = document.getElementById('vote_chart').getContext('2d');
                 var vote_chart = new Chart(ctx, {
                     type: 'horizontalBar',
