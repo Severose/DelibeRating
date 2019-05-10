@@ -100,7 +100,7 @@ def downvote(request):
         user = request.user
         vote_opt = VoteOption.objects.get(data['vote_name'] + '/' + data['element_id'][:-1])
         group_vote = GroupVote.objects.get(vote_opt.group_vote_id)
-        vote_counts = {}
+        vote_counts = []
         business_names = []
 
         if user.username in vote_opt.downvotes.split(','):
@@ -122,7 +122,7 @@ def downvote(request):
             vo_count = VoteOption.objects.vote_count(vo.opt_id)
             business = get_cached_business(vo.business_id)
             business_names.append(business['name'])
-            vote_counts[business['name']] = vo_count
+            vote_counts.append(vo_count)
 
         response["chart_labels"] = business_names
         response["chart_data"] = vote_counts
@@ -176,9 +176,8 @@ def update_chart(request):
         raw_data = request.body.decode('utf-8')
         data = json.loads(raw_data)
         user = request.user
-        vote_opt = VoteOption.objects.get(data['vote_name'] + '/' + data['element_id'][:-1])
-        group_vote = GroupVote.objects.get(vote_opt.group_vote)
-        vote_counts = {}
+        group_vote = GroupVote.objects.get(data['vote_name'])
+        vote_counts = []
         business_names = []
 
         vote_options = GroupVote.objects.get_options(group_vote.vote_id)

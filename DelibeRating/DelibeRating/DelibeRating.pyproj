@@ -100,7 +100,6 @@
     <Content Include="app\static\app\scripts\jquery.min.js" />
     <Content Include="app\static\app\content\deliberating.css" />
     <Content Include="app\static\app\scripts\moment.js" />
-    <Content Include="app\static\app\scripts\piechart.js" />
     <Content Include="app\static\images\favicon.ico" />
     <Content Include="app\templates\app\create_group_vote.html" />
     <Content Include="app\templates\app\create_group.html" />

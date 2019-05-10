@@ -149,11 +149,50 @@
                 if(response.toggled === true) {
                     $(response.element_toggled).attr('class', 'btn btn-secondary downvote');
                 }
-                alert(response.chart_data);
-                alert(response.chart_labels);
-                vote_chart.data.datasets[0].data = response.chart_data;
-                vote_chart.labels = response.chart_labels;
-                vote_chart.update();
+
+                $("canvas#vote_chart").remove();
+                $("div#vote_chart_report").append('<canvas id="vote_chart"></canvas>');
+
+                var ctx = document.getElementById('vote_chart').getContext('2d');
+                var vote_chart = new Chart(ctx, {
+                    type: 'horizontalBar',
+                    data: {
+                        labels: response.chart_labels,
+                        datasets: [{
+                            data: response.chart_data,
+                            backgroundColor: [
+                                'rgba(75, 192, 192, 0.2)',
+                                'rgba(54, 162, 235, 0.2)',
+                                'rgba(153, 102, 255, 0.2)'
+                            ],
+                            borderColor: [
+                                'rgba(75, 192, 192, 1)',
+                                'rgba(54, 162, 235, 1)',
+                                'rgba(153, 102, 255, 1)'
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            yAxes: [{
+                                ticks: {
+                                    beginAtZero: true
+                                }
+                            }]
+                        },
+                        legend: {
+                            display: false
+                        },
+                        tooltips: {
+                            callbacks: {
+                                label: function (tooltipItem) {
+                                    return tooltipItem.yLabel;
+                                }
+                            }
+                        }
+                    }
+                });
             },
             error: function (rs, e) {
                 alert(e);
@@ -179,14 +218,112 @@
                 if (response.toggled === true) {
                     $(response.element_toggled).attr('class', 'btn btn-secondary upvote');
                 }
-                alert(response.chart_data);
-                alert(response.chart_labels);
-                vote_chart.data.datasets[0].data = response.chart_data;
-                vote_chart.labels = response.chart_labels;
-                vote_chart.update();
+
+                $("canvas#vote_chart").remove();
+                $("div#vote_chart_report").append('<canvas id="vote_chart"></canvas>');
+
+                var ctx = document.getElementById('vote_chart').getContext('2d');
+                var vote_chart = new Chart(ctx, {
+                    type: 'horizontalBar',
+                    data: {
+                        labels: response.chart_labels,
+                        datasets: [{
+                            data: response.chart_data,
+                            backgroundColor: [
+                                'rgba(75, 192, 192, 0.2)',
+                                'rgba(54, 162, 235, 0.2)',
+                                'rgba(153, 102, 255, 0.2)'
+                            ],
+                            borderColor: [
+                                'rgba(75, 192, 192, 1)',
+                                'rgba(54, 162, 235, 1)',
+                                'rgba(153, 102, 255, 1)'
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            yAxes: [{
+                                ticks: {
+                                    beginAtZero: true
+                                }
+                            }]
+                        },
+                        legend: {
+                            display: false
+                        },
+                        tooltips: {
+                            callbacks: {
+                                label: function (tooltipItem) {
+                                    return tooltipItem.yLabel;
+                                }
+                            }
+                        }
+                    }
+                });
             },
             error: function (rs, e) {
                 alert(e);
+            }
+        });
+    });
+    
+    $('#vote_chart').ready(function () {
+        $.ajax({
+            type: "POST",
+            url: "/api/update_chart",
+            data: JSON.stringify({
+                'vote_name': $('#vid').attr('value')
+            }),
+            dataType: "json",
+            success: function (response) {
+                //alert(response.chart_data);
+                //vote_chart.labels = ['4', '3', '2', '1'];//response.chart_labels;
+                //alert(response.chart_data);
+                //vote_chart.data.datasets.data = [4, 3, 2, 1];//response.chart_data.split(",");
+                //vote_chart.update();
+
+                var ctx = document.getElementById('vote_chart').getContext('2d');
+                var vote_chart = new Chart(ctx, {
+                    type: 'horizontalBar',
+                    data: {
+                        labels: response.chart_labels,
+                        datasets: [{
+                            data: response.chart_data,
+                            backgroundColor: [
+                                'rgba(75, 192, 192, 0.2)',
+                                'rgba(54, 162, 235, 0.2)',
+                                'rgba(153, 102, 255, 0.2)'
+                            ],
+                            borderColor: [
+                                'rgba(75, 192, 192, 1)',
+                                'rgba(54, 162, 235, 1)',
+                                'rgba(153, 102, 255, 1)'
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            yAxes: [{
+                                ticks: {
+                                    beginAtZero: true
+                                }
+                            }]
+                        },
+                        legend: {
+                            display: false
+                        },
+                        tooltips: {
+                            callbacks: {
+                                label: function (tooltipItem) {
+                                    return tooltipItem.yLabel;
+                                }
+                            }
+                        }
+                    }
+                });
             }
         });
     });
