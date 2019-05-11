@@ -1,0 +1,55 @@
+﻿{% load staticfiles %}
+
+<!-- Gallery -->
+<!-- 
+Gallery is linked to lightbox using data attributes.
+
+To open lightbox, this is added to the gallery element: {data-toggle="modal" data-target="#exampleModal"}.
+
+To open carousel on correct image, this is added to each image element: {data-target="#carouselExample" data-slide-to="0"}.
+Replace '0' with corresponding slide number.
+-->
+
+<div class="row srch-img" id="gallery-{{ element.id }}" data-toggle="modal" data-target="#modal-{{ element.id }}">
+    <img class="resize_fit_center" src="{% if element.image_url %}{{ element.image_url }}{% else %}{% static 'images/no_photo.png' %}{% endif %}" alt="Picture" data-target="#carousel-{{ element.id }}" data-slide-to="{{ forloop.counter }}-{{ element.id }}">
+</div>
+
+<!-- Modal -->
+<!-- 
+This part is straight out of Bootstrap docs. Just a carousel inside a modal.
+-->
+<div class="modal fade" id="modal-{{ element.id }}" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div id="carousel-{{ element.id }}" class="carousel slide" data-ride="carousel">
+          <ol class="carousel-indicators">
+            <li data-target="#carousel-{{ element.id }}" data-slide-to="0-{{ element.id }}" class="active"></li>
+          </ol>
+          <div class="carousel-inner">
+            <div class="carousel-item active">
+              <img class="d-block w-100" src="{% if element.image_url %}{{ element.image_url }}{% else %}{% static 'images/no_photo.png' %}{% endif %}" alt="Pic 1">
+            </div>
+          </div>
+          <!--<a class="carousel-control-prev" href="#carousel-{# element.id #}" role="button" data-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="sr-only">Previous</span>
+          </a>
+          <a class="carousel-control-next" href="#carousel-{# element.id #}" role="button" data-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="sr-only">Next</span>
+          </a>-->
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+

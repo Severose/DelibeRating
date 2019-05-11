@@ -52,7 +52,7 @@ def get_cached_business(id):
         return None
 
 def get_confidence_score(user, business):
-    if business['id'] in user.downvotes[:-1].split(','):
+    if business['id'] in user.dislikes[:-1].split(','):
         return -1.0
     
     tastes = ast.literal_eval(user.tastes)
@@ -76,11 +76,36 @@ def add_confidence_scores(user, businesses):
 
     return businesses
 
+def get_init_states(page, user, businesses, votes):
+    if page == 'vote':
+        for business in businesses:
+            business['init_up'] = votes[0][business['id']]
+            business['init_down'] = votes[1][business['id']]
+
+    else:
+        for business in businesses:
+            if business['id'] in user.stars[:-1].split(','):
+                business['init_star'] = True
+            else:
+                business['init_star'] = False
+            if business['id'] in user.likes[:-1].split(','):
+                business['init_like'] = True
+            else:
+                business['init_like'] = False
+            if business['id'] in user.dislikes[:-1].split(','):
+                business['init_dislike'] = True
+            else:
+                business['init_dislike'] = False
+
+    return businesses
+
 def get_yelp_results(query,location,radius,sortby,pricerange,opennow,attributes):
     if cache.get(''.join(i for i in str(query+location+radius+sortby+pricerange+opennow) if i.isalnum())):
         print("Using cached results!")
         print(''.join(i for i in str(query+location+radius+sortby+pricerange+opennow) if i.isalnum()))
         raw_data = cache.get(''.join(i for i in str(query+location+radius+sortby+pricerange+opennow) if i.isalnum()))
+        
+        data = json.loads(json.dumps(raw_data))
     else:
         print("Querying Yelp Fusion API")
         raw_data = yelp_api.search_query(term=query,
@@ -92,8 +117,8 @@ def get_yelp_results(query,location,radius,sortby,pricerange,opennow,attributes)
                                          open_now=opennow,
                                          attributes=attributes)
             
-    data = json.loads(json.dumps(raw_data))
-    cache.set(''.join(i for i in str(query+location+radius+sortby+pricerange+opennow) if i.isalnum()), data, 86400)  #TODO: Use DEFAULT_TIMEOUT
+        data = json.loads(json.dumps(raw_data))
+        cache.set(''.join(i for i in str(query+location+radius+sortby+pricerange+opennow) if i.isalnum()), data, 86400)  #TODO: Use DEFAULT_TIMEOUT'
 
     # Cache businesses
     for b in data['businesses']:
@@ -196,6 +221,32 @@ def like(request):
 @login_required
 @require_POST
 @csrf_exempt
+def star(request):
+    if request.method == 'POST':
+        raw_data = request.body.decode('utf-8')
+        data = json.loads(raw_data)
+        user = request.user
+        business_id = data['element_id'][:-2]
+
+        if business_id in user.stars[:-1].split(','):
+            user.stars = user.stars.replace(business_id + ',', '')
+            sel = '#' + data['element_id']
+            response = {'success': False, 'element_id': sel}
+        else:
+            user.stars += business_id + ','
+            sel = '#' + data['element_id']
+            if business_id in user.dislikes[:-1].split(','):
+                user.dislikes = user.dislikes.replace(business_id + ',', '')
+                response = {'success': True, 'toggled': True, 'element_toggled': sel[:-2] + 'td', 'element_id': sel}
+            else:
+                response = {'success': True, 'toggled': False, 'element_id': sel}
+        user.save()
+
+    return HttpResponse(json.dumps(response), content_type='application/json')
+
+@login_required
+@require_POST
+@csrf_exempt
 def downvote(request):
     if request.method == 'POST':
         raw_data = request.body.decode('utf-8')
@@ -206,19 +257,18 @@ def downvote(request):
         vote_counts = []
         business_names = []
 
+        test = vote_opt.downvotes[:-1].split(',')
+
         if user.username in vote_opt.downvotes[:-1].split(','):
             vote_opt.downvotes = vote_opt.downvotes.replace(user.username + ',', '')
-            user.downvotes = user.downvotes.replace(data['element_id'][:-2] + ',', '')
             sel = '#' + data['element_id']
             response = {'success': False, 'element_id': sel}
         else:
             vote_opt.downvotes += user.username + ','
-            user.downvotes += data['element_id'][:-2] + ','
             sel = '#' + data['element_id']
             if user.username in vote_opt.upvotes[:-1].split(','):
                 vote_opt.upvotes = vote_opt.upvotes.replace(user.username + ',', '')
-                user.upvotes = user.upvotes.replace(data['element_id'][:-2] + ',', '')
-                response = {'success': True, 'toggled': True, 'element_toggled': sel[:-2] + 'u', 'element_id': sel}
+                response = {'success': True, 'toggled': True, 'element_toggled': sel[:-2] + 'vu', 'element_id': sel}
             else:
                 response = {'success': True, 'toggled': False, 'element_id': sel}
         vote_opt.save()
@@ -250,17 +300,14 @@ def upvote(request):
 
         if user.username in vote_opt.upvotes[:-1].split(','):
             vote_opt.upvotes = vote_opt.upvotes.replace(user.username + ',', '')
-            user.upvotes = user.downvotes.replace(data['element_id'][:-2] + ',', '')
             sel = '#' + data['element_id']
             response = {'success': False, 'element_id': sel}
         else:
             vote_opt.upvotes += user.username + ','
-            user.upvotes += data['element_id'][:-2] + ','
             sel = '#' + data['element_id']
             if user.username in vote_opt.downvotes[:-1].split(','):
                 vote_opt.downvotes = vote_opt.downvotes.replace(user.username + ',', '')
-                user.downvotes = user.downvotes.replace(data['element_id'][:-2] + ',', '')
-                response = {'success': True, 'toggled': True, 'element_toggled': sel[:-2] + 'd', 'element_id': sel}
+                response = {'success': True, 'toggled': True, 'element_toggled': sel[:-2] + 'vd', 'element_id': sel}
             else:
                 response = {'success': True, 'toggled': False, 'element_id': sel}
         vote_opt.save()
@@ -538,9 +585,15 @@ def group_vote(request):
         cgroup = CustomGroup.objects.get(group.id)
         group_vote = GroupVote.objects.get(groupvoteid)
         vote_options = GroupVote.objects.get_options(groupvoteid)
+        votes = [{},{}]
 
         for opt in vote_options:
             data.append(get_cached_business(opt.business_id))
+            votes[0][opt.business_id] = user.username in opt.upvotes[:-1].split(',')
+            votes[1][opt.business_id] = user.username in opt.downvotes[:-1].split(',')
+            
+        data = add_confidence_scores(user, data)
+        data = get_init_states('vote', user, data, votes)
 
         results_page = request.GET.get('page', 1)
         paginator = Paginator(data, 4)
@@ -583,13 +636,19 @@ def home(request):
 
         data = get_yelp_results(query,location,radius,sortby,pricerange,opennow,attributes)
 
-        user = request.user
-        #Use cache to store businesses instead of a Django model
-        user = request.user
-        for g in user.groups.all():
-            v_all = GroupVote.objects.all_active(g.name)
-            for v in v_all:
-                active_votes.append(v.vote_id)
+        if request.user.is_authenticated():
+            user = request.user
+            data['businesses'] = add_confidence_scores(user, data['businesses'])
+            data['businesses'] = get_init_states('home', user, data['businesses'], None)
+
+            #Use cache to store businesses instead of a Django model
+            for g in user.groups.all():
+                v_all = GroupVote.objects.all_active(g.name)
+                for v in v_all:
+                    active_votes.append(v.vote_id)
+                    
+        else:
+            user = None
 
 
         shuffle(data['businesses'])
@@ -889,13 +948,16 @@ def search(request):
             print('open not found!')
 
         data = get_yelp_results(query,location,radius,sortby,pricerange,opennow,"")
-        user = request.user
-        data['businesses'] = add_confidence_scores(user, data['businesses'])
 
-        for g in user.groups.all():
-            v_all = GroupVote.objects.all_active(g.name)
-            for v in v_all:
-                active_votes.append(v.vote_id)
+        if request.user.is_authenticated():
+            user = request.user
+            data['businesses'] = add_confidence_scores(user, data['businesses'])
+            data['businesses'] = get_init_states('search', user, data['businesses'], None)
+
+            for g in user.groups.all():
+                v_all = GroupVote.objects.all_active(g.name)
+                for v in v_all:
+                    active_votes.append(v.vote_id)
 
         results_page = request.GET.get('page', 1)
         paginator = Paginator(data['businesses'], 12)

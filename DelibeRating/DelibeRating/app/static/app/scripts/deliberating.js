@@ -113,6 +113,30 @@
         },
     });
 
+    $('.star').click(function () {
+        $.ajax({
+            type: "POST",
+            url: "/api/star",
+            data: JSON.stringify({
+                'element_id': $(this).attr('id')
+            }),
+            dataType: "json",
+            success: function (response) {
+                if (response.success === true) {
+                    $(response.element_id).attr('class', 'btn btn-success like');
+                } else {
+                    $(response.element_id).attr('class', 'btn btn-secondary like');
+                }
+                if (response.toggled === true) {
+                    $(response.element_toggled).attr('class', 'btn btn-secondary dislike');
+                }
+            },
+            error: function (rs, e) {
+                alert(e);
+            }
+        });
+    });
+
     $('.like').click(function () {
         $.ajax({
             type: "POST",
@@ -161,26 +185,6 @@
             }
         });
     });
-    
-    // Update colors of thumbnails based on confidence score
-    var thumbnails = document.getElementsByClassName("thumbnail");
-
-    for (var i = 0, len = thumbnails.length; i < len; i++) {
-        var color1 = '3EA6FF';
-        var color2 = 'ECEEEF';
-        var ratio = parseFloat(thumbnails[i].getAttribute('value'));
-        var hex = function (x) {
-            x = x.toString(16);
-            return (x.length === 1) ? '0' + x : x;
-        };
-
-        var r = Math.ceil(parseInt(color1.substring(0, 2), 16) * ratio + parseInt(color2.substring(0, 2), 16) * (1 - ratio));
-        var g = Math.ceil(parseInt(color1.substring(2, 4), 16) * ratio + parseInt(color2.substring(2, 4), 16) * (1 - ratio));
-        var b = Math.ceil(parseInt(color1.substring(4, 6), 16) * ratio + parseInt(color2.substring(4, 6), 16) * (1 - ratio));
-
-        var gradient = "#" + hex(r) + hex(g) + hex(b);
-        thumbnails[i].style.backgroundColor = gradient;
-    }
 
     $('.vote-opt').click(function () {
         $.ajax({
@@ -390,4 +394,86 @@
             }
         });
     });
+});
+
+$('#search_results').ready(function () {
+    var thumbnails = document.getElementsByClassName("thumbnail");
+
+    for (var i = 0; i < thumbnails.length; i++) {
+        var color1 = '3EA6FF';
+        var color2 = 'ECEEEF';
+        var ratio = parseFloat(thumbnails[i].getAttribute('value'));
+        var hex = function (x) {
+            x = x.toString(16);
+            return (x.length === 1) ? '0' + x : x;
+        };
+
+        var r = Math.ceil(parseInt(color1.substring(0, 2), 16) * ratio + parseInt(color2.substring(0, 2), 16) * (1 - ratio));
+        var g = Math.ceil(parseInt(color1.substring(2, 4), 16) * ratio + parseInt(color2.substring(2, 4), 16) * (1 - ratio));
+        var b = Math.ceil(parseInt(color1.substring(4, 6), 16) * ratio + parseInt(color2.substring(4, 6), 16) * (1 - ratio));
+
+        var gradient = "#" + hex(r) + hex(g) + hex(b);
+        thumbnails[i].style.backgroundColor = gradient;
+    }
+
+    // Update states of Star Buttons
+    var stars = document.getElementsByClassName("star tog");
+
+    for (var j = 0; j < stars.length; j++) {
+        stars[j].setAttribute('class', 'btn btn-success star');
+    }
+
+    // Update states of Like Buttons
+    var likes = document.getElementsByClassName("like tog");
+
+    for (var k = 0; k < likes.length; k++) {
+        likes[k].setAttribute('class', 'btn btn-primary like');
+    }
+
+    // Update states of Dislike Buttons
+    var dislikes = document.getElementsByClassName("dislike tog");
+
+    for (var l = 0; l < dislikes.length; l++) {
+        dislikes[l].setAttribute('class', 'btn btn-warning dislike');
+    }
+});
+
+$('#vote_results').ready(function () {
+    var thumbnails = document.getElementsByClassName("thumbnail");
+
+    for (var i = 0; i < thumbnails.length; i++) {
+        var color1 = '3EA6FF';
+        var color2 = 'ECEEEF';
+        var ratio = parseFloat(thumbnails[i].getAttribute('value'));
+        var hex = function (x) {
+            x = x.toString(16);
+            return (x.length === 1) ? '0' + x : x;
+        };
+
+        var r = Math.ceil(parseInt(color1.substring(0, 2), 16) * ratio + parseInt(color2.substring(0, 2), 16) * (1 - ratio));
+        var g = Math.ceil(parseInt(color1.substring(2, 4), 16) * ratio + parseInt(color2.substring(2, 4), 16) * (1 - ratio));
+        var b = Math.ceil(parseInt(color1.substring(4, 6), 16) * ratio + parseInt(color2.substring(4, 6), 16) * (1 - ratio));
+
+        var gradient = "#" + hex(r) + hex(g) + hex(b);
+        thumbnails[i].style.backgroundColor = gradient;
+    }
+
+    // Update states of Like Buttons
+    var upvotes = document.getElementsByClassName("upvote tog");
+
+    for (var m = 0; m < upvotes.length; m++) {
+        upvotes[m].setAttribute('class', 'btn btn-success upvote');
+    }
+
+    // Update states of Dislike Buttons
+    var downvotes = document.getElementsByClassName("downvote tog");
+
+    for (var n = 0; n < downvotes.length; n++) {
+        downvotes[n].setAttribute('class', 'btn btn-danger downvote');
+    }
+});
+
+$(document).on("click", '[data-toggle="lightbox"]', function (event) {
+    event.preventDefault();
+    $(this).ekkoLightbox();
 });

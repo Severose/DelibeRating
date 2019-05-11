@@ -31,7 +31,7 @@
     <div class="row">
         {% include 'app/pagination_vote.html' %}
     </div>
-    <div class="row">
+    <div id="vote_results" class="row">
         {% for element in results.object_list %}
             {% include 'app/result_vote.html' %}
         {% endfor %}

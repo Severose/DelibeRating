@@ -107,6 +107,7 @@
     <Content Include="app\templates\app\group_manage.html" />
     <Content Include="app\templates\app\group_vote.html" />
     <Content Include="app\templates\app\group.html" />
+    <Content Include="app\templates\app\image.html" />
     <Content Include="app\templates\app\messages.html" />
     <Content Include="app\templates\app\pagination_vote.html" />
     <Content Include="app\templates\app\result_vote.html" />

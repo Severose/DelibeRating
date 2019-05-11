@@ -19,9 +19,7 @@
 {% load staticfiles %}
 
 <div class="thumbnail" value="{{ element.confidence_score }}">
-    <a href="{{ element.url }}">
-        <img class="resize_fit_center" src="{% if element.image_url %}{{ element.image_url }}{% else %}{% static 'images/no_photo.png' %}{% endif %}" alt="">
-    </a>
+    {% include 'app/image.html' %}
     <div class="caption">
         <h5><a href="{{ element.url }}">{{ element.name }}</a></h5>
 
@@ -41,11 +39,11 @@
         <p class="phone">{{ element.display_phone }}</p>
 
         <div class="row">
-            <button id="{{ element.id }}fv" class="btn btn-secondary favorite" type="button">☆</button>
-            <button id="{{ element.id }}tu" class="btn btn-secondary like" type="button"
-                    value="{% for category in element.categories %}{{ category.title }},{% endfor %}">👍</button>
-            <button id="{{ element.id }}td" class="btn btn-secondary dislike" type="button">👎</button>
             {% if user.is_authenticated %}
+            <button id="{{ element.id }}fv" class="btn btn-secondary star{% if element.init_star %} tog{% endif %}" type="button">⭐</button>
+            <button id="{{ element.id }}tu" class="btn btn-secondary like{% if element.init_like %} tog{% endif %}" type="button"
+                    value="{% for category in element.categories %}{{ category.title }},{% endfor %}">👍</button>
+            <button id="{{ element.id }}td" class="btn btn-secondary dislike{% if element.init_dislike %} tog{% endif %}" type="button">👎</button>
             <div class="dropdown">
                 <button class="btn btn-info dropdown-toggle" type="button" data-toggle="dropdown">☑</button>
                 <ul class="dropdown-menu">

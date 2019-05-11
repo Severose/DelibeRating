@@ -127,14 +127,6 @@ button.ctr {
     margin: 8px 8px 8px 8px;
 }
 
-.resize_fit_center {
-    width: 308px;
-    height: 308px;
-    vertical-align: middle;
-    overflow: hidden;
-    object-fit: cover;
-}
-
 .thumbnail.user {
     display: block;
     padding: 4px;
@@ -205,7 +197,7 @@ li {
 li.ctr {
     padding-top: 10px;
     padding-left: 10px;
-    width: 100%;
+    width: 322px;
 }
 
 
@@ -326,4 +318,59 @@ fieldset, label {
     font-style: normal;
     font-weight: 700;
     src: local('Open Sans Bold'), local('OpenSans-Bold'), url(https://fonts.gstatic.com/s/opensans/v16/mem5YaGs126MiZpBA-UN7rgOUuhs.ttf) format('truetype');
+}
+
+
+/* Lightbox images */
+.resize_fit_center {
+    width: 308px;
+    height: 308px;
+    vertical-align: middle;
+    overflow: hidden;
+    object-fit: cover;
+}
+
+.row.srch-img {
+    margin-top: -24px;
+    margin-right: 0;
+    margin-left: 0;
+}
+
+#gallery img {
+    width: 308px;
+    height: 308px;
+    vertical-align: middle;
+    overflow: hidden;
+    -o-object-fit: cover;
+    object-fit: cover;
+}
+
+.carousel-item img {
+    height: 352px;
+    vertical-align: middle;
+    overflow: hidden;
+    -o-object-fit: cover;
+    object-fit: cover;
+}
+
+@media (min-width: 576px) {
+    .carousel-item img {
+        height: 518px;
+    }
+}
+
+@media (min-width: 768px) {
+    .carousel-item img {
+        height: 691px;
+    }
+}
+
+@media (min-width: 992px) {
+    .carousel-item img {
+        height: 893px;
+    }
+}
+
+.modal-dialog {
+    max-width: 1000px;
 }

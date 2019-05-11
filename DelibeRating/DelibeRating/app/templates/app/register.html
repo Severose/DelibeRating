@@ -7,45 +7,54 @@
 {% include 'app/form_errors.html' %}
 
 {% block content %}
-<h2>{{ title }}</h2>
-<div class="row">
-    <div class="col-md-8">
-        <section id="registrationForm">
-            <form action="{% url 'register' %}" method="post" class="form-horizontal">
-                {% csrf_token %}
-                <div class="form-row">
-                    <div class="form-group col-md-6 mb-0">
-                        {{ form.username|as_crispy_field }}
+<div class="jumbotron">
+    <div class="container">
+        <div class="row">
+            <h1 class="display-4"><b>{{ title }}</b></h1>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-8">
+            <section id="registrationForm">
+                <form action="{% url 'register' %}" method="post" class="form-horizontal">
+                    {% csrf_token %}
+                    <div class="form-row">
+                        <div class="form-group col-md-6 mb-0">
+                            {{ form.username|as_crispy_field }}
+                        </div>
                     </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group col-md-6 mb-0">
-                        {{ form.password1|as_crispy_field }}
+                    <div class="form-row">
+                        <div class="form-group col-md-6 mb-0">
+                            {{ form.password1|as_crispy_field }}
+                        </div>
                     </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group col-md-6 mb-0">
-                        {{ form.password2|as_crispy_field }}
+                    <div class="form-row">
+                        <div class="form-group col-md-6 mb-0">
+                            {{ form.password2|as_crispy_field }}
+                        </div>
                     </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group col-md-6 mb-0">
-                        {{ form.email|as_crispy_field }}
+                    <div class="form-row">
+                        <div class="form-group col-md-6 mb-0">
+                            {{ form.email|as_crispy_field }}
+                        </div>
                     </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group col-md-6 mb-0">
-                        {{ form.first_name|as_crispy_field }}
+                    <div class="form-row">
+                        <div class="form-group col-md-6 mb-0">
+                            {{ form.first_name|as_crispy_field }}
+                        </div>
                     </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group col-md-6 mb-0">
-                        {{ form.last_name|as_crispy_field }}
+                    <div class="form-row">
+                        <div class="form-group col-md-6 mb-0">
+                            {{ form.last_name|as_crispy_field }}
+                        </div>
                     </div>
-                </div>
-                <input type="submit" value="Create new user account" class="btn btn-primary" />
-            </form>
-        </section>
+                    <input type="submit" value="Create new user account" class="btn btn-primary" />
+                </form>
+            </section>
+        </div>
     </div>
 </div>
 {% endblock %}

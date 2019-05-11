@@ -41,8 +41,10 @@
         <p class="phone">{{ element.display_phone }}</p>
 
         <div class="row">
-            <button class="btn btn-secondary upvote" id="{{ element.id }}vu" value="{{ group_vote.vote_id }}">↑</button>
-            <button class="btn btn-secondary downvote" id="{{ element.id }}vd" value="{{ group_vote.vote_id }}">↓</button>
+            {% if user.is_authenticated %}
+            <button class="btn btn-secondary upvote{% if element.init_up %} tog{% endif %}" id="{{ element.id }}vu" value="{{ group_vote.vote_id }}">↑</button>
+            <button class="btn btn-secondary downvote{% if element.init_down %} tog{% endif %}" id="{{ element.id }}vd" value="{{ group_vote.vote_id }}">↓</button>
+            {% endif %}
         </div>
     </div>
 </div>

@@ -17,7 +17,7 @@
     <div class="row">
         {% include 'app/pagination.html' %}
     </div>
-    <div class="row">
+    <div id="search_results" class="row">
         {% for element in results.object_list %}
             {% include 'app/result.html' %}
         {% endfor %}
