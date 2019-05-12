@@ -91,7 +91,7 @@
         $grp.attr('value', $parform.find('input[name="g"]').attr('value'));
     });
         
-    $('input[name="q"]').autocomplete({
+    $('input[id="q"]').autocomplete({
         source: "api/search/",
         minLength: 2,
         delay: 250,
