@@ -29,7 +29,7 @@
                 <br/>
                 <b>Thumbs up:</b>
                 <br/>
-                These let the app know what you like, so that it can suggest similar places.
+                These let the app know what you like, so similar places are suggested (color shading).
                 <br/>
                 <br/>
                 <b>Thumbs down:</b>
@@ -45,21 +45,33 @@
     </div>
 </div>
 
-<div id="wordcloud"></div>
-
-{% if results %}
-<h2>Some new and popular places</h2>
-<div class="row">
-    <div class="col-2">
-        <ul>
-            <li class="ctr">
-                <button class="btn btn-secondary ctr" onClick="window.location.reload();">Refresh</button>
-            </li>
-        </ul>
+<div class="container">
+    <div class="row">
+        <h2>Search cloud</h2>
+    </div>
+    <div class="row">
+        <div id="wordcloud" data-value="{{ words }}"></div>
+    </div>
+    
+    {% if results %}
+    <div class="row">
+        <h2>New and popular places</h2>
+    </div>
+    <div class="row">
+        <div class="col-2">
+            <ul>
+                <li class="ctr">
+                    <button class="btn btn-secondary ctr" onClick="window.location.reload();">Refresh</button>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <br/>
+    <div class="row">
+        {% for element in results.object_list %}
+            {% include 'app/result.html' %}
+        {% endfor %}
+        {% endif %}
     </div>
 </div>
-{% for element in results.object_list %}
-    {% include 'app/result.html' %}
-{% endfor %}
-{% endif %}
 {% endblock %}

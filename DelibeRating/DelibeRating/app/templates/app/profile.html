@@ -24,16 +24,16 @@
         <h4><b>Username: </b>{{ user.username }}</h4>
     </div>
     <div class="row">
+        <h4><b>Groups: </b></h4>
         <ul>
-            <h4><b>Groups: </b></h4>
             {% for g in groups %}
-                <li>{{ g }}</li>
+                <li><a href="{% url 'group' %}?g={{ g }}"><h6>{{ g }}</h6></a></li>
             {% endfor %}
         </ul>
     </div>
     <br/>
-    <div class="row">
+    <!--<div class="row">
         <a class="btn btn-danger" href="{% url 'delete_user' %}?u={{ user.username }}" tabIndex="-1">Delete my account</a>
-    </div>
+    </div>-->
 </div>
 {% endblock %}

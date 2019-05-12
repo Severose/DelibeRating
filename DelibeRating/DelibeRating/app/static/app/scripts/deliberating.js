@@ -62,7 +62,7 @@
             price.push('4');
         }
         if (price.length === 0) {
-            price = ['1', '2', '3', '4']
+            price = ['1', '2', '3', '4'];
         }
 
         $q.attr('value', String(query));
@@ -417,21 +417,21 @@ $('#search_results').ready(function () {
     }
 
     // Update states of Star Buttons
-    var stars = document.getElementsByClassName("star tog");
+    var stars = document.querySelectorAll(".star.tog");
 
     for (var j = 0; j < stars.length; j++) {
         stars[j].setAttribute('class', 'btn btn-success star');
     }
 
     // Update states of Like Buttons
-    var likes = document.getElementsByClassName("like tog");
+    var likes = document.querySelectorAll(".like.tog");
 
     for (var k = 0; k < likes.length; k++) {
         likes[k].setAttribute('class', 'btn btn-primary like');
     }
 
     // Update states of Dislike Buttons
-    var dislikes = document.getElementsByClassName("dislike tog");
+    var dislikes = document.querySelectorAll(".dislike.tog");
 
     for (var l = 0; l < dislikes.length; l++) {
         dislikes[l].setAttribute('class', 'btn btn-warning dislike');
@@ -479,15 +479,9 @@ $(document).on("click", '[data-toggle="lightbox"]', function (event) {
 });
 
 $('#wordcloud').ready(function () {
-    var words = [
-        { text: "Lorem", weight: 13 },
-        { text: "Ipsum", weight: 10.5 },
-        { text: "Dolor", weight: 9.4 },
-        { text: "Sit", weight: 8 },
-        { text: "Amet", weight: 6.2 },
-        { text: "Consectetur", weight: 5 },
-        { text: "Adipiscing", weight: 5 }
-    ];
-    $('#wordcloud').jQCloud(words);
-    alert('Word Cloud!');
+    var words = eval($('#wordcloud').attr('data-value'));
+    $('#wordcloud').jQCloud(words, {
+        width: 300,
+        height: 300
+    });
 });

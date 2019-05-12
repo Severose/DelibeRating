@@ -17,31 +17,30 @@
 
 <div class="container">
     <div class="row">
+        <a class="btn btn-success" href="{% url 'create_group_vote' %}?g={{ group.name }}">Start a Vote</a>
+        <a class="btn btn-warning" href="{% url 'group_manage' %}?g={{ group.name }}">Manage Group</a>
+    </div>
+    <br/>
+    <div class="row">
+        <h4><b>Group voting</b></h4>
+    </div>
+    <div class="row">
         <ul>
-            <li><p><h4>Group Voting</h4></p></li>
-            <li><a class="btn btn-success" href="{% url 'create_group_vote' %}?g={{ group.name }}">Start a Vote</a></li>
-            <li><ul>
-                {% for v in active_votes %}
-                <li><a href="{% url 'group_vote' %}?g={{ group.name }}&v={{ v }}" class="dropdown-item" tabIndex="-1">{{ v }}</a></li>
-                {% endfor %}
-            </ul></li>
+            {% for v in active_votes %}
+            <li><a href="{% url 'group_vote' %}?g={{ group.name }}&v={{ v }}" class="btn" tabIndex="-1"><h6>{{ v }}</h6></a></li>
+            {% endfor %}
         </ul>
     </div>
     <br/>
     <div class="row">
+        <h4><b>Group members</b></h4>
+    </div>
+    <div class="row">
         <ul>
-            <li><h4>Group members</h4></li>
-            <li>
-                <ul>
-                    <li><a class="btn btn-warning" href="{% url 'group_manage' %}?g={{ group.name }}">Manage Group</a></li>
-                    <br/>
-                    {% for u in users %}
-                    <li>{{ u.username }}</li>
-                    {% endfor %}
-                </ul>
-            </li>
+            {% for u in users %}
+            <li><a href="{% url 'profile' %}?u={{ u.username }}" class="btn" tabIndex="-1"><h6>{{ u.username }}</h6></a></li>
+            {% endfor %}
         </ul>
-        
     </div>
 </div>
 {% endblock %}

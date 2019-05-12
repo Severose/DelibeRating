@@ -15,12 +15,13 @@
 <div class="container">
     {% if groups %}
     <h4>Your groups:</h4>
+    <br/>
     <div class="row">
         {% if groups %}
         <ul>
             {% for group in groups %}
             <li>
-                <a class="dropdown-item" href="{% url 'group' %}/?g={{ group }}">{{ group }}</a>
+                <a class="btn btn-list" href="{% url 'group' %}/?g={{ group }}"><h6>{{ group }}</h6></a>
             </li>
             {% endfor %}
         </ul>

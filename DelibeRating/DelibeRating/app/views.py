@@ -71,31 +71,38 @@ def add_confidence_scores(user, businesses):
     total = 0.0
     confidence_score = 0.0
 
-    for business in businesses:
-        business['confidence_score'] = get_confidence_score(user, business)
+    try:
+        for business in businesses:
+            if business:
+                business['confidence_score'] = get_confidence_score(user, business)
+    except:
+        businesses = []
 
     return businesses
 
 def get_init_states(page, user, businesses, votes):
-    if page == 'vote':
-        for business in businesses:
-            business['init_up'] = votes[0][business['id']]
-            business['init_down'] = votes[1][business['id']]
+    try:
+        if page == 'vote':
+            for business in businesses:
+                business['init_up'] = votes[0][business['id']]
+                business['init_down'] = votes[1][business['id']]
 
-    else:
-        for business in businesses:
-            if business['id'] in user.stars[:-1].split(','):
-                business['init_star'] = True
-            else:
-                business['init_star'] = False
-            if business['id'] in user.likes[:-1].split(','):
-                business['init_like'] = True
-            else:
-                business['init_like'] = False
-            if business['id'] in user.dislikes[:-1].split(','):
-                business['init_dislike'] = True
-            else:
-                business['init_dislike'] = False
+        else:
+            for business in businesses:
+                if business['id'] in user.stars[:-1].split(','):
+                    business['init_star'] = True
+                else:
+                    business['init_star'] = False
+                if business['id'] in user.likes[:-1].split(','):
+                    business['init_like'] = True
+                else:
+                    business['init_like'] = False
+                if business['id'] in user.dislikes[:-1].split(','):
+                    business['init_dislike'] = True
+                else:
+                    business['init_dislike'] = False
+    except:
+        businesses = []
 
     return businesses
 
@@ -125,6 +132,68 @@ def get_yelp_results(query,location,radius,sortby,pricerange,opennow,attributes)
         cache.set(b['id'], b, 86400)  #TODO: Use DEFAULT_TIMEOUT
 
     return data
+
+def user_function(user, data, query, location):
+    words = []
+    tmp_words = {}
+
+    if user:
+        try:
+            cached_data = cache.get(user.username + '_searches')
+            if not cached_data:
+                cached_data = {}
+        except:
+            cached_data = {}
+
+    try:
+        cached_data_all = cache.get('all_searches')
+        if not cached_data_all:
+            cached_data_all = {}
+    except:
+        cached_data_all = {}
+
+    if user:
+        if query in cached_data:
+            cached_data[query] += 1
+        else:
+            cached_data[query] = 1
+        
+    if query in cached_data_all:
+        cached_data_all[query] += 1
+    else:
+        cached_data_all[query] = 1
+
+    if user:
+        data['businesses'] = add_confidence_scores(user, data['businesses'])
+        data['businesses'] = get_init_states('search', user, data['businesses'], None)
+
+        cache.set(user.username + 'location', location, 2592000) # 30 days
+        cache.set(user.username + '_searches', cached_data, 2592000) # 30 days
+
+        max_search = max(cached_data.items(), key=operator.itemgetter(1))[1]
+
+        for w, v in cached_data.items():
+            word = {}
+            tmp_words[w] = True
+            word['text'] = w.lower()
+            word['weight'] = int(12 * (v / max_search))
+            word['link'] = 'search/?q=' + w + '&loc=' + location + '&rad=8050&sort=best_match&price=1,2,3,4&open=false'
+            words.append(word)
+
+
+    max_search_all = max(cached_data_all.items(), key=operator.itemgetter(1))[1]
+
+    for w, v in cached_data_all.items():
+        if not w in tmp_words:
+            word = {}
+            word['text'] = w.lower()
+            word['weight'] = int(6 * (v / max_search_all))
+            word['link'] = 'search/?q=' + w + '&loc=' + location + '&rad=8050&sort=best_match&price=1,2,3,4&open=false'
+            words.append(word)
+
+    cache.set('all_searches', cached_data_all, 2592000) # 30 days
+
+    return data, words
 
 
 """
@@ -622,8 +691,12 @@ def home(request):
     print("Home View")
     time_form = CustomTimeForm()
     active_votes = []
+    words = []
 
-    location = "Irvine, CA" #Update to use user's preferred location
+    if request.user.is_authenticated():
+        location = cache.get(request.user.username + 'location')
+    else:
+        location = "Irvine, CA"
 
     if request.method == 'GET':
         query = 'food'
@@ -638,10 +711,8 @@ def home(request):
 
         if request.user.is_authenticated():
             user = request.user
-            data['businesses'] = add_confidence_scores(user, data['businesses'])
-            data['businesses'] = get_init_states('home', user, data['businesses'], None)
+            data, words = user_function(user, data, query, location)
 
-            #Use cache to store businesses instead of a Django model
             for g in user.groups.all():
                 v_all = GroupVote.objects.all_active(g.name)
                 for v in v_all:
@@ -649,7 +720,7 @@ def home(request):
                     
         else:
             user = None
-
+            data, words = user_function(None, data, query, location)
 
         shuffle(data['businesses'])
 
@@ -668,6 +739,7 @@ def home(request):
                    'pages': pages,
                    'user': user,
                    'active_votes': active_votes,
+                   'words': words,
                    }
 
         assert isinstance(request, HttpRequest)
@@ -881,6 +953,10 @@ def register(request):
         if form.is_valid():
             print("Register: Form Valid")
             form.save()
+            new_user = auth_authenticate(username=form.cleaned_data['username'],
+                                    password=form.cleaned_data['password1'],
+                                    )
+            auth_login(request, new_user)
             messages.success(request, 'Your account was successfully created!')
             return redirect('/')
         else:
@@ -908,6 +984,7 @@ def search(request):
     print("Search View")
     time_form = CustomTimeForm()
     active_votes = []
+    words = []
 
     if request.method == 'GET':
         query = request.GET.get('q', None)
@@ -917,42 +994,11 @@ def search(request):
         pricerange = request.GET.get('price', None)
         opennow = request.GET.get('open', None)
 
-        if 'q' in request.GET:
-            print(request.GET)
-        else:
-            print('q not found!')
-
-        if 'loc' in request.GET:
-            print(request.GET)
-        else:
-            print('loc not found!')
-
-        if 'rad' in request.GET:
-            print(request.GET)
-        else:
-            print('rad not found!')
-
-        if 'sort' in request.GET:
-            print(request.GET)
-        else:
-            print('sort not found!')
-
-        if 'price' in request.GET:
-            print(request.GET)
-        else:
-            print('price not found!')
-
-        if 'open' in request.GET:
-            print(request.GET)
-        else:
-            print('open not found!')
-
         data = get_yelp_results(query,location,radius,sortby,pricerange,opennow,"")
 
         if request.user.is_authenticated():
             user = request.user
-            data['businesses'] = add_confidence_scores(user, data['businesses'])
-            data['businesses'] = get_init_states('search', user, data['businesses'], None)
+            data, words = user_function(user, data, query, location)
 
             for g in user.groups.all():
                 v_all = GroupVote.objects.all_active(g.name)
@@ -978,6 +1024,7 @@ def search(request):
                    'pages': pages,
                    'group': group,
                    'active_votes': active_votes,
+                   'words': words,
                    }
 
         assert isinstance(request, HttpRequest)
@@ -1028,8 +1075,13 @@ def suggestions(request):
     """
     print("Suggestions View")
     time_form = CustomTimeForm()
-
-    location = "Irvine, CA" #Update to use user's preferred location
+    active_votes = []
+    words = []
+    
+    if request.user.is_authenticated():
+        location = cache.get(request.user.username + 'location')
+    else:
+        location = "Irvine, CA"
 
     if request.method == 'GET':
         query = 'food'
@@ -1038,10 +1090,25 @@ def suggestions(request):
         sortby = 'rating'
         pricerange = '1,2,3,4'
         opennow = 'false'
-        attributes = 'hot_and_new'
+        attributes = 'rating'
 
-        data = get_yelp_results(query,location,radius,sortby,pricerange,opennow,attributes)
-        shuffle(data['businesses'])
+        data = {'businesses': []}
+        
+        if request.user.is_authenticated():
+            user = request.user
+
+            for s in user.stars[:-1].split(','):
+                star = get_cached_business(s)
+                data['businesses'].append(star)
+
+            data, words = user_function(user, data, query, location)
+
+            for g in user.groups.all():
+                v_all = GroupVote.objects.all_active(g.name)
+                for v in v_all:
+                    active_votes.append(v.vote_id)
+        else:
+            user = None
 
         results_page = request.GET.get('page', 1)
         paginator = Paginator(data['businesses'], 12)
@@ -1056,6 +1123,9 @@ def suggestions(request):
                    'location':'Irvine, CA',
                    'time_form': time_form,
                    'pages': pages,
+                   'user': user,
+                   'active_votes': active_votes,
+                   'words': words,
                    }
 
         assert isinstance(request, HttpRequest)
