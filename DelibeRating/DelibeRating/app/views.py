@@ -129,7 +129,7 @@ def get_yelp_results(query,location,radius,sortby,pricerange,opennow,attributes)
 
     # Cache businesses
     for b in data['businesses']:
-        cache.set(b['id'], b, 86400)  #TODO: Use DEFAULT_TIMEOUT
+        cache.set(b['id'], b, 2592000)  #TODO: Use DEFAULT_TIMEOUT
 
     return data
 
@@ -209,7 +209,7 @@ def addopt(request):
         data = json.loads(raw_data)
         vote_opt = VoteOption()
         group_vote = GroupVote.objects.get(data['vote_name'] + '/' + data['element_id'])
-        vote_opt.group_vote = group_vote
+        vote_opt.group_vote_id = data['vote_name']
         vote_opt.opt_id = data['vote_name'] + '/' + data['element_id']
         vote_opt.business_id = data['element_id']
         vote_opt.upvotes = ''
@@ -313,6 +313,55 @@ def star(request):
 
     return HttpResponse(json.dumps(response), content_type='application/json')
 
+def cast_vote(user, data, vote_opt, type, vote_name, element_id):
+    group_vote = GroupVote.objects.get(vote_opt.group_vote_id)
+    vote_counts = []
+    business_names = []
+
+    if type == 0:
+        votes_pri = vote_opt.downvotes
+        votes_sec = vote_opt.upvotes
+        pri = 'vd'
+        sec = 'vu'
+    else:
+        votes_pri = vote_opt.upvotes
+        votes_sec = vote_opt.downvotes
+        pri = 'vu'
+        sec = 'vd'
+
+    if user.username in votes_pri[:-1].split(','):
+        votes_pri = votes_pri.replace(user.username + ',', '')
+        sel = '#' + element_id.split('/')[1]
+        response = {'success': False, 'element_id': sel}
+    else:
+        votes_pri += user.username + ','
+        sel = '#' + element_id.split('/')[1]
+        if user.username in votes_sec[:-1].split(','):
+            votes_sec = votes_sec.replace(user.username + ',', '')
+            response = {'success': True, 'toggled': True, 'element_toggled': sel + sec, 'element_id': sel + pri}
+        else:
+            response = {'success': True, 'toggled': False, 'element_id': sel + pri}
+
+    if type == 0:
+        vote_opt.downvotes = votes_pri
+        vote_opt.upvotes = votes_sec
+    else:
+        vote_opt.upvotes = votes_pri
+        vote_opt.downvotes = votes_sec
+    vote_opt.save()
+
+    vote_options = GroupVote.objects.get_options(group_vote.vote_id)
+    for vo in vote_options:
+        vo_count = VoteOption.objects.vote_count(vo.opt_id)
+        business = get_cached_business(vo.business_id)
+        business_names.append(business['name'])
+        vote_counts.append(vo_count)
+
+    response["chart_labels"] = business_names
+    response["chart_data"] = vote_counts
+
+    return response
+
 @login_required
 @require_POST
 @csrf_exempt
@@ -321,36 +370,9 @@ def downvote(request):
         raw_data = request.body.decode('utf-8')
         data = json.loads(raw_data)
         user = request.user
-        vote_opt = VoteOption.objects.get(data['vote_name'] + '/' + data['element_id'][:-2])
-        group_vote = GroupVote.objects.get(vote_opt.group_vote_id)
-        vote_counts = []
-        business_names = []
+        vote_opt = VoteOption.objects.get(data['element_id'][:-2])
 
-        test = vote_opt.downvotes[:-1].split(',')
-
-        if user.username in vote_opt.downvotes[:-1].split(','):
-            vote_opt.downvotes = vote_opt.downvotes.replace(user.username + ',', '')
-            sel = '#' + data['element_id']
-            response = {'success': False, 'element_id': sel}
-        else:
-            vote_opt.downvotes += user.username + ','
-            sel = '#' + data['element_id']
-            if user.username in vote_opt.upvotes[:-1].split(','):
-                vote_opt.upvotes = vote_opt.upvotes.replace(user.username + ',', '')
-                response = {'success': True, 'toggled': True, 'element_toggled': sel[:-2] + 'vu', 'element_id': sel}
-            else:
-                response = {'success': True, 'toggled': False, 'element_id': sel}
-        vote_opt.save()
-
-        vote_options = GroupVote.objects.get_options(group_vote.vote_id)
-        for vo in vote_options:
-            vo_count = VoteOption.objects.vote_count(vo.opt_id)
-            business = get_cached_business(vo.business_id)
-            business_names.append(business['name'])
-            vote_counts.append(vo_count)
-
-        response["chart_labels"] = business_names
-        response["chart_data"] = vote_counts
+        response = cast_vote(user, data, vote_opt, 0, data['vote_name'], data['element_id'][:-2])
 
     return HttpResponse(json.dumps(response), content_type='application/json')
 
@@ -362,34 +384,9 @@ def upvote(request):
         raw_data = request.body.decode('utf-8')
         data = json.loads(raw_data)
         user = request.user
-        vote_opt = VoteOption.objects.get(data['vote_name'] + '/' + data['element_id'][:-2])
-        group_vote = GroupVote.objects.get(vote_opt.group_vote_id)
-        vote_counts = []
-        business_names = []
+        vote_opt = VoteOption.objects.get(data['element_id'][:-2])
 
-        if user.username in vote_opt.upvotes[:-1].split(','):
-            vote_opt.upvotes = vote_opt.upvotes.replace(user.username + ',', '')
-            sel = '#' + data['element_id']
-            response = {'success': False, 'element_id': sel}
-        else:
-            vote_opt.upvotes += user.username + ','
-            sel = '#' + data['element_id']
-            if user.username in vote_opt.downvotes[:-1].split(','):
-                vote_opt.downvotes = vote_opt.downvotes.replace(user.username + ',', '')
-                response = {'success': True, 'toggled': True, 'element_toggled': sel[:-2] + 'vd', 'element_id': sel}
-            else:
-                response = {'success': True, 'toggled': False, 'element_id': sel}
-        vote_opt.save()
-
-        vote_options = GroupVote.objects.get_options(group_vote.vote_id)
-        for vo in vote_options:
-            vo_count = VoteOption.objects.vote_count(vo.opt_id)
-            business = get_cached_business(vo.business_id)
-            business_names.append(business['name'])
-            vote_counts.append(vo_count)
-
-        response["chart_labels"] = business_names
-        response["chart_data"] = vote_counts
+        response = cast_vote(user, data, vote_opt, 1, data['vote_name'], data['element_id'][:-2])
 
     return HttpResponse(json.dumps(response), content_type='application/json')
 
@@ -474,7 +471,8 @@ def create_group_vote(request):
             group = Group.objects.get(name = groupname)
             cgroup = CustomGroup.objects.get(group.id)
             vote_id = str(group.id) + datetime.datetime.now().strftime("--%m-%d-%y--") + form.cleaned_data["name"]
-            group_vote, created = GroupVote.objects.get_or_create(vote_id, cgroup)
+            name = datetime.datetime.now().strftime("(%m-%d-%y)  ") + form.cleaned_data["name"]
+            group_vote, created = GroupVote.objects.get_or_create(vote_id, name, cgroup)
             if created:
                 messages.success(request, 'Your vote was successfully created!')
             return redirect('group/vote/?g=' + group.name + '&v=' + group_vote.vote_id)
@@ -556,7 +554,7 @@ def group(request):
     
     v_all = GroupVote.objects.all_active(cgroup.name)
     for v in v_all:
-        active_votes.append(v.vote_id)
+        active_votes.append(v.name)
 
     assert isinstance(request, HttpRequest)
     return render(
@@ -657,9 +655,11 @@ def group_vote(request):
         votes = [{},{}]
 
         for opt in vote_options:
-            data.append(get_cached_business(opt.business_id))
-            votes[0][opt.business_id] = user.username in opt.upvotes[:-1].split(',')
-            votes[1][opt.business_id] = user.username in opt.downvotes[:-1].split(',')
+            business = get_cached_business(opt.business_id)
+            if business:
+                data.append(business)
+                votes[0][opt.business_id] = user.username in opt.upvotes[:-1].split(',')
+                votes[1][opt.business_id] = user.username in opt.downvotes[:-1].split(',')
             
         data = add_confidence_scores(user, data)
         data = get_init_states('vote', user, data, votes)
@@ -713,10 +713,13 @@ def home(request):
             user = request.user
             data, words = user_function(user, data, query, location)
 
+            # Remove disliked businesses
+            data['businesses'] = [business for business in data['businesses'] if business['id'] not in user.dislikes[:-1].split(',')]
+
             for g in user.groups.all():
                 v_all = GroupVote.objects.all_active(g.name)
                 for v in v_all:
-                    active_votes.append(v.vote_id)
+                    active_votes.append(v.name)
                     
         else:
             user = None
@@ -826,6 +829,9 @@ def profile(request):
     print("User Profile View")
     time_form = CustomTimeForm()
     groups = []
+    stars = []
+    likes = []
+    dislikes = []
 
     if request.method == 'GET':
         print("User Profile: GET Request")
@@ -842,6 +848,15 @@ def profile(request):
     user = CustomUser.objects.get(username = name)
     for g in user.groups.all():
         groups.append(g.name)
+    for s in user.stars[:-1].split(','):
+        business = get_cached_business(s)
+        stars.append({'name': business['name'], 'link': business['url']})
+    for l in user.likes[:-1].split(','):
+        business = get_cached_business(l)
+        likes.append({'name': business['name'], 'link': business['url']})
+    for d in user.dislikes[:-1].split(','):
+        business = get_cached_business(d)
+        dislikes.append({'name': business['name'], 'link': business['url']})
 
     assert isinstance(request, HttpRequest)
     return render(
@@ -852,6 +867,9 @@ def profile(request):
             'time_form': time_form,
             'user': user,
             'groups': groups,
+            'stars': stars,
+            'likes': likes,
+            'dislikes': dislikes,
         }
     )
 
@@ -1000,10 +1018,13 @@ def search(request):
             user = request.user
             data, words = user_function(user, data, query, location)
 
+            # Remove disliked businesses
+            data['businesses'] = [business for business in data['businesses'] if business['id'] not in user.dislikes[:-1].split(',')]
+
             for g in user.groups.all():
                 v_all = GroupVote.objects.all_active(g.name)
                 for v in v_all:
-                    active_votes.append(v.vote_id)
+                    active_votes.append(v.name)
 
         results_page = request.GET.get('page', 1)
         paginator = Paginator(data['businesses'], 12)

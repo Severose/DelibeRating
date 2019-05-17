@@ -98,18 +98,18 @@ class GroupVoteQuerySet(models.query.QuerySet):
         try:
             with connection.cursor() as cursor:
                 cursor.execute("""
-                    SELECT vote_id, group_id, vote_options
+                    SELECT vote_id, name, group_id, vote_options
 	                FROM public.app_votes
                     WHERE vote_id = %s""", [vid])
                 result_list = []
 
                 for row in cursor.fetchall():
-                    gv = self.model(vote_id=row[0], group_id=row[1], vote_options = row[2])
+                    gv = self.model(vote_id=row[0], name=row[1], group_id=row[2], vote_options = row[3])
             return gv
         except:
             return None
 
-    def get_or_create(self, vid, grp):
+    def get_or_create(self, vid, nam, grp):
         try:
             obj = self.get(vid)
             if obj:
@@ -119,6 +119,7 @@ class GroupVoteQuerySet(models.query.QuerySet):
         except GroupVote.DoesNotExist:
             obj = GroupVote()
             obj.vote_id = vid
+            obj.name = nam
             obj.group = grp
             obj.vote_options = ''
             obj.save()
@@ -141,23 +142,23 @@ class GroupVoteQuerySet(models.query.QuerySet):
     def all_active(self, gid):
         with connection.cursor() as cursor:
             cursor.execute("""
-                SELECT vote_id, group_id, vote_options
+                SELECT vote_id, name, group_id, vote_options
 	            FROM public.app_votes
                 WHERE group_id = %s""", [gid])
             result_list = []
             for row in cursor.fetchall():
-                gv = self.model(vote_id=row[0], group_id=row[1], vote_options = row[2])
+                gv = self.model(vote_id=row[0], name=row[1], group_id=row[2], vote_options = row[3])
                 result_list.append(gv)
         return result_list
 
     def all(self):
         with connection.cursor() as cursor:
             cursor.execute("""
-                SELECT vote_id, group_id, vote_options
+                SELECT vote_id, name, group_id, vote_options
 	            FROM public.app_votes""")
             result_list = []
             for row in cursor.fetchall():
-                gv = self.model(vote_id=row[0], group_id=row[1], vote_options = row[2])
+                gv = self.model(vote_id=row[0], name=row[1], group_id=row[2], vote_options = row[3])
                 result_list.append(gv)
         return result_list
 
@@ -168,8 +169,8 @@ class GroupVoteManager(models.Manager):
     def get(self, vid):
         return self.get_queryset().get(vid)
 
-    def get_or_create(self, vid, grp):
-        return self.get_queryset().get_or_create(vid, grp)
+    def get_or_create(self, vid, nam, grp):
+        return self.get_queryset().get_or_create(vid, nam, grp)
 
     def get_options(self, vid):
         return self.get_queryset().get_options(vid)
@@ -185,6 +186,7 @@ class GroupVote(models.Model):
     """
     # MM-DD-YY--<Name>
     vote_id = models.CharField(max_length=50, primary_key=True)
+    name = models.CharField(max_length=50)
     group = models.ForeignKey(CustomGroup, on_delete=models.CASCADE)
     vote_options = models.CharField(max_length=10000)
 

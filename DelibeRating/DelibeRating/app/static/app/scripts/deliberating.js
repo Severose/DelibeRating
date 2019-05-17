@@ -210,7 +210,7 @@
             url: "/api/upvote",
             data: JSON.stringify({
                 'vote_name': $(this).attr('value'),
-                'element_id': $(this).attr('id')
+                'element_id': $(this).attr('value') + '/' + $(this).attr('id'),
             }),
             dataType: "json",
             success: function (response) {
@@ -279,7 +279,7 @@
             url: "/api/downvote",
             data: JSON.stringify({
                 'vote_name': $(this).attr('value'),
-                'element_id': $(this).attr('id')
+                'element_id': $(this).attr('value') + '/' + $(this).attr('id'),
             }),
             dataType: "json",
             success: function (response) {

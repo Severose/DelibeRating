@@ -10,7 +10,7 @@
 <div class="jumbotron">
     <div class="container">
         <h1 class="display-4">{{ group.name }}</h1>
-        <h2 id="vid" value="{{ group_vote.vote_id }}">{{ group_vote.vote_id }}</h2>
+        <h2 id="vid" value="{{ group_vote.vote_id }}">{{ group_vote.name }}</h2>
         <br/>
         <a class="btn btn-primary" href="{% url 'group' %}?g={{ group.name }}">Back to Group Page</a>
     </div>

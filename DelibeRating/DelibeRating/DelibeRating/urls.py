@@ -34,6 +34,7 @@ urlpatterns = [
     url(r'^group', app_views.group, name='group'),
     url(r'^login/$', app_views.login, name='login'),
     url(r'^logout$', auth_views.logout, {'next_page': '/',}, name='logout'),
+    url(r'^search/random', app_views.randomizer, name='random'),
     url(r'^random', app_views.randomizer, name='random'),
     url(r'^register', app_views.register, name='register'),
     url(r'^password', app_views.password, name='password'),

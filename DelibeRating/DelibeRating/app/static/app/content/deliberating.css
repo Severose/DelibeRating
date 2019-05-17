@@ -1,3 +1,7 @@
+.navbar-brand {
+    margin-left: 4.5rem;
+}
+
 /* headings */
 h1 {
     padding-top: 10px;
@@ -43,13 +47,6 @@ h6 {
     position: relative;
 }
 
-.nav-item {
-    display: inline-block;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-}
-
 .navbar-nav li {
     display: inline;
 }
@@ -93,8 +90,8 @@ div.categories {
 .dropdown-submenu .dropdown-menu {
     top: 0;
     left: 100%;
-    margin-left: .1rem;
-    margin-right: .1rem;
+    margin-left: 0;
+    margin-right: 0;
 }
 
 
@@ -220,7 +217,7 @@ ul {
     list-style-type: none;
 }
 
-ul li:hover ul {
+ul li:hover ul.dmenu {
     display: block;
 }
 
