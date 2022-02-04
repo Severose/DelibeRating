@@ -710,7 +710,7 @@ def home(request):
 
         data = get_yelp_results(query,location,radius,sortby,pricerange,opennow,attributes)
 
-        if request.user.is_authenticated::
+        if request.user.is_authenticated:
             user = request.user
             data, words = user_function(user, data, query, location)
 
