@@ -693,8 +693,9 @@ def home(request):
     active_votes = []
     words = []
 
-    if request.user.is_authenticated():
+    if request.user.is_authenticated::
         location = cache.get(request.user.username + 'location')
+
     else:
         location = "Irvine, CA"
 
@@ -709,7 +710,7 @@ def home(request):
 
         data = get_yelp_results(query,location,radius,sortby,pricerange,opennow,attributes)
 
-        if request.user.is_authenticated():
+        if request.user.is_authenticated::
             user = request.user
             data, words = user_function(user, data, query, location)
 
@@ -1014,7 +1015,7 @@ def search(request):
 
         data = get_yelp_results(query,location,radius,sortby,pricerange,opennow,"")
 
-        if request.user.is_authenticated():
+        if request.user.is_authenticated:
             user = request.user
             data, words = user_function(user, data, query, location)
 

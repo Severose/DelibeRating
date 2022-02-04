@@ -63,7 +63,7 @@ class CustomGroup(models.Model):
     """
     name = models.CharField(max_length=50, primary_key=True)
 
-    group = models.OneToOneField(Group, unique=True)
+    group = models.OneToOneField(Group, unique=True, on_delete=models.CASCADE)
 
     objects = CustomGroupManager()
 

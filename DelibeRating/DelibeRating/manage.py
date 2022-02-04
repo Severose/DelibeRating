@@ -6,6 +6,15 @@ Command-line utility for administrative tasks.
 import os
 import sys
 
+
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+        'LOCATION': 'deliberating_cache_table',
+    }
+}
+
 if __name__ == "__main__":
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "DelibeRating.settings.dev")
     try:

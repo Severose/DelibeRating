@@ -1,1 +1,22 @@
-django >=1.9, <2
+certifi
+chardet
+django-crispy_forms
+django>=2.2.24
+django_crispy_forms
+django-dotenv
+django_mathfilters
+django-resources
+django_secretballot
+django_tempus_dominus
+django-tests
+django_vote
+idna
+pip
+psycopg2
+pytest
+python_dotenv
+pytz
+requests
+setuptools
+urllib3
+yelpapi

@@ -33,7 +33,7 @@ urlpatterns = [
     url(r'^group/vote', app_views.group_vote, name='group_vote'),
     url(r'^group', app_views.group, name='group'),
     url(r'^login/$', app_views.login, name='login'),
-    url(r'^logout$', auth_views.logout, {'next_page': '/',}, name='logout'),
+    url(r'^logout$', auth_views.auth_logout, {'next_page': '/',}, name='logout'),
     url(r'^search/random', app_views.randomizer, name='random'),
     url(r'^random', app_views.randomizer, name='random'),
     url(r'^register', app_views.register, name='register'),
@@ -49,5 +49,5 @@ urlpatterns = [
     url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
 
     # Uncomment the next line to enable the admin:
-    url(r'^admin/', include(admin.site.urls)),
+    url(r'^admin/', admin.site.urls),
 ]
