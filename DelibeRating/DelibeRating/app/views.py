@@ -693,7 +693,7 @@ def home(request):
     active_votes = []
     words = []
 
-    if request.user.is_authenticated::
+    if request.user.is_authenticated:
         location = cache.get(request.user.username + 'location')
 
     else:
