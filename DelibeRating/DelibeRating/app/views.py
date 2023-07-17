@@ -41,6 +41,10 @@ yelp_api = YelpAPI(settings.API_KEY, timeout_s=3.0)
 View helper functions
 """
 
+# Working around the deprecation of request.is_ajax()
+def is_ajax(request):
+    return request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest'
+
 def get_cached_business(id):
     if cache.get(str(id)):
         print("Using cached results!")
@@ -208,8 +212,11 @@ def addopt(request):
         raw_data = request.body.decode('utf-8')
         data = json.loads(raw_data)
         vote_opt = VoteOption()
-        group_vote = GroupVote.objects.get(data['vote_name'] + '/' + data['element_id'])
-        vote_opt.group_vote_id = data['vote_name']
+        print("Data: ", data)
+        group_vote = GroupVote.objects.get(data['vote_name'])
+        # vote_opt.group_vote_id = data['vote_name']
+        print("Retrieved Group Vote: ", group_vote)
+        vote_opt.group_vote = group_vote
         vote_opt.opt_id = data['vote_name'] + '/' + data['element_id']
         vote_opt.business_id = data['element_id']
         vote_opt.upvotes = ''
@@ -335,7 +342,7 @@ def cast_vote(user, data, vote_opt, type, vote_name, element_id):
         response = {'success': False, 'element_id': sel}
     else:
         votes_pri += user.username + ','
-        sel = '#' + element_id.split('/')[1]
+        sel = '#' + element_id
         if user.username in votes_sec[:-1].split(','):
             votes_sec = votes_sec.replace(user.username + ',', '')
             response = {'success': True, 'toggled': True, 'element_toggled': sel + sec, 'element_id': sel + pri}
@@ -369,8 +376,9 @@ def downvote(request):
     if request.method == 'POST':
         raw_data = request.body.decode('utf-8')
         data = json.loads(raw_data)
+        print('Downvote data: ', data)
         user = request.user
-        vote_opt = VoteOption.objects.get(data['element_id'][:-2])
+        vote_opt = VoteOption.objects.get(data['vote_name'], data['element_id'][:-2])
 
         response = cast_vote(user, data, vote_opt, 0, data['vote_name'], data['element_id'][:-2])
 
@@ -383,8 +391,9 @@ def upvote(request):
     if request.method == 'POST':
         raw_data = request.body.decode('utf-8')
         data = json.loads(raw_data)
+        print('Upvote data: ', data)
         user = request.user
-        vote_opt = VoteOption.objects.get(data['element_id'][:-2])
+        vote_opt = VoteOption.objects.get(data['vote_name'], data['element_id'][:-2])
 
         response = cast_vote(user, data, vote_opt, 1, data['vote_name'], data['element_id'][:-2])
 
@@ -397,19 +406,24 @@ def update_chart(request):
     if request.method == 'POST':
         raw_data = request.body.decode('utf-8')
         data = json.loads(raw_data)
-        user = request.user
-        group_vote = GroupVote.objects.get(data['vote_name'])
-        vote_counts = []
-        business_names = []
+        if data:
+            user = request.user
+            print(f"Data: {data}")
+            group_vote = GroupVote.objects.get(data['vote_name'])
+            vote_counts = []
+            business_names = []
 
-        vote_options = GroupVote.objects.get_options(group_vote.vote_id)
-        for vo in vote_options:
-            vo_count = VoteOption.objects.vote_count(vo.opt_id)
-            business = get_cached_business(vo.business_id)
-            business_names.append(business['name'])
-            vote_counts.append(vo_count)
+            print(f"Getting vote options for {group_vote.vote_id}")
+            vote_options = GroupVote.objects.get_options(group_vote.vote_id)
+            for vo in vote_options:
+                vo_count = VoteOption.objects.vote_count(vo.opt_id)
+                business = get_cached_business(vo.business_id)
+                business_names.append(business['name'])
+                vote_counts.append(vo_count)
 
-        response = {'success': True, 'chart_labels': business_names, 'chart_data': vote_counts}
+            response = {'success': True, 'chart_labels': business_names, 'chart_data': vote_counts}
+        else:
+            response = {'success': False}
 
     return HttpResponse(json.dumps(response), content_type='application/json')
 
@@ -472,9 +486,12 @@ def create_group_vote(request):
             cgroup = CustomGroup.objects.get(group.id)
             vote_id = str(group.id) + datetime.datetime.now().strftime("--%m-%d-%y--") + form.cleaned_data["name"]
             name = datetime.datetime.now().strftime("(%m-%d-%y)  ") + form.cleaned_data["name"]
+            print(f"Data: {(vote_id, name, cgroup)}")
             group_vote, created = GroupVote.objects.get_or_create(vote_id, name, cgroup)
             if created:
                 messages.success(request, 'Your vote was successfully created!')
+            else:
+                messages.error(request, "Vote creation failed!")
             return redirect('group/vote/?g=' + group.name + '&v=' + group_vote.vote_id)
         else:
             print("Create Vote: Form Invalid")
@@ -851,13 +868,16 @@ def profile(request):
         groups.append(g.name)
     for s in user.stars[:-1].split(','):
         business = get_cached_business(s)
-        stars.append({'name': business['name'], 'link': business['url']})
+        if business:
+            stars.append({'name': business['name'], 'link': business['url']})
     for l in user.likes[:-1].split(','):
         business = get_cached_business(l)
-        likes.append({'name': business['name'], 'link': business['url']})
+        if business:
+            likes.append({'name': business['name'], 'link': business['url']})
     for d in user.dislikes[:-1].split(','):
         business = get_cached_business(d)
-        dislikes.append({'name': business['name'], 'link': business['url']})
+        if business:
+            dislikes.append({'name': business['name'], 'link': business['url']})
 
     assert isinstance(request, HttpRequest)
     return render(
@@ -1100,7 +1120,7 @@ def suggestions(request):
     active_votes = []
     words = []
     
-    if request.user.is_authenticated():
+    if request.user.is_authenticated:
         location = cache.get(request.user.username + 'location')
     else:
         location = "Irvine, CA"
@@ -1116,7 +1136,7 @@ def suggestions(request):
 
         data = {'businesses': []}
         
-        if request.user.is_authenticated():
+        if request.user.is_authenticated:
             user = request.user
 
             for s in user.stars[:-1].split(','):
@@ -1186,7 +1206,7 @@ def voting(request):
 
 @login_required
 def user_autocomplete(request):
-    if request.is_ajax():
+    if is_ajax(request):
         if 'term' in request.GET:
             print(request.GET)
             q = request.GET.get('term', '')
@@ -1205,7 +1225,7 @@ def user_autocomplete(request):
     return HttpResponse(data, 'application/json')
 
 def yelp_autocomplete(request):
-    if request.is_ajax():
+    if is_ajax(request):
         if 'term' in request.GET:
             print(request.GET)
             q = request.GET.get('term', '').capitalize()

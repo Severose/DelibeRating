@@ -7,7 +7,7 @@ from django import forms
 from app.models import *
 from django.forms import ModelForm
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm, UserChangeForm, PasswordChangeForm
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from tempus_dominus.widgets import TimePicker
 
 class CustomGroupCreationForm(ModelForm):

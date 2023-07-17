@@ -10,7 +10,7 @@
     {% endif %}
 
     {% for i in pages %}
-    <li class="page-item{% ifequal i results.number %}{% else %} active{% endifequal %}">
+    <li class="page-item{% if i == results.number %}{% else %} active{% endif %}">
         <a class="page-link" href="?page={{ i }}&g={{ group.name }}&v={{ group_vote.vote_id }}">{{ i }}</a>
     </li>
     {% endfor %}

@@ -12,7 +12,7 @@
     {% endif %}
 
     {% for i in pages %}
-    <li class="page-item{% ifequal i results.number %}{% else %} active{% endifequal %}">
+    <li class="page-item{% if i == results.number %}{% else %} active{% endif %}">
         <a class="page-link" href="?csrfmiddlewaretoken={{ csrf_token }}&q={{ query }}&loc={{ location }}&rad={{ radius }}&sort={{ sortby }}&price={{ pricerange }}&open={{ opennow }}&page={{ i }}">{{ i }}</a>
     </li>
     {% endfor %}

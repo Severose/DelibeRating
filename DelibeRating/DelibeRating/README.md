@@ -8,18 +8,20 @@ DelibeRating is a Django web app that aims to make decision-making easier for in
 1. Install project dependencies:
     $ pip install -r requirements.txt
     
-2. Apply the migrations:
-    $ python manage.py migrate
-    
-3. Install PostgreSQL, then create two databases 'deliberating' & 'deliberating_cache_table', and a user.
+2. Install PostgreSQL, then create a database 'deliberating', and a user ('nathanrcobb' by default) with the ability to login and create tables.
 
-4. Create the cache:
+3. (Temporarily) In this database, create tables 'deliberating_cache_table' and 'app_customuser' (with 'username' primary key).
+
+4. Apply the migrations:
+    $ python manage.py migrate
+
+5. Create the cache:
     $ python manage.py createcachetable
 
-5. Obtain a Yelp Fusion API Key.
+6. Obtain a Yelp Fusion API Key.
 
-6. Update the dev.json file according to your environment.
+7. Update the dev.json file according to your environment.
 
-7. You can now, finally, run the development server with:
+8. You can now, finally, run the development server with:
 
     $ python manage.py runserver

@@ -8,6 +8,28 @@ from django.db import models, connection
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
+class CustomUser(AbstractUser):
+    """Custom User Model, extending AbstractUser
+        username, email, password, first_name, last_name, groups
+    """
+    username = models.CharField(max_length=20, primary_key=True)
+    email = models.CharField(max_length=100)
+    password = models.CharField(max_length=40)
+    first_name = models.CharField(max_length=20)
+    last_name = models.CharField(max_length=20)
+    stars = models.CharField(max_length=10000)
+    likes = models.CharField(max_length=10000)
+    tastes = models.CharField(max_length=50000, default='{}')
+    dislikes = models.CharField(max_length=10000)
+
+    class Meta:
+        managed = False
+        db_table = 'app_customuser'
+        #Implement for delete user
+        #permissions = (
+        #    ('delete', 'can delete')
+        #    )
+
 class CustomGroupQuerySet(models.query.QuerySet):
     def get(self, gid):
         try:
@@ -71,28 +93,6 @@ class CustomGroup(models.Model):
         ordering = ['name']
         db_table = 'app_customgroup'
 
-class CustomUser(AbstractUser):
-    """Custom User Model, extending AbstractUser
-        username, email, password, first_name, last_name, groups
-    """
-    username = models.CharField(max_length=20, primary_key=True)
-    email = models.CharField(max_length=100)
-    password = models.CharField(max_length=40)
-    first_name = models.CharField(max_length=20)
-    last_name = models.CharField(max_length=20)
-    stars = models.CharField(max_length=10000)
-    likes = models.CharField(max_length=10000)
-    tastes = models.CharField(max_length=50000, default='{}')
-    dislikes = models.CharField(max_length=10000)
-
-    class Meta:
-        managed = False
-        db_table = 'app_customuser'
-        #Implement for delete user
-        #permissions = (
-        #    ('delete', 'can delete')
-        #    )
-
 class GroupVoteQuerySet(models.query.QuerySet):
     def get(self, vid):
         try:
@@ -101,7 +101,6 @@ class GroupVoteQuerySet(models.query.QuerySet):
                     SELECT vote_id, name, group_id, vote_options
 	                FROM public.app_votes
                     WHERE vote_id = %s""", [vid])
-                result_list = []
 
                 for row in cursor.fetchall():
                     gv = self.model(vote_id=row[0], name=row[1], group_id=row[2], vote_options = row[3])
@@ -111,12 +110,14 @@ class GroupVoteQuerySet(models.query.QuerySet):
 
     def get_or_create(self, vid, nam, grp):
         try:
+            print(f"Getting {vid}")
             obj = self.get(vid)
             if obj:
                 return obj, False
             else:
                 raise GroupVote.DoesNotExist
         except GroupVote.DoesNotExist:
+            print("Group doesn't exist")
             obj = GroupVote()
             obj.vote_id = vid
             obj.name = nam
@@ -196,13 +197,13 @@ class GroupVote(models.Model):
         db_table = 'app_votes'
 
 class VoteOptionQuerySet(models.query.QuerySet):
-    def get(self, oid):
+    def get(self, gvid, oid):
         try:
             with connection.cursor() as cursor:
                 cursor.execute("""
                     SELECT opt_id, group_vote_id, business_id, upvotes, downvotes
 	                FROM public.app_vote_options
-                    WHERE opt_id = %s""", [oid])
+                    WHERE group_vote_id = %s AND opt_id = %s""", [gvid, oid])
                 result_list = []
 
                 for row in cursor.fetchall():
@@ -237,8 +238,8 @@ class VoteOptionManager(models.Manager):
     def get_queryset(self):
         return VoteOptionQuerySet(self.model)
 
-    def get(self, oid):
-        return self.get_queryset().get(oid)
+    def get(self, gvid, oid):
+        return self.get_queryset().get(gvid, oid)
 
     def vote_count(self, oid):
         return self.get_queryset().vote_count(oid)
