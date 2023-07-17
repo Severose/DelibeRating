@@ -14,6 +14,7 @@ from app.forms import *
 from django.contrib.auth import authenticate as auth_authenticate
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth import login as auth_login
+from django.contrib.auth import logout as auth_logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.admin.views.decorators import staff_member_required
 from django.views.decorators.csrf import csrf_exempt
@@ -217,7 +218,7 @@ def addopt(request):
         # vote_opt.group_vote_id = data['vote_name']
         print("Retrieved Group Vote: ", group_vote)
         vote_opt.group_vote = group_vote
-        vote_opt.opt_id = data['vote_name'] + '/' + data['element_id']
+        vote_opt.opt_id = data['element_id']
         vote_opt.business_id = data['element_id']
         vote_opt.upvotes = ''
         vote_opt.downvotes = ''
@@ -338,7 +339,7 @@ def cast_vote(user, data, vote_opt, type, vote_name, element_id):
 
     if user.username in votes_pri[:-1].split(','):
         votes_pri = votes_pri.replace(user.username + ',', '')
-        sel = '#' + element_id.split('/')[1]
+        sel = '#' + element_id
         response = {'success': False, 'element_id': sel}
     else:
         votes_pri += user.username + ','
@@ -521,7 +522,7 @@ def group(request):
     """
     print("Group View")
     time_form = CustomTimeForm()
-    active_votes = []
+    active_votes = {}
 
     if request.method == 'GET':
         print("Group: GET Request")
@@ -571,7 +572,7 @@ def group(request):
     
     v_all = GroupVote.objects.all_active(cgroup.name)
     for v in v_all:
-        active_votes.append(v.name)
+        active_votes.update({v.vote_id: v.name})
 
     assert isinstance(request, HttpRequest)
     return render(
@@ -665,8 +666,11 @@ def group_vote(request):
         groupname = request.GET.get('g', None)
         groupvoteid = request.GET.get('v', None)
         user = request.user
-        group = Group.objects.get(name = groupname)
+        group = Group.objects.get(name=groupname)
         cgroup = CustomGroup.objects.get(group.id)
+        # Convert name to vote ID
+        if groupvoteid:
+            groupvoteid = groupvoteid.replace('(', '-').replace(')  ', '--')
         group_vote = GroupVote.objects.get(groupvoteid)
         vote_options = GroupVote.objects.get_options(groupvoteid)
         votes = [{},{}]
@@ -707,7 +711,7 @@ def home(request):
     """
     print("Home View")
     time_form = CustomTimeForm()
-    active_votes = []
+    active_votes = {}
     words = []
 
     if request.user.is_authenticated:
@@ -737,7 +741,7 @@ def home(request):
             for g in user.groups.all():
                 v_all = GroupVote.objects.all_active(g.name)
                 for v in v_all:
-                    active_votes.append(v.name)
+                    active_votes.update({v.vote_id: v.name})
                     
         else:
             user = None
@@ -804,6 +808,10 @@ def login(request):
             'time_form': time_form,
         }
     )
+
+def logout(request):
+    auth_logout(request)
+    return redirect('/')
 
 @login_required
 def password(request):
@@ -886,7 +894,7 @@ def profile(request):
         {
             'title':'Profile',
             'time_form': time_form,
-            'user': user,
+            'profile': user,
             'groups': groups,
             'stars': stars,
             'likes': likes,
@@ -1022,7 +1030,7 @@ def search(request):
     """
     print("Search View")
     time_form = CustomTimeForm()
-    active_votes = []
+    active_votes = {}
     words = []
 
     if request.method == 'GET':
@@ -1045,7 +1053,7 @@ def search(request):
             for g in user.groups.all():
                 v_all = GroupVote.objects.all_active(g.name)
                 for v in v_all:
-                    active_votes.append(v.name)
+                    active_votes.update({v.vote_id: v.name})
 
         results_page = request.GET.get('page', 1)
         paginator = Paginator(data['businesses'], 12)
@@ -1117,7 +1125,7 @@ def suggestions(request):
     """
     print("Suggestions View")
     time_form = CustomTimeForm()
-    active_votes = []
+    active_votes = {}
     words = []
     
     if request.user.is_authenticated:
@@ -1148,7 +1156,7 @@ def suggestions(request):
             for g in user.groups.all():
                 v_all = GroupVote.objects.all_active(g.name)
                 for v in v_all:
-                    active_votes.append(v.vote_id)
+                    active_votes.update({v.vote_id: v.name})
         else:
             user = None
 

@@ -49,8 +49,8 @@
                 <ul class="dropdown-menu">
                     <li class="dropdown-submenu">
                         <ul>
-                            {% for v in active_votes %}
-                            <li><a id="{{ element.id }}" href="#" class="dropdown-item vote-opt" tabIndex="-1" value="{{ v }}">{{ v }}</a></li>
+                            {% for k, v in active_votes.items %}
+                            <li><a id="{{ element.id }}" href="#" class="dropdown-item vote-opt" tabIndex="-1" value="{{ k }}">{{ v }}</a></li>
                             {% endfor %}
                         </ul>
                     </li>
