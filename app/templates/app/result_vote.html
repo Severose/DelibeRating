@@ -1,0 +1,50 @@
+﻿<!--
+{'id': 'omgqdRCtv0X9IZ9mqH1qIA',
+'alias': 'carls-jr-irvine-7',
+'name': "Carl's Jr.",
+'image_url': 'https://s3-media1.fl.yelpcdn.com/bphoto/aprqHVojIBzgKwmedDvEtg/o.jpg',
+'is_closed': False,
+'url': 'https://www.yelp.com/biz/carls-jr-irvine-7?adjust_creative=tKYz_d_z71DeYreiDbTsEw&utm_campaign=yelp_api_v3&utm_medium=api_v3_business_search&utm_source=tKYz_d_z71DeYreiDbTsEw',
+'review_count': 60,
+'categories': [{'alias': 'hotdogs', 'title': 'Fast Food'}, {'alias': 'burgers', 'title': 'Burgers'}],
+'rating': 2.5,
+'coordinates': {'latitude': 33.6758945, 'longitude': -117.7945514},
+'transactions': ['delivery', 'pickup'],
+'price': '$',
+'location': {'address1': '4960 Barranca Pkwy', 'address2': '', 'address3': '', 'city': 'Irvine', 'zip_code': '92604', 'country': 'US', 'state': 'CA', 'display_address': ['4960 Barranca Pkwy', 'Irvine, CA 92604']},
+'phone': '+19495590882',
+'display_phone': '(949) 559-0882',
+'distance': 320.41475858270235}    
+-->
+{% load static %}
+
+<div class="thumbnail" value="{{ element.confidence_score }}">
+    <a href="{{ element.url }}">
+        <img class="resize_fit_center" src="{% if element.image_url %}{{ element.image_url }}{% else %}{% static 'images/no_photo.png' %}{% endif %}" alt="">
+    </a>
+    <div class="caption">
+        <h5><a href="{{ element.url }}">{{ element.name }}     </a></h5>
+
+        <div class="categories">{% for category in element.categories %}
+            {{ category.title }} &nbsp;
+        {% endfor %}</div>
+
+        {% include 'app/star_rating.html' %}
+        <p class="price">
+            <b>{{ element.price }}</b>
+        </p>
+
+        <p class="address">{% for i in element.location.display_address %}
+            {{ i }}<br/>
+        {% endfor %}</p>
+
+        <p class="phone">{{ element.display_phone }}</p>
+
+        <div class="row">
+            {% if user.is_authenticated %}
+            <button class="btn btn-secondary upvote{% if element.init_up %} tog{% endif %}" id="{{ element.id }}vu" value="{{ group_vote.vote_id }}">↑</button>
+            <button class="btn btn-secondary downvote{% if element.init_down %} tog{% endif %}" id="{{ element.id }}vd" value="{{ group_vote.vote_id }}">↓</button>
+            {% endif %}
+        </div>
+    </div>
+</div>

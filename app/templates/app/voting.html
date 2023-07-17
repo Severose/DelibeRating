@@ -1,0 +1,35 @@
+{% extends "app/layout.html" %}
+
+{% include 'app/messages.html' %}
+{% include 'app/form_errors.html' %}
+
+{% block content %}
+<div class="jumbotron">
+    <div class="container">
+        <h1 class="display-4">Group Voting</h1>
+        <p class="lead">Select a group below, or create one to start voting!</p>
+        <a class="btn btn-secondary" href="{% url 'create_group' %}">Create Group</a>
+    </div>
+</div>
+
+<div class="container">
+    {% if groups %}
+    <h4>Your groups:</h4>
+    <br/>
+    <div class="row">
+        {% if groups %}
+        <ul>
+            {% for group in groups %}
+            <li>
+                <a class="btn btn-list" href="{% url 'group' %}/?g={{ group }}"><h6>{{ group }}</h6></a>
+            </li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+    </div>
+    {% else %}
+    <h4>You are not in any groups!</h4>
+
+    {% endif %}
+</div>
+{% endblock %}

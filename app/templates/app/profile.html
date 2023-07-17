@@ -1,0 +1,77 @@
+{% extends "app/layout.html" %}
+
+{% load crispy_forms_tags %}
+{% load static %}
+
+{% include 'app/messages.html' %}
+
+{% block content %}
+
+<div class="jumbotron">
+    <div class="container">
+        <div class="row">
+            <img src="{% static 'images/no_user_photo.jpg' %}" alt="" height="200" width="200">
+        </div>
+        <div class="row">
+            <h3><b>{{ profile.first_name }} {{ profile.last_name }}</b></h3>
+        </div>
+    </div>
+</div>
+<br/>
+
+<div class="container">
+    <div class="row">
+        <h4><b>Username: </b>{{ profile.username }}</h4>
+    </div>
+    <br/>
+    <div class="row">
+        <button class="btn btn-secondary" data-toggle="collapse" data-target="#stars">Stars</button>
+    </div>
+    <br/>
+    <div id="stars" class="row collapse">
+        <ul>
+            {% for s in stars %}
+                <li><a href="{{ s.link }}"><h6>{{ s.name }}</h6></a></li>
+            {% endfor %}
+        </ul>
+    </div>
+    <div class="row">
+        <button class="btn btn-secondary" data-toggle="collapse" data-target="#likes">Likes</button>
+    </div>
+    <br/>
+    <div id="likes" class="row collapse">
+        <ul>
+            {% for l in likes %}
+                <li><a href="{{ l.link }}"><h6>{{ l.name }}</h6></a></li>
+            {% endfor %}
+        </ul>
+    </div>
+    <div class="row">
+        <button class="btn btn-secondary" data-toggle="collapse" data-target="#dislikes">Dislikes</button>
+    </div>
+    <br/>
+    <div id="dislikes" class="row collapse">
+        <ul>
+            {% for d in dislikes %}
+                <li><a href="{{ d.link }}"><h6>{{ d.name }}</h6></a></li>
+            {% endfor %}
+        </ul>
+    </div>
+    <br/>
+    <div class="row">
+        <h4><b>Groups: </b></h4>
+    </div>
+    <br/>
+    <div class="row">
+        <ul>
+            {% for g in groups %}
+                <li><a href="{% url 'group' %}?g={{ g }}"><h6>{{ g }}</h6></a></li>
+            {% endfor %}
+        </ul>
+    </div>
+    <br/>
+    <!--<div class="row">
+        <a class="btn btn-danger" href="{# url 'delete_user' #}?u={# user.username #}" tabIndex="-1">Delete my account</a>
+    </div>-->
+</div>
+{% endblock %}
