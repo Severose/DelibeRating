@@ -13,7 +13,7 @@ django_vote
 django-heroku
 idna
 pip
-psycopg2
+psycopg2-binary
 pytest
 python_dotenv
 pytz
