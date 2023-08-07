@@ -1,6 +1,10 @@
 # Introduction
 
-DelibeRating is a Django web app that aims to make decision-making easier for individuals and groups trying to decide where to eat.
+DelibeRating is a Django web app that aims to help groups of people make decisions regarding where to eat.
+
+This was my first attempt at a web app written in Django, so the code definitely isn't pretty, isn't well-tested, and does not follow industry standards by any means.
+
+If I wrote the app from the ground up today, it would be much different, and is something I intend to do in the future.
 
 
 # Getting Started
