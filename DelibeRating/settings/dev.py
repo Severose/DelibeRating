@@ -4,14 +4,15 @@ from .base import *
 DEBUG = True
 
 with open(os.path.join(BASE_DIR, 'settings/dev.json')) as settings_vars_file:
-    settings_vars = json.load(settings_vars_file)
+  settings_vars = json.load(settings_vars_file)
+
 
 def get_var(setting, vars=settings_vars):
-    """Get setting or fail with ImproperlyConfigured"""
-    try:
-        return vars[setting]
-    except KeyError:
-        raise ImproperlyConfigured("Set the {} setting".format(setting))
+  """Get setting or fail with ImproperlyConfigured"""
+  try:
+    return vars[setting]
+  except KeyError:
+    raise ImproperlyConfigured("Set the {} setting".format(setting))
 
 
 # SECURITY WARNING: keep the secret key used in production secret!
@@ -31,7 +32,7 @@ DATABASES = {
         'USER': DB_USER,
         'PASSWORD': DB_PASS,
         'HOST': '127.0.0.1',
-        'PORT': '5433',
+        'PORT': '5432',
     }
 }
 
